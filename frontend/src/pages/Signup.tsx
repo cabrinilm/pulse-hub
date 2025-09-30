@@ -1,8 +1,8 @@
 import { useState } from 'react';
-import { supabase } from '../services/supabase';
+import { supabase } from '../services/supabaseCliente';
 import { useNavigate } from 'react-router-dom';
 
-function Signup() {
+export default function Signup() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [username, setUsername] = useState('');
@@ -106,4 +106,3 @@ function Signup() {
   );
 }
 
-export default Signup;

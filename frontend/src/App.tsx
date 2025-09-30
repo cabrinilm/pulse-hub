@@ -1,12 +1,18 @@
-
+import { BrowserRouter, Route, Routes } from 'react-router-dom';
+import Signup from './pages/Signup';
+// import Login from './pages/Login';
 
 function App() {
   return (
-    <div className="text-blue-500 text-center p-4">
-      Welcome to PulseHub
-    </div>
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<div className="text-blue-500 text-center p-4">Welcome to PulseHub</div>} />
+        <Route path="/signup" element={<Signup />} />
+        {/* <Route path="/login" element={<Login />} /> */}
+      </Routes>
+    </BrowserRouter>
   );
 }
-export default App;
 
+export default App;
 
