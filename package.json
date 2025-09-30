@@ -3,9 +3,12 @@
   "version": "1.0.0",
   "description": "PulseHub: Community event platform with React/TypeScript frontend and Node/Express backend",
   "private": true,
-  "workspaces": ["frontend", "backend"],
+  "workspaces": [
+    "frontend",
+    "backend"
+  ],
   "scripts": {
-    "dev": "npm run dev --workspaces",
+    "dev": "concurrently \"npm run dev --workspace frontend\" \"npm run dev --workspace backend\"",
     "build": "npm run build --workspaces",
     "lint": "npm run lint --workspaces"
   },
@@ -13,7 +16,13 @@
     "type": "git",
     "url": "git+https://github.com/cabrinilm/pulse-hub.git"
   },
-  "keywords": ["community", "events", "react", "express", "supabase"],
+  "keywords": [
+    "community",
+    "events",
+    "react",
+    "express",
+    "supabase"
+  ],
   "author": "cabrinilm",
   "license": "ISC",
   "type": "module",
@@ -22,11 +31,12 @@
   },
   "homepage": "https://github.com/cabrinilm/pulse-hub#readme",
   "devDependencies": {
-    "typescript": "^5.5.4",
+    "concurrently": "^9.2.1",
     "eslint": "^8.57.0",
-    "prettier": "^3.3.3",
     "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-node": "^11.1.0",
     "eslint-plugin-react": "^7.35.0",
-    "eslint-plugin-node": "^11.1.0"
+    "prettier": "^3.3.3",
+    "typescript": "^5.5.4"
   }
 }
