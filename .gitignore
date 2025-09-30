@@ -416,3 +416,21 @@ FodyWeavers.xsd
 *.msix
 *.msm
 *.msp
+
+
+# Node modules
+node_modules/
+package-lock.json
+
+# Environment variables
+.env
+
+# Build outputs
+dist/
+build/
+
+# Vite cache
+.vite/
+
+# Local dev
+*.log
