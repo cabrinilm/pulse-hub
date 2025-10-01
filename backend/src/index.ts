@@ -1,7 +1,8 @@
 import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
-import { supabase } from './services/supabaseClient';
+import { supabase } from './services/supabaseClient.ts';
+
 
 dotenv.config();
 const app = express();
