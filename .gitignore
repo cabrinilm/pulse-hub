@@ -434,3 +434,5 @@ build/
 
 # Local dev
 *.log
+
+*get-jwt.js
