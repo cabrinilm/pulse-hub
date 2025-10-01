@@ -2,6 +2,7 @@ import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import { supabase } from './services/supabaseClient.ts';
+import { ProfileController } from './controllers/ProfileController.ts';
 
 
 dotenv.config();
@@ -49,6 +50,9 @@ app.post('/api/signup', async (req, res) => {
     res.status(400).json({ error: 'User creation failed' });
   }
 });
+
+app.post('/api/profile', ProfileController.create);
+app.get('/api/profile', ProfileController.get);
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {

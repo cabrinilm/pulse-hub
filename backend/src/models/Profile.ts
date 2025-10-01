@@ -1,4 +1,4 @@
-import { supabase } from '../services/supabaseClient';
+import { supabase } from '../services/supabaseClient.ts';
 import type { PostgrestError } from '@supabase/supabase-js';
 
 // Define TypeScript interface for Profile

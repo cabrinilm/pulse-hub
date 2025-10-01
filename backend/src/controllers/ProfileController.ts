@@ -1,6 +1,8 @@
-import {Request, Response} from 'express'
-import { supabase } from '../services/supabaseClient'
-import { ProfileModel } from '../models/Profile'
+
+import { supabase } from '../services/supabaseClient.ts';
+import { ProfileModel } from '../models/Profile.ts'
+import type { Request, Response } from 'express';
+
 
 
 export class ProfileController {
