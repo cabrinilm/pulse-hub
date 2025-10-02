@@ -33,7 +33,7 @@ describe('Profile Routes (Integration)', () => {
     await userSupabase.from('profiles').delete().eq('user_id', userId);
   });
 
-  it.only('should create profile with valid username and token', async () => {
+  it('should create profile with valid username and token', async () => {
     const username = `u${Date.now()}`;
     console.log(username, '<pppp')
     const response = await request(app)
@@ -111,12 +111,13 @@ describe('Profile Routes (Integration)', () => {
     expect(response.headers['access-control-allow-origin']).toBe('*');
   });
 
-  it('should return 404 if profile not found', async () => {
+  it.only('should return 404 if profile not found', async () => {
+
     const response = await request(app)
       .get('/api/profile')
       .set('Authorization', `Bearer ${process.env.SUPABASE_BEARER_TOKEN}`)
       .set('Content-Type', 'application/json');
-
+    
     expect(response.status).toBe(404);
     expect(response.body).toHaveProperty('error', 'Profile not found');
     expect(response.headers['content-type']).toMatch(/application\/json/);
