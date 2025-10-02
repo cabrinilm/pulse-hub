@@ -4,7 +4,7 @@ import { ProfileModel } from '../models/ProfileModel';
 import type { Request, Response } from 'express';
 
 const supabaseUrl = process.env.SUPABASE_URL!;
-const supabaseKey = process.env.SUPABASE_ANON_KEY!; // qualquer key serve para inicializar
+const supabaseKey = process.env.SUPABASE_ANON_KEY!; 
 
 export class ProfileController {
   static async create(req: Request, res: Response) {
