@@ -1,7 +1,7 @@
 
-import { supabase } from '../services/supabaseClient.ts';
 import { ProfileModel } from '../models/ProfileModel.ts'
 import type { Request, Response } from 'express';
+import { getSupabaseUserClient } from '../services/supabaseUserClient.ts';
 
 
 
@@ -23,9 +23,11 @@ export class ProfileController {
 
 
         const token = authHeader.split(' ')[1]
+
+        const supabaseUser = getSupabaseUserClient(token)
      
     
-     const {data: {user}, error: authError} = await supabase.auth.getUser(token);
+     const {data: {user}, error: authError} = await supabaseUser.auth.getUser(token);
 
        if(authError || !user){
         return res.status(401).json({error : 'Invalid token'});
@@ -58,11 +60,12 @@ static async get(req: Request, res: Response){
     if(!authHeader || !authHeader.startsWith('Bearer ')){
         return res.status(401).json({error: 'Unauthorized: Missing or invalid token'});
     }
+ 
 
     const token = authHeader.split(' ')[1];
+    const supabaseUser = getSupabaseUserClient(token);
 
-    const { data: { user }, error: authError } = await supabase.auth.getUser(token);
-
+    const { data: { user }, error: authError } = await supabaseUser.auth.getUser();
     if (authError || !user) {
       return res.status(401).json({ error: 'Invalid token' });
     }
