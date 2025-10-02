@@ -38,7 +38,7 @@ export class ProfileController {
         return res.status(400).json({error: 'Username is required'});
        }
 
-        const { success, error } = await ProfileModel.createOrUpdate(user.id, username, avatar)
+        const { success, error } = await ProfileModel.createOrUpdate(user.id, username, avatar,supabaseUser)
         
         if(!success){
             if(error?.code === '23505'){
@@ -70,7 +70,7 @@ static async get(req: Request, res: Response){
       return res.status(401).json({ error: 'Invalid token' });
     }
 
-    const { data, error } = await ProfileModel.get(user.id);
+    const { data, error } = await ProfileModel.get(user.id,supabaseUser);
 
     if (error || !data) {
       return res.status(404).json({ error: 'Profile not found' });
