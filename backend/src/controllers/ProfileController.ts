@@ -1,6 +1,6 @@
 
 import { supabase } from '../services/supabaseClient.ts';
-import { ProfileModel } from '../models/Profile.ts'
+import { ProfileModel } from '../models/ProfileModel.ts'
 import type { Request, Response } from 'express';
 
 
@@ -10,7 +10,10 @@ export class ProfileController {
 
     static async create(req: Request, res: Response) {
         const {username, avatar} = req.body;
+      
         const authHeader = req.headers.authorization;
+
+       
 
 
         if(!authHeader || !authHeader.startsWith('Bearer ')) {
@@ -20,6 +23,7 @@ export class ProfileController {
 
 
         const token = authHeader.split(' ')[1]
+     
     
      const {data: {user}, error: authError} = await supabase.auth.getUser(token);
 
