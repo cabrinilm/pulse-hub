@@ -1,6 +1,6 @@
 // src/controllers/ProfileController.ts
 import { createClient } from '@supabase/supabase-js';
-import { ProfileModel } from '../models/ProfileModel';
+import { ProfileModel } from '../models/ProfileModel.ts';
 import type { Request, Response } from 'express';
 
 const supabaseUrl = process.env.SUPABASE_URL!;
