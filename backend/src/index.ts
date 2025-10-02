@@ -1,10 +1,10 @@
 import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
-import AuthController from './controllers/AuthController';
-import CommunityController from './controllers/CommunityController';
-import { ProfileController } from './controllers/ProfileController';
-import { authMiddleware } from './middleware/auth';
+import AuthController from './controllers/AuthController.ts';
+import CommunityController from './controllers/CommunityController.ts';
+import { ProfileController } from './controllers/ProfileController.ts';
+import { authMiddleware } from './middleware/auth.ts';
 
 
 dotenv.config();

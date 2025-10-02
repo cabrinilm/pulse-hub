@@ -1,6 +1,6 @@
-// /backend/src/controllers/AuthController.ts
-import { Request, Response } from 'express';
-import { supabase } from '../services/supabaseClient';
+
+import type { Request, Response } from "express";
+import { supabase } from '../services/supabaseClient.ts';
 
 class AuthController {
   async signup(req: Request, res: Response): Promise<void> {

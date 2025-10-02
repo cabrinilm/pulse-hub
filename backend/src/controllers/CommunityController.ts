@@ -1,6 +1,6 @@
-// /backend/src/controllers/CommunityController.ts
-import { Request, Response } from 'express';
-import CommunityModel from '../models/CommunityModel';
+
+import type { Request, Response } from "express";
+import CommunityModel from '../models/CommunityModel.ts';
 
 class CommunityController {
   async createCommunity(req: Request, res: Response): Promise<void> {

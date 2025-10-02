@@ -93,7 +93,7 @@ describe('Profile Routes (Integration)', () => {
       .send({ username: 'testuser' });
 
     expect(response.status).toBe(401);
-    expect(response.body).toHaveProperty('error', 'Unauthorized: Missing or invalid token');
+    expect(response.body).toHaveProperty('error', 'No token provided');
     expect(response.headers['content-type']).toMatch(/application\/json/);
   });
 });

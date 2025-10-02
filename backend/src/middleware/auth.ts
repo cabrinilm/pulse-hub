@@ -1,5 +1,6 @@
-import { Request, Response, NextFunction } from 'express';
-import { supabase } from '../services/supabaseClient';
+import type { Request, Response, NextFunction } from "express";
+
+import { supabase } from '../services/supabaseClient.ts';
 
 export async function authMiddleware(req: Request, res: Response, next: NextFunction) {
   const token = req.headers.authorization?.split('Bearer ')[1];
