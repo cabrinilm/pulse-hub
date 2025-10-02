@@ -59,6 +59,44 @@ class CommunityModel {
       throw new Error(`Create community error: ${err instanceof Error ? err.message : 'Unknown error'}`);
     }
   }
+  // Get all communities (public view via RLS)
+  async getAll(): Promise<Community[]> {
+    try {
+      const { data, error } = await supabase
+        .from('communities')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      if (error) {
+        throw new Error(`Failed to fetch communities: ${error.message}`);
+      }
+
+      return data as Community[] || [];
+    } catch (err) {
+      throw new Error(`Get all communities error: ${err instanceof Error ? err.message : 'Unknown error'}`);
+    }
+  }
+  // Get a single community by ID
+  async getById(id: string): Promise<Community | null> {
+    try {
+      const { data, error } = await supabase
+        .from('communities')
+        .select('*')
+        .eq('id', id)
+        .single();
+
+      if (error) {
+        if (error.code === 'PGRST116') {
+          return null; // No community found
+        }
+        throw new Error(`Failed to fetch community: ${error.message}`);
+      }
+
+      return data as Community;
+    } catch (err) {
+      throw new Error(`Get community by ID error: ${err instanceof Error ? err.message : 'Unknown error'}`);
+    }
+  }
 
 }
 
