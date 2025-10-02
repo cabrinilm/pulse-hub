@@ -25,9 +25,13 @@ app.post('/api/profile', authMiddleware, ProfileController.create);
 app.get('/api/profile', authMiddleware, ProfileController.get);
 
 // Community routes
+
 app.post('/api/communities', authMiddleware, CommunityController.createCommunity);
 app.get('/api/communities', authMiddleware, CommunityController.getCommunities);
 app.get('/api/communities/:id', authMiddleware, CommunityController.getCommunityById);
+app.patch('/api/communities/:id', authMiddleware, CommunityController.updateCommunity);
+app.delete('/api/communities/:id', authMiddleware, CommunityController.deleteCommunity);
+
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
