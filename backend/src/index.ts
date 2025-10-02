@@ -1,8 +1,10 @@
 import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
-import { supabase } from './services/supabaseClient.ts';
-import { ProfileController } from './controllers/ProfileController.ts';
+import AuthController from './controllers/AuthController';
+import CommunityController from './controllers/CommunityController';
+import { ProfileController } from './controllers/ProfileController';
+import { authMiddleware } from './middleware/auth';
 
 
 dotenv.config();
@@ -15,49 +17,21 @@ app.get('/api', (_req, res) => {
   res.json({ message: 'PulseHub Backend' });
 });
 
-app.post('/api/signup', async (req, res) => {
-  const { email, password, username } = req.body;
+// Auth routes
+app.post('/api/signup', AuthController.signup);
 
-  if (!email || !password || !username) {
-    return res.status(400).json({ error: 'Missing required fields' });
-  }
+// Profile routes
+app.post('/api/profile', authMiddleware, ProfileController.create);
+app.get('/api/profile', authMiddleware, ProfileController.get);
 
-  if (!/^[a-zA-Z0-9]{3,20}$/.test(username)) {
-    return res.status(400).json({ error: 'Username must be 3-20 alphanumeric characters' });
-  }
-
-  const { data, error } = await supabase.auth.signUp({
-    email,
-    password,
-    options: { data: { username } },
-  });
-
-  if (error) {
-    return res.status(400).json({ error: error.message });
-  }
-
-  if (data.user) {
-    const { error: profileError } = await supabase
-      .from('profiles')
-      .insert({ user_id: data.user.id, username });
-
-    if (profileError) {
-      return res.status(400).json({ error: profileError.message });
-    }
-
-    res.status(201).json({ message: 'Signup successful', user: data.user });
-  } else {
-    res.status(400).json({ error: 'User creation failed' });
-  }
-});
-
-app.post('/api/profile', ProfileController.create);
-app.get('/api/profile', ProfileController.get);
+// Community routes
+app.post('/api/communities', authMiddleware, CommunityController.createCommunity);
+app.get('/api/communities', authMiddleware, CommunityController.getCommunities);
+app.get('/api/communities/:id', authMiddleware, CommunityController.getCommunityById);
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`Backend running on port ${PORT}`);
 });
 
-
-export {app};
+export { app };
