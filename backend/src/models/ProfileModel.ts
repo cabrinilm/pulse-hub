@@ -1,3 +1,4 @@
+// src/models/Profile.ts
 import type { PostgrestError } from '@supabase/supabase-js';
 import type { SupabaseClient } from '@supabase/supabase-js';
 
@@ -12,42 +13,39 @@ export class ProfileModel {
     userId: string,
     username: string,
     avatar: string | null = null,
-    supabaseUser: SupabaseClient 
+    supabaseClient: SupabaseClient 
   ): Promise<{ success: boolean; error?: PostgrestError }> {
     const normalizedUsername = username.toLowerCase();
 
     if (!/^[a-zA-Z0-9]{3,20}$/.test(normalizedUsername)) {
       return {
         success: false,
-        error: { message: 'Username must be 3-20 alphanumeric characters', code: 'invalid_input', details: '', hint: '' } as PostgrestError
+        error: {
+          message: 'Username must be 3-20 alphanumeric characters',
+          code: 'invalid_input',
+          details: '',
+          hint: '',
+        } as PostgrestError,
       };
     }
 
-    const { error } = await supabaseUser
+    const { error } = await supabaseClient
       .from('profiles')
       .upsert({ user_id: userId, username: normalizedUsername, avatar }, { onConflict: 'user_id' });
 
-    if (error) {
-      return { success: false, error };
-    }
+    if (error) return { success: false, error };
 
     return { success: true };
   }
 
-  static async get(
-    userId: string,
-    supabaseUser: SupabaseClient // <- Client do usuário logado
-  ): Promise<{ data: Profile | null; error?: PostgrestError }> {
-    const { data, error } = await supabaseUser
+  static async get(userId: string, supabaseClient: SupabaseClient): Promise<{ data: Profile | null; error?: PostgrestError }> {
+    const { data, error } = await supabaseClient
       .from('profiles')
       .select('*')
       .eq('user_id', userId)
       .single();
 
-    if (error) {
-      return { data: null, error };
-    }
-
+    if (error) return { data: null, error };
     return { data: data as Profile };
   }
 }

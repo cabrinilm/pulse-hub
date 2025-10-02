@@ -1,3 +1,4 @@
+// __tests__/profile.test.ts
 import request from 'supertest';
 import { createClient } from '@supabase/supabase-js';
 import { app } from '../src/index';
