@@ -98,6 +98,61 @@ class CommunityModel {
     }
   }
 
+    // Update a community (RLS enforces creator_id = auth.uid())
+    async update(id: string, name: string | null, description: string | null): Promise<Community> {
+        try {
+          // Validate name if provided
+          if (name) {
+            const validation = this.validateName(name);
+            if (!validation.isValid) {
+              throw new Error(validation.error);
+            }
+          }
+    
+          // Build update object
+          const updates: Partial<Community> = {};
+          if (name) updates.name = name;
+          if (description !== null) updates.description = description;
+          updates.updated_at = new Date().toISOString();
+    
+          const { data, error } = await supabase
+            .from('communities')
+            .update(updates)
+            .eq('id', id)
+            .select()
+            .single();
+    
+          if (error) {
+            if (error.code === '23505') {
+              throw new Error('Community name already exists');
+            }
+            throw new Error(`Failed to update community: ${error.message}`);
+          }
+    
+          if (!data) {
+            throw new Error('No data returned from community update');
+          }
+    
+          return data as Community;
+        } catch (err) {
+          throw new Error(`Update community error: ${err instanceof Error ? err.message : 'Unknown error'}`);
+        }
+      }
+      // Delete a community (RLS enforces creator_id = auth.uid())
+  async delete(id: string): Promise<void> {
+    try {
+      const { error } = await supabase
+        .from('communities')
+        .delete()
+        .eq('id', id);
+
+      if (error) {
+        throw new Error(`Failed to delete community: ${error.message}`);
+      }
+    } catch (err) {
+      throw new Error(`Delete community error: ${err instanceof Error ? err.message : 'Unknown error'}`);
+    }
+  }
 }
 
 export default new CommunityModel();
