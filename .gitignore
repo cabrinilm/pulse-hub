@@ -436,3 +436,4 @@ build/
 *.log
 
 *get-jwt.js
+*types
