@@ -6,7 +6,7 @@ class CommunityController {
     try {
       const { name, description } = req.body;
       const creatorId = req.user?.id;
-      const supabase = req.supabase; // 👈 vem do middleware
+      const supabase = req.supabase; 
 
       if (!creatorId) {
         res.status(401).json({ error: 'Unauthorized: No user ID found' });
