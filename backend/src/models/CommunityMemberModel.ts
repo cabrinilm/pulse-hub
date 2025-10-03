@@ -65,9 +65,24 @@ class CommunityMemberModel {
  
     //  Member leaves the community 
 
-
-
-
+    async leaveCommunity(
+      supabase: SupabaseClient<Database>,
+      communityId: string,
+      userId: string,
+    ): Promise<CommunityMember[]> {
+      const { data, error } = await supabase
+        .from("community_members")
+        .delete()
+        .eq("community_id", communityId)
+        .eq("user_id", userId)
+        .select(); 
+    
+      if (error) {
+        throw new Error(`Failed to leave community: ${error.message}`);
+      }
+    
+      return data as CommunityMember[];
+    }
   }
   
 

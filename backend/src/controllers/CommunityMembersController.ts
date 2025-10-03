@@ -66,7 +66,7 @@ class CommunityMemberController {
       });
     }
   }
-  async memberLeaveCommunity(req: Request, res: Response): Promise<void> {
+  async memberLeavesCommunity(req: Request, res: Response): Promise<void> {
     try {
       const communityId = req.params.communityId;
       const userId = req.user?.id;

@@ -101,6 +101,7 @@ describe("Community.Members routes", () => {
       expect(resList.status).toBe(200);
       const memberUserIds = resList.body.map((m: any) => m.user_id);
       expect(memberUserIds).not.toContain(userId);
+      console.log(memberUserIds)
     });
   });
   })
