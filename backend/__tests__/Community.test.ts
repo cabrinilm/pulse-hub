@@ -16,7 +16,7 @@ describe('Community Routes (Integration)', () => {
   const authHeader = { Authorization: `Bearer ${bearerToken}` };
 
   // Helpers
-  const uniqueName = () => `Community_${Date.now()}`;
+  const uniqueName = () => `Community${Date.now()}`;
   const makeRequest = (method: 'post' | 'get' | 'put' | 'delete', url: string, body?: object) => {
     let req = request(app)[method](url).set('Authorization', `Bearer ${bearerToken}`).set('Content-Type', 'application/json');
     if (body) req = req.send(body);
@@ -37,9 +37,8 @@ describe('Community Routes (Integration)', () => {
   });
 
   describe('POST /api/communities', () => {
-    it.only('creates a community successfully', async () => {
+    it('creates a community successfully', async () => {
       const name = 'Peace Community';
-      console.log(name)
       const res = await makeRequest('post', '/api/communities', { name, description: 'Test Desc' });
         console.log(res.body)
       expect(res.status).toBe(201);
