@@ -1,5 +1,5 @@
-import type { SupabaseClient } from '@supabase/supabase-js';
-import type { Database } from '../types/supabase';
+import type { SupabaseClient } from "@supabase/supabase-js";
+import type { Database } from "../types/supabase";
 
 interface Community {
   id: string;
@@ -17,7 +17,8 @@ class CommunityModel {
     if (!NAME_REGEX.test(name)) {
       return {
         isValid: false,
-        error: 'Community name must be 3-50 characters and contain only alphanumeric characters or spaces',
+        error:
+          "Community name must be 3-50 characters and contain only alphanumeric characters or spaces",
       };
     }
     return { isValid: true };
@@ -25,9 +26,9 @@ class CommunityModel {
 
   // Create a new community
   async create(
-    supabase: SupabaseClient<Database>, 
-    name: string, 
-    description: string | null, 
+    supabase: SupabaseClient<Database>,
+    name: string,
+    description: string | null,
     creatorId: string
   ): Promise<Community> {
     const validation = this.validateName(name);
@@ -36,20 +37,20 @@ class CommunityModel {
     }
 
     const { data, error } = await supabase
-      .from('communities')
+      .from("communities")
       .insert([{ name, description, creator_id: creatorId }])
       .select()
       .single();
 
     if (error) {
-      if (error.code === '23505') {
-        throw new Error('Community name already exists');
+      if (error.code === "23505") {
+        throw new Error("Community name already exists");
       }
       throw new Error(`Failed to create community: ${error.message}`);
     }
 
     if (!data) {
-      throw new Error('No data returned from community creation');
+      throw new Error("No data returned from community creation");
     }
 
     return data as Community;
@@ -58,27 +59,30 @@ class CommunityModel {
   // Get all communities
   async getAll(supabase: SupabaseClient<Database>): Promise<Community[]> {
     const { data, error } = await supabase
-      .from('communities')
-      .select('*')
-      .order('created_at', { ascending: false });
+      .from("communities")
+      .select("*")
+      .order("created_at", { ascending: false });
 
     if (error) {
       throw new Error(`Failed to fetch communities: ${error.message}`);
     }
 
-    return data as Community[] || [];
+    return (data as Community[]) || [];
   }
 
   // Get a single community by ID
-  async getById(supabase: SupabaseClient<Database>, id: string): Promise<Community | null> {
+  async getById(
+    supabase: SupabaseClient<Database>,
+    id: string
+  ): Promise<Community | null> {
     const { data, error } = await supabase
-      .from('communities')
-      .select('*')
-      .eq('id', id)
+      .from("communities")
+      .select("*")
+      .eq("id", id)
       .single();
 
     if (error) {
-      if (error.code === 'PGRST116') {
+      if (error.code === "PGRST116") {
         return null;
       }
       throw new Error(`Failed to fetch community: ${error.message}`);
@@ -86,13 +90,12 @@ class CommunityModel {
 
     return data as Community;
   }
-  
 
   // Update a community
   async update(
-    supabase: SupabaseClient<Database>, 
-    id: string, 
-    name: string | null, 
+    supabase: SupabaseClient<Database>,
+    id: string,
+    name: string | null,
     description: string | null,
     creatorId: string
   ): Promise<Community> {
@@ -102,60 +105,52 @@ class CommunityModel {
         throw new Error(validation.error);
       }
     }
-  
-    console.log('Checking community existence for id:', id);
+
     const { data: existing, error: selectError } = await supabase
-      .from('communities')
-      .select('*')
-      .eq('id', id)
+      .from("communities")
+      .select("*")
+      .eq("id", id)
       .single();
-    console.log('Select result:', { existing, selectError });
-  
+
     if (selectError || !existing) {
-      console.log('Community not found for id:', id, 'Error:', selectError);
-      throw new Error('Community not found');
+      throw new Error("Community not found");
     }
     if (existing.creator_id !== creatorId) {
-      console.log('Authorization failed: creator_id mismatch', { communityCreatorId: existing.creator_id, providedCreatorId: creatorId });
-      throw new Error('Unauthorized: Only the creator can update this community');
+      throw new Error(
+        "Unauthorized: Only the creator can update this community"
+      );
     }
-  
+
     const updates: Partial<Community> = {};
     if (name) updates.name = name;
     if (description !== null) updates.description = description;
     updates.updated_at = new Date().toISOString();
-    
-    console.log('Updating community with:', { id, creatorId, updates });
+
     const { data, error } = await supabase
-      .from('communities')
+      .from("communities")
       .update(updates)
-      .eq('id', id) // Removed .eq('creator_id', creatorId)
+      .eq("id", id)
       .select()
       .single();
-    console.log('Update query result:', { data, error });
-  
+
     if (error) {
-      console.log('Update failed:', error);
-      if (error.code === '23505') {
-        throw new Error('Community name already exists');
+      console.log("Update failed:", error);
+      if (error.code === "23505") {
+        throw new Error("Community name already exists");
       }
       throw new Error(`Failed to update community: ${error.message}`);
     }
-  
+
     if (!data) {
-      console.log('No data returned from update for id:', id);
-      throw new Error('No data returned from community update');
+      throw new Error("No data returned from community update");
     }
-  
+
     return data as Community;
   }
 
   // Delete a community
   async delete(supabase: SupabaseClient<Database>, id: string): Promise<void> {
-    const { error } = await supabase
-      .from('communities')
-      .delete()
-      .eq('id', id);
+    const { error } = await supabase.from("communities").delete().eq("id", id);
 
     if (error) {
       throw new Error(`Failed to delete community: ${error.message}`);

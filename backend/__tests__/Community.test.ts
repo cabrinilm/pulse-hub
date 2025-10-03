@@ -93,24 +93,24 @@ describe('Community Routes (Integration)', () => {
 
   describe('PUT /api/communities/:id', () => {
     it('updates community successfully', async () => {
-      // 1️⃣ Cria a comunidade
+
       const { body: created } = await makeRequest(
         'post',
         '/api/communities',
         { name: uniqueName(), description: 'Old' }
       );
   
-      console.log('Created community:', created);
+
   
-      // 2️⃣ Verifica o creator_id da comunidade criada
+     
       const { data: community } = await supabase
         .from('communities')
         .select('creator_id')
         .eq('id', created.id)
         .single();
-      console.log('Community creator_id:', community, 'User ID:', userId);
+ 
   
-      // 3️⃣ Atualiza a comunidade
+    
       const newName = uniqueName();
       const res = await makeRequest(
         'patch',
@@ -118,9 +118,9 @@ describe('Community Routes (Integration)', () => {
         { name: newName, description: 'Updated' }
       );
   
-      console.log('Updated response:', res.body);
+      
   
-      // 4️⃣ Asserts
+   
       expect(res.status).toBe(200);
       expect(res.body.description).toBe('Updated');
       expect(res.body.name).toBe(newName);

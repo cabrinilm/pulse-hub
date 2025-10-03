@@ -1,31 +1,40 @@
 import type { Request, Response } from "express";
-import CommunityModel from '../models/CommunityModel';
+import CommunityModel from "../models/CommunityModel";
 
 class CommunityController {
   async createCommunity(req: Request, res: Response): Promise<void> {
     try {
       const { name, description } = req.body;
       const creatorId = req.user?.id;
-      const supabase = req.supabase; 
-      console.log('Attempting created for:', { creatorId });
+      const supabase = req.supabase;
+   
 
       if (!creatorId) {
-        res.status(401).json({ error: 'Unauthorized: No user ID found' });
+        res.status(401).json({ error: "Unauthorized: No user ID found" });
         return;
       }
       if (!supabase) {
-        res.status(500).json({ error: 'Supabase client not found in request' });
+        res.status(500).json({ error: "Supabase client not found in request" });
         return;
       }
       if (!name) {
-        res.status(400).json({ error: 'Name is required' });
+        res.status(400).json({ error: "Name is required" });
         return;
       }
 
-      const community = await CommunityModel.create(supabase, name, description, creatorId);
+      const community = await CommunityModel.create(
+        supabase,
+        name,
+        description,
+        creatorId
+      );
       res.status(201).json(community);
     } catch (error) {
-      res.status(400).json({ error: error instanceof Error ? error.message : 'Unknown error' });
+      res
+        .status(400)
+        .json({
+          error: error instanceof Error ? error.message : "Unknown error",
+        });
     }
   }
 
@@ -33,14 +42,18 @@ class CommunityController {
     try {
       const supabase = req.supabase;
       if (!supabase) {
-        res.status(404).json({ error: 'Supabase client not found in request' });
+        res.status(404).json({ error: "Supabase client not found in request" });
         return;
       }
 
       const communities = await CommunityModel.getAll(supabase);
       res.status(200).json(communities);
     } catch (error) {
-      res.status(500).json({ error: error instanceof Error ? error.message : 'Unknown error' });
+      res
+        .status(500)
+        .json({
+          error: error instanceof Error ? error.message : "Unknown error",
+        });
     }
   }
 
@@ -50,59 +63,68 @@ class CommunityController {
       const supabase = req.supabase;
 
       if (!id) {
-        res.status(400).json({ error: 'Community ID is required' });
+        res.status(400).json({ error: "Community ID is required" });
         return;
       }
       if (!supabase) {
-        res.status(500).json({ error: 'Supabase client not found in request' });
+        res.status(500).json({ error: "Supabase client not found in request" });
         return;
       }
 
       const community = await CommunityModel.getById(supabase, id);
       if (!community) {
-        res.status(404).json({ error: 'Community not found' });
+        res.status(404).json({ error: "Community not found" });
         return;
       }
 
       res.status(200).json(community);
     } catch (error) {
-      res.status(500).json({ error: error instanceof Error ? error.message : 'Unknown error' });
+      res
+        .status(500)
+        .json({
+          error: error instanceof Error ? error.message : "Unknown error",
+        });
     }
   }
- 
+
   async updateCommunity(req: Request, res: Response): Promise<void> {
     try {
       const { id } = req.params;
       const { name, description } = req.body;
       const creatorId = req.user?.id;
       const supabase = req.supabase;
-      console.log('Attempting update for:', { id, creatorId, name, description });
-  
+
       if (!creatorId) {
-        console.log('No creatorId found');
-        res.status(401).json({ error: 'Unauthorized: No user ID found' });
+        res.status(401).json({ error: "Unauthorized: No user ID found" });
         return;
       }
       if (!supabase) {
-        console.log('No supabase client found');
-        res.status(500).json({ error: 'Supabase client not found in request' });
+        res.status(500).json({ error: "Supabase client not found in request" });
         return;
       }
       if (!id) {
-        console.log('No community ID provided');
-        res.status(400).json({ error: 'Community ID is required' });
+        res.status(400).json({ error: "Community ID is required" });
         return;
       }
-  
-      const community = await CommunityModel.update(supabase, id, name, description, creatorId);
-      console.log('Updated community:', community);
+
+      const community = await CommunityModel.update(
+        supabase,
+        id,
+        name,
+        description,
+        creatorId
+      );
+
       res.status(200).json(community);
     } catch (error) {
-      console.error('Update error:', error);
-      if (error instanceof Error && error.message === 'Community not found') {
-        res.status(404).json({ error: 'Community not found' });
+      if (error instanceof Error && error.message === "Community not found") {
+        res.status(404).json({ error: "Community not found" });
       } else {
-        res.status(400).json({ error: error instanceof Error ? error.message : 'Unknown error' });
+        res
+          .status(400)
+          .json({
+            error: error instanceof Error ? error.message : "Unknown error",
+          });
       }
     }
   }
@@ -113,22 +135,26 @@ class CommunityController {
       const supabase = req.supabase;
 
       if (!creatorId) {
-        res.status(401).json({ error: 'Unauthorized: No user ID found' });
+        res.status(401).json({ error: "Unauthorized: No user ID found" });
         return;
       }
       if (!supabase) {
-        res.status(500).json({ error: 'Supabase client not found in request' });
+        res.status(500).json({ error: "Supabase client not found in request" });
         return;
       }
       if (!id) {
-        res.status(400).json({ error: 'Community ID is required' });
+        res.status(400).json({ error: "Community ID is required" });
         return;
       }
 
       await CommunityModel.delete(supabase, id);
       res.status(204).send();
     } catch (error) {
-      res.status(400).json({ error: error instanceof Error ? error.message : 'Unknown error' });
+      res
+        .status(400)
+        .json({
+          error: error instanceof Error ? error.message : "Unknown error",
+        });
     }
   }
 }
