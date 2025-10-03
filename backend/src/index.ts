@@ -4,6 +4,7 @@ import dotenv from 'dotenv';
 import AuthController from './controllers/AuthController.ts';
 import CommunityController from './controllers/CommunityController.ts';
 import { ProfileController } from './controllers/ProfileController.ts';
+import communityMemberController from './controllers/CommunityMembersController.ts';
 import { authMiddleware } from './middleware/auth.ts';
 
 
@@ -32,6 +33,9 @@ app.get('/api/communities/:id', authMiddleware, CommunityController.getCommunity
 app.patch('/api/communities/:id', authMiddleware, CommunityController.updateCommunity);
 app.delete('/api/communities/:id', authMiddleware, CommunityController.deleteCommunity);
 
+// Community members 
+
+app.post('/api/communities/:communityId/members', communityMemberController.joinCommunityById);
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
