@@ -7,6 +7,7 @@ class CommunityController {
       const { name, description } = req.body;
       const creatorId = req.user?.id;
       const supabase = req.supabase; 
+      console.log('Attempting created for:', { creatorId });
 
       if (!creatorId) {
         res.status(401).json({ error: 'Unauthorized: No user ID found' });
@@ -32,7 +33,7 @@ class CommunityController {
     try {
       const supabase = req.supabase;
       if (!supabase) {
-        res.status(500).json({ error: 'Supabase client not found in request' });
+        res.status(404).json({ error: 'Supabase client not found in request' });
         return;
       }
 
@@ -68,34 +69,43 @@ class CommunityController {
       res.status(500).json({ error: error instanceof Error ? error.message : 'Unknown error' });
     }
   }
-
+ 
   async updateCommunity(req: Request, res: Response): Promise<void> {
     try {
       const { id } = req.params;
       const { name, description } = req.body;
       const creatorId = req.user?.id;
       const supabase = req.supabase;
-
+      console.log('Attempting update for:', { id, creatorId, name, description });
+  
       if (!creatorId) {
+        console.log('No creatorId found');
         res.status(401).json({ error: 'Unauthorized: No user ID found' });
         return;
       }
       if (!supabase) {
+        console.log('No supabase client found');
         res.status(500).json({ error: 'Supabase client not found in request' });
         return;
       }
       if (!id) {
+        console.log('No community ID provided');
         res.status(400).json({ error: 'Community ID is required' });
         return;
       }
-
-      const community = await CommunityModel.update(supabase, id, name, description);
+  
+      const community = await CommunityModel.update(supabase, id, name, description, creatorId);
+      console.log('Updated community:', community);
       res.status(200).json(community);
     } catch (error) {
-      res.status(400).json({ error: error instanceof Error ? error.message : 'Unknown error' });
+      console.error('Update error:', error);
+      if (error instanceof Error && error.message === 'Community not found') {
+        res.status(404).json({ error: 'Community not found' });
+      } else {
+        res.status(400).json({ error: error instanceof Error ? error.message : 'Unknown error' });
+      }
     }
   }
-
   async deleteCommunity(req: Request, res: Response): Promise<void> {
     try {
       const { id } = req.params;

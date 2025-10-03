@@ -22,7 +22,10 @@ export async function authMiddleware(req: Request, res: Response, next: NextFunc
       global: { headers: { Authorization: `Bearer ${token}` } },
     }
   );
+  const { data: { user: debugUser }, error: debugError } = await userSupabase.auth.getUser();
+  console.log('userSupabase auth check:', { userId: debugUser?.id, debugError });
 
+  console.log('Auth middleware: user ID:', user.id, 'Token:', token);
   req.user = { id: user.id };
   req.supabase = userSupabase;
 

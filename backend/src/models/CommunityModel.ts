@@ -86,13 +86,15 @@ class CommunityModel {
 
     return data as Community;
   }
+  
 
   // Update a community
   async update(
     supabase: SupabaseClient<Database>, 
     id: string, 
     name: string | null, 
-    description: string | null
+    description: string | null,
+    creatorId: string
   ): Promise<Community> {
     if (name) {
       const validation = this.validateName(name);
@@ -100,30 +102,51 @@ class CommunityModel {
         throw new Error(validation.error);
       }
     }
-
+  
+    console.log('Checking community existence for id:', id);
+    const { data: existing, error: selectError } = await supabase
+      .from('communities')
+      .select('*')
+      .eq('id', id)
+      .single();
+    console.log('Select result:', { existing, selectError });
+  
+    if (selectError || !existing) {
+      console.log('Community not found for id:', id, 'Error:', selectError);
+      throw new Error('Community not found');
+    }
+    if (existing.creator_id !== creatorId) {
+      console.log('Authorization failed: creator_id mismatch', { communityCreatorId: existing.creator_id, providedCreatorId: creatorId });
+      throw new Error('Unauthorized: Only the creator can update this community');
+    }
+  
     const updates: Partial<Community> = {};
     if (name) updates.name = name;
     if (description !== null) updates.description = description;
     updates.updated_at = new Date().toISOString();
-
+    
+    console.log('Updating community with:', { id, creatorId, updates });
     const { data, error } = await supabase
       .from('communities')
       .update(updates)
-      .eq('id', id)
+      .eq('id', id) // Removed .eq('creator_id', creatorId)
       .select()
       .single();
-
+    console.log('Update query result:', { data, error });
+  
     if (error) {
+      console.log('Update failed:', error);
       if (error.code === '23505') {
         throw new Error('Community name already exists');
       }
       throw new Error(`Failed to update community: ${error.message}`);
     }
-
+  
     if (!data) {
+      console.log('No data returned from update for id:', id);
       throw new Error('No data returned from community update');
     }
-
+  
     return data as Community;
   }
 
