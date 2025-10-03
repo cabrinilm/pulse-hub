@@ -16,7 +16,6 @@ describe("Community.Members routes", () => {
   const authHeader = { Authorization: `Bearer ${bearerToken}` };
   communityId = "98d6642c-37ec-41df-b407-50ec60196583";
   // helpers
-  // const uniqueName = () => `Community${Date.now()}`;
   const makeRequest = (
     method: "post" | "get" | "patch" | "delete",
     url: string,
@@ -29,7 +28,7 @@ describe("Community.Members routes", () => {
     if (body) req = req.send(body);
     return req;
   };
- 
+
   beforeAll(async () => {
     if (!bearerToken) throw new Error("Missing SUPABASE_BEARER_TOKEN");
     supabase = createClient(supabaseUrl, supabaseKey, {
@@ -41,44 +40,68 @@ describe("Community.Members routes", () => {
     } = await supabase.auth.getUser();
     if (!user) throw new Error("Test user not found");
     userId = user.id;
-
   });
 
   afterEach(async () => {
     await supabase
-    .from("community_members")
-    .delete()
-    .eq("user_id", userId)
-    .eq("community_id", "98d6642c-37ec-41df-b407-50ec60196583");
+      .from("community_members")
+      .delete()
+      .eq("user_id", userId)
+      .eq("community_id", "98d6642c-37ec-41df-b407-50ec60196583");
   });
-  
+
   describe("POST api/communities", () => {
     it("should successfuly join a community", async () => {
-      // communityId = "98d6642c-37ec-41df-b407-50ec60196583";
-
       const resJoin = await makeRequest(
         "post",
         `/api/communities/${communityId}/members`
       );
-       
+
       expect(resJoin.status).toBe(200);
       expect(resJoin.body).toHaveProperty("user_id", userId);
       expect(resJoin.body).toHaveProperty("community_id", communityId);
-
     });
-    it("should list the members of a community", async () => {
+    it("GET/ should list the members of a community", async () => {
       const resList = await makeRequest(
         "get",
         `/api/communities/${communityId}/members`
       );
-    
+
       console.log(resList.body);
-    
+
       expect(resList.status).toBe(200);
       expect(Array.isArray(resList.body)).toBe(true);
-    
+
       const memberUserIds = resList.body.map((m: any) => m.user_id);
       expect(memberUserIds).toContain("98234733-7397-4478-9e8b-504761923450");
     });
+
   });
-});
+  describe('DELETE api/communities/:communityId/members', () => {
+    it.only("user should be able to leave the community", async() => {
+    
+      const resJoin = await makeRequest(
+        "post",
+        `/api/communities/${communityId}/members`
+      );
+      expect(resJoin.status).toBe(200);
+  
+  
+      const resDelete = await makeRequest(
+        "delete",
+        `/api/communities/${communityId}/members`
+      );
+      expect(resDelete.status).toBe(200); 
+  
+      
+      const resList = await makeRequest(
+        "get",
+        `/api/communities/${communityId}/members`
+      );
+      expect(resList.status).toBe(200);
+      const memberUserIds = resList.body.map((m: any) => m.user_id);
+      expect(memberUserIds).not.toContain(userId);
+    });
+  });
+  })
+
