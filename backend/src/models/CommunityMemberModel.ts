@@ -62,6 +62,12 @@ class CommunityMemberModel {
   
       return (data as CommunityMember[]) || [];
     }
+ 
+    //  Member leaves the community 
+
+
+
+
   }
   
 
