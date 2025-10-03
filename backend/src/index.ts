@@ -35,7 +35,7 @@ app.delete('/api/communities/:id', authMiddleware, CommunityController.deleteCom
 
 // Community members 
 
-app.post('/api/communities/:communityId/members', communityMemberController.joinCommunityById);
+app.post('/api/communities/:communityId/members', authMiddleware, communityMemberController.joinCommunityById);
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {

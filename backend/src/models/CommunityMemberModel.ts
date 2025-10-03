@@ -22,8 +22,8 @@ class CommunityMemberModel {
       .insert({
         community_id,
         user_id,
-        role: role ?? "member", 
-        status: status ?? "pending",
+        role: role ?? "member",         
+        status: status ?? "accepted",
         joined_at: new Date().toISOString(),
       })
       .select()

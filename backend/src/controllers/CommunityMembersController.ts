@@ -7,6 +7,7 @@ class CommunityMemberController {
       const communityId = req.params.communityId;
       const userId = req.user?.id;
       const supabase = req.supabase;
+      console.log(userId, 'controller')
 
       if (!userId) {
         res.status(401).json({ error: "Unauthorized: No user ID found" });

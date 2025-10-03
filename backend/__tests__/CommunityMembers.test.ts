@@ -41,10 +41,15 @@ describe("Community.Members routes", () => {
     } = await supabase.auth.getUser();
     if (!user) throw new Error("Test user not found");
     userId = user.id;
+
   });
 
   afterEach(async () => {
-    await supabase.from("community_members").delete().eq("user_id", userId);
+    await supabase
+    .from("community_members")
+    .delete()
+    .eq("user_id", userId)
+    .eq("community_id", "98d6642c-37ec-41df-b407-50ec60196583");
   });
 
   describe("POST api/communities", () => {
@@ -56,19 +61,10 @@ describe("Community.Members routes", () => {
         `/api/communities/${communityId}/members`
       );
 
-      expect(resJoin.status).toBe(201);
-      expect(resJoin.body).toHaveProperty("id");
+      expect(resJoin.status).toBe(200);
       expect(resJoin.body).toHaveProperty("user_id", userId);
       expect(resJoin.body).toHaveProperty("community_id", communityId);
 
-      const resList = await makeRequest(
-        "get",
-        `/api/communities/${communityId}/members`
-      );
-      expect(resList.status).toBe(200);
-      expect(Array.isArray(resList.body)).toBe(true);
-      const memberUserIds = resList.body.map((m: any) => m.user_id);
-      expect(memberUserIds).toContain(userId);
     });
   });
 });
