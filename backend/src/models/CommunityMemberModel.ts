@@ -42,6 +42,28 @@ class CommunityMemberModel {
 
     return data as CommunityMember;
   }
-}
+ 
+  // Get members of a community
+
+
+    async getAllMembers(
+      supabase: SupabaseClient<Database>,
+      communityId: string
+    ): Promise<CommunityMember[]> {
+      const { data, error } = await supabase
+        .from("community_members")
+        .select("*")
+        .eq("community_id", communityId)
+        .order("joined_at", { ascending: false });
+  
+      if (error) {
+        throw new Error(`Failed to fetch members: ${error.message}`);
+      }
+  
+      return (data as CommunityMember[]) || [];
+    }
+  }
+  
+
 
 export default new CommunityMemberModel();

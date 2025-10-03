@@ -7,7 +7,7 @@ class CommunityMemberController {
       const communityId = req.params.communityId;
       const userId = req.user?.id;
       const supabase = req.supabase;
-      console.log(userId, 'controller')
+ 
 
       if (!userId) {
         res.status(401).json({ error: "Unauthorized: No user ID found" });
@@ -40,6 +40,42 @@ class CommunityMemberController {
       });
     }
   }
+
+  async getAllMembersCommunity(req: Request, res: Response): Promise<void> {
+    try {
+      const communityId = req.params.communityId;
+      const supabase = req.supabase;
+
+      if (!communityId) {
+        res.status(400).json({ error: "Community ID is required" });
+        return;
+      }
+      if (!supabase) {
+        res.status(500).json({ error: "Supabase client not found in request" });
+        return;
+      }
+
+      const members = await CommunityMemberModel.getAllMembers(
+        supabase,
+        communityId
+      );
+
+      res.status(200).json(members);
+    } catch (error) {
+        res.status(500).json({
+          error: error instanceof Error ? error.message : "Unknown error",
+        });
+      }
+
+        
+
+
+
+   }
+
+
+
+
 }
 
 const communityMemberController = new CommunityMemberController();
