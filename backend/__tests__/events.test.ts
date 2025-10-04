@@ -355,4 +355,30 @@ describe("Events routes", () => {
     expect(resUpdateEvent.body.error).toMatch("Event not found or update failed");
   });
   });
+  describe("DELETE  /api/events/:id", () => {
+    it("should delete an event create by a user", async () => {
+
+      const eventData = {
+        creator_id: creatorId,
+        community_id: null,
+        title: "Allowed Event",
+        description: "User created event without community",
+        event_date: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
+        is_public: true,
+        price: 0,
+        location: "Online",
+      };
+
+      const resNewEvent = await makeRequest("post", "/api/events", eventData);
+
+   
+      expect(resNewEvent.status).toBe(201);
+      
+
+
+
+
+
+    })
+  })
 });
