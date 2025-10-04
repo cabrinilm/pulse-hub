@@ -6,6 +6,7 @@ import CommunityController from './controllers/CommunityController.ts';
 import { ProfileController } from './controllers/ProfileController.ts';
 import communityMemberController from './controllers/CommunityMembersController.ts';
 import { authMiddleware } from './middleware/auth.ts';
+import eventsController from './controllers/EventsController.ts';
 
 
 dotenv.config();
@@ -41,6 +42,9 @@ app.delete('/api/communities/:communityId/members', authMiddleware, communityMem
 app.delete('/api/communities/:communityId/:removedUserId', authMiddleware, communityMemberController.admRemoveMember);
 
 
+// Events 
+
+app.post('/api/events', authMiddleware, eventsController.createEventByUser);
 
 
 

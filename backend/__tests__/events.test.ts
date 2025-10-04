@@ -55,12 +55,16 @@ describe("Events routes", () => {
 
   describe("POST /api/events", () => {
     it("should create event successfully", async () => {
+      
       const resNewEvent = await makeRequest("post", `/api/events`, {
         title: "Football event",
         description: "we need 10 people",
         event_date: new Date().toISOString(),
       });
 
+       
+    
+      console.log(resNewEvent.body)
       expect(resNewEvent.status).toBe(201);
 
       const event: Event = resNewEvent.body;

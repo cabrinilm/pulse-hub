@@ -1,9 +1,9 @@
 import type { Request, Response } from "express";
-import eventsModel from "../models/eventsModel";
+import EventsModel from "../models/EventsModel";
 
 
 class EventsController {
-    async eventCreateByUser(req: Request, res: Response): Promise<void> {
+    async createEventByUser(req: Request, res: Response): Promise<void> {
        try {
         
         const creatorId = req.user?.id; 
@@ -23,7 +23,7 @@ class EventsController {
             return;
           }
 
-          const event = await eventsModel.createEvent(
+          const event = await EventsModel.createEvent(
             supabase, 
             creatorId,
             { title, description, event_date, is_public, price, location }
@@ -44,4 +44,5 @@ class EventsController {
 }
 
 
- export default new EventsController();
+const eventsController = new EventsController();
+export default eventsController;
