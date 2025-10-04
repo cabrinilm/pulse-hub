@@ -6,7 +6,7 @@ class EventsController {
     try {
       const creatorId = req.user?.id;
       const supabase = req.supabase;
-      const { title, description, event_date, is_public, price, location, community_id } = req.body;
+      const { creator_id, title, description, event_date, is_public, price, location, community_id } = req.body;
 
       if (!creatorId) {
         res.status(401).json({ error: "Unauthorized: No user ID found" });
@@ -20,6 +20,10 @@ class EventsController {
         res.status(400).json({ error: "Title and event_date are required" });
         return;
       }
+      if (creator_id !== creatorId) {
+        res.status(403).json({ error: "Forbidden: creator_id does not match authenticated user" });
+        return;
+      }
 
       const event = await EventsModel.createEvent(supabase, creatorId, {
         title,
@@ -28,7 +32,7 @@ class EventsController {
         is_public,
         price,
         location,
-        community_id, 
+        community_id,
       });
 
       if (!event) {
