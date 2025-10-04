@@ -78,7 +78,7 @@ describe("Community.Members routes", () => {
 
   });
   describe('DELETE api/communities/:communityId/members', () => {
-    it.only("user should be able to leave the community", async() => {
+    it("user should be able to leave the community", async() => {
     
       const resJoin = await makeRequest(
         "post",
@@ -103,6 +103,29 @@ describe("Community.Members routes", () => {
       expect(memberUserIds).not.toContain(userId);
       console.log(memberUserIds)
     });
+    it("adm should be able to remove a member", async () => {
+      
+      const targetUserId = "98234733-7397-4478-9e8b-504761923450";
+  
+    
+      const resDelete = await makeRequest(
+        "delete",
+        `/api/communities/${communityId}/members/${targetUserId}`
+      );
+  
+    
+      expect(resDelete.status).toBe(200);
+      expect(resDelete.body).toEqual([{ user_id: targetUserId, community_id: communityId }]);
+  
+     
+      const resList = await makeRequest(
+        "get",
+        `/api/communities/${communityId}/members`
+      );
+      const memberUserIds = resList.body.map((m: any) => m.user_id);
+      expect(memberUserIds).not.toContain(targetUserId);
+    });
   });
-  })
+  });
+  
 
