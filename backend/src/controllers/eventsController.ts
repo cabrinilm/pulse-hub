@@ -140,7 +140,31 @@ class EventsController {
       });
     }
   }
+  async listEvents(req: Request, res: Response): Promise<void> {
+    try {
+      const creatorId = req.user?.id;
+      const supabase = req.supabase;
+
+      if (!creatorId) {
+        res.status(401).json({ error: "Unauthorized: No user ID found" });
+        return;
+      }
+      if (!supabase) {
+        res.status(500).json({ error: "Supabase client not found in request" });
+        return;
+      }
+
+      const events = await EventsModel.listEvents(supabase, creatorId);
+
+      res.status(200).json(events);
+    } catch (error) {
+      res.status(500).json({
+        error: error instanceof Error ? error.message : "Unknown error",
+      });
+    }
+  }
 }
+
 
 
 const eventsController = new EventsController();

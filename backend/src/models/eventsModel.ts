@@ -103,7 +103,7 @@ class EventsModel {
     if (!validation.isValid) {
       throw new Error(validation.error);
     }
-  
+
     const { data, error } = await supabase
       .from("events")
       .update({
@@ -120,21 +120,23 @@ class EventsModel {
       .eq("creator_id", creator_id)
       .select()
       .maybeSingle();
-  
+
     if (error) {
       if (error.code === "42501") {
-        throw new Error("Forbidden: user is not the creator of the event or not a member of the specified community");
+        throw new Error(
+          "Forbidden: user is not the creator of the event or not a member of the specified community"
+        );
       }
       if (error.code === "23505") {
         throw new Error("Event with this title already exists");
       }
       throw new Error(`Failed to update event: ${error.message}`);
     }
-  
+
     return data as Event | null;
   }
 
-  // delete event 
+  // delete event
 
   async deleteEvent(
     supabase: SupabaseClient<Database>,
@@ -146,20 +148,31 @@ class EventsModel {
       .delete()
       .eq("id", event_id)
       .eq("creator_id", creator_id)
-      .select(); 
-  
+      .select();
+
     if (error) {
       if (error.code === "42501") {
         throw new Error("Forbidden: user is not the creator of the event");
       }
       throw new Error(`Failed to delete event: ${error.message}`);
     }
-  
 
     return !!data && data.length > 0;
   }
+
+  // list events
+  async listEvents(
+    supabase: SupabaseClient<Database>,
+    user_id: string
+  ): Promise<Event[]> {
+    const { data, error } = await supabase.from("events").select("*");
+
+    if (error) {
+      throw new Error(`Failed to list events: ${error.message}`);
+    }
+
+    return data as Event[];
+  }
 }
-
-
 
 export default new EventsModel();
