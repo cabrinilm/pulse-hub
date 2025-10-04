@@ -39,7 +39,7 @@ class EventsModel {
       is_public?: boolean;
       price?: number | null;
       location?: string | null;
-      community_id?: string | null; 
+      community_id?: string | null;
     }
   ): Promise<Event> {
     const validation = this.validateTitle(eventData.title);
@@ -52,7 +52,7 @@ class EventsModel {
       .insert([
         {
           creator_id,
-          community_id: eventData.community_id ?? null, 
+          community_id: eventData.community_id ?? null,
           title: eventData.title,
           description: eventData.description ?? null,
           event_date: eventData.event_date,
@@ -69,13 +69,64 @@ class EventsModel {
         throw new Error("Event with this title already exists");
       }
       if (error.code === "42501") {
-        throw new Error("Forbidden: user is not a member of the specified community");
+        throw new Error(
+          "Forbidden: user is not a member of the specified community"
+        );
       }
       throw new Error(`Failed to create event: ${error.message}`);
     }
 
     if (!data) {
       throw new Error("No data returned from event creation");
+    }
+
+    return data as Event;
+  }
+
+  // update event
+
+  async updateEventByOwner(
+    supabase: SupabaseClient<Database>,
+    creator_id: string,
+    eventData: {
+      id: string;
+      title: string;
+      description?: string | null;
+      event_date: string;
+      is_public?: boolean;
+      price?: number | null;
+      location?: string | null;
+      community_id?: string | null;
+    }
+  ): Promise<Event> {
+    const validation = this.validateTitle(eventData.title);
+    if (!validation.isValid) {
+      throw new Error(validation.error);
+    }
+
+    const { data, error } = await supabase
+      .from("events")
+      .update({
+        title: eventData.title,
+        description: eventData.description ?? null,
+        event_date: eventData.event_date,
+        is_public: eventData.is_public ?? true,
+        price: eventData.price ?? 0,
+        location: eventData.location ?? null,
+        community_id: eventData.community_id ?? null,
+        updated_at: new Date().toISOString(),
+      })
+      .eq("id", eventData.id)
+      .eq("creator_id", creator_id)
+      .select()
+      .single();
+
+    if (error) {
+      throw new Error(`Failed to update event: ${error.message}`);
+    }
+
+    if (!data) {
+      throw new Error("Event not found or not authorized");
     }
 
     return data as Event;
