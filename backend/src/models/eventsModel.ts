@@ -39,6 +39,7 @@ class EventsModel {
       is_public?: boolean;
       price?: number | null;
       location?: string | null;
+      community_id?: string | null; 
     }
   ): Promise<Event> {
     const validation = this.validateTitle(eventData.title);
@@ -51,6 +52,7 @@ class EventsModel {
       .insert([
         {
           creator_id,
+          community_id: eventData.community_id ?? null, 
           title: eventData.title,
           description: eventData.description ?? null,
           event_date: eventData.event_date,
@@ -65,6 +67,9 @@ class EventsModel {
     if (error) {
       if (error.code === "23505") {
         throw new Error("Event with this title already exists");
+      }
+      if (error.code === "42501") {
+        throw new Error("Forbidden: user is not a member of the specified community");
       }
       throw new Error(`Failed to create event: ${error.message}`);
     }

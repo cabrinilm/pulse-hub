@@ -17,7 +17,7 @@ describe("Events routes", () => {
   let supabase: SupabaseClient<Database>;
   const authHeader = { Authorization: `Bearer ${bearerToken}` };
 
-  // helper 
+  // Helper
   const makeRequest = (
     method: "post" | "get" | "patch" | "delete",
     url: string,
@@ -54,24 +54,52 @@ describe("Events routes", () => {
   });
 
   describe("POST /api/events", () => {
-    it("should create event successfully", async () => {
-      
-      const resNewEvent = await makeRequest("post", `/api/events`, {
-        title: "Football event",
-        description: "we need 10 people",
-        event_date: new Date().toISOString(),
-      });
+    it("should create event successfully without community", async () => {
+      const eventData = {
+        creator_id: creatorId, 
+        community_id: null, 
+        title: "Allowed Event",
+        description: "User created event without community",
+        event_date: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(), 
+        is_public: true,
+        price: 0,
+        location: "Online",
+      };
 
-       
-    
-      console.log(resNewEvent.body)
+      const resNewEvent = await makeRequest("post", "/api/events", eventData);
+
+      console.log("Response body:", resNewEvent.body);
       expect(resNewEvent.status).toBe(201);
 
       const event: Event = resNewEvent.body;
       expect(event).toHaveProperty("id");
-      expect(event.title).toBe("Football event");
-      expect(event.description).toBe("we need 10 people");
+      expect(event.title).toBe("Allowed Event");
+      expect(event.description).toBe("User created event without community");
       expect(event.creator_id).toBe(creatorId);
+      expect(event.community_id).toBeNull();
+      expect(event.is_public).toBe(true);
+      expect(event.price).toBe(0);
+      expect(event.location).toBe("Online");
+    });
+
+    it("should fail to create event for community where user is not a member", async () => {
+      const eventData = {
+        creator_id: creatorId,
+        community_id: "7622bf78-748b-49c4-9c29-a619cecc72e6", 
+        title: "Unauthorized Event",
+        description: "User is not a member of this community",
+        event_date: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
+        is_public: true,
+        price: 0,
+        location: "Online",
+      };
+
+      const resNewEvent = await makeRequest("post", "/api/events", eventData);
+       console.log(resNewEvent.body)
+      console.log("Response body:", resNewEvent.body);
+      expect(resNewEvent.status).toBe(403); 
+      expect(resNewEvent.body).toHaveProperty("error");
+      expect(resNewEvent.body.error).toMatch("Forbidden: user is not a member of the specified community");
     });
   });
 });

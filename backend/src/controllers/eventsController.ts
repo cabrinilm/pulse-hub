@@ -1,48 +1,53 @@
 import type { Request, Response } from "express";
 import EventsModel from "../models/EventsModel";
 
-
 class EventsController {
-    async createEventByUser(req: Request, res: Response): Promise<void> {
-       try {
-        
-        const creatorId = req.user?.id; 
-        const supabase = req.supabase;
-        const {title, description, event_date, is_public, price, location} = req.body;
+  async createEventByUser(req: Request, res: Response): Promise<void> {
+    try {
+      const creatorId = req.user?.id;
+      const supabase = req.supabase;
+      const { title, description, event_date, is_public, price, location, community_id } = req.body;
 
-        if (!creatorId) {
-            res.status(401).json({ error: "Unauthorized: No user ID found" });
-            return;
-          }
-          if (!supabase) {
-            res.status(500).json({ error: "Supabase client not found in request" });
-            return;
-          }
-          if (!title || !event_date) {
-            res.status(400).json({ error: "Title and event_date are required" });
-            return;
-          }
+      if (!creatorId) {
+        res.status(401).json({ error: "Unauthorized: No user ID found" });
+        return;
+      }
+      if (!supabase) {
+        res.status(500).json({ error: "Supabase client not found in request" });
+        return;
+      }
+      if (!title || !event_date) {
+        res.status(400).json({ error: "Title and event_date are required" });
+        return;
+      }
 
-          const event = await EventsModel.createEvent(
-            supabase, 
-            creatorId,
-            { title, description, event_date, is_public, price, location }
-          );
+      const event = await EventsModel.createEvent(supabase, creatorId, {
+        title,
+        description,
+        event_date,
+        is_public,
+        price,
+        location,
+        community_id, 
+      });
 
-          if(!event){
-            res.status(404).json({ error: "Event cration failed" });
-            return;
-          }
-            
-          res.status(201).json(event);
-       } catch (error){
-        res.status(500).json({
-            error: error instanceof Error ? error.message: "Unknow error",
-        });
-       }
+      if (!event) {
+        res.status(404).json({ error: "Event creation failed" });
+        return;
+      }
+
+      res.status(201).json(event);
+    } catch (error) {
+      if (error instanceof Error && error.message.includes("Forbidden")) {
+        res.status(403).json({ error: error.message });
+        return;
+      }
+      res.status(500).json({
+        error: error instanceof Error ? error.message : "Unknown error",
+      });
     }
+  }
 }
-
 
 const eventsController = new EventsController();
 export default eventsController;
