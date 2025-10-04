@@ -40,6 +40,11 @@ app.get('/api/communities/:communityId/members', authMiddleware, communityMember
 app.delete('/api/communities/:communityId/members', authMiddleware, communityMemberController.memberLeavesCommunity);
 app.delete('/api/communities/:communityId/:removedUserId', authMiddleware, communityMemberController.admRemoveMember);
 
+
+
+
+
+
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`Backend running on port ${PORT}`);
