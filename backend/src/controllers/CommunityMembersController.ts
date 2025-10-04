@@ -98,6 +98,42 @@ class CommunityMemberController {
       });
     }
   }
+
+  async admRemoveMember(req: Request, res: Response): Promise<void>{
+    
+    try{
+      const removedUserId = req.params.removedUserId;
+      const supabase = req.supabase;
+      const  communityId = req.params.communityId;
+    
+      if (!removedUserId) {
+        res.status(400).json({ error: "Community ID is required" });
+        return;
+      }
+
+
+    if (!communityId) {
+      res.status(400).json({ error: "Community ID is required" });
+      return;
+    }
+    if (!supabase) {
+      res.status(500).json({ error: "Supabase client not found in request" });
+      return;
+    }
+   
+    const removedMember = await CommunityMemberModel.admRemove(
+      supabase, 
+      communityId,
+      removedUserId
+    );
+
+    res.status(200).json({removedMember});
+    } catch (error) {
+      res.status(500).json({
+        error: error instanceof Error ? error.message : "Unknown error",
+      });
+    }
+  }
 }
 
 const communityMemberController = new CommunityMemberController();
