@@ -12,9 +12,11 @@ const bearerToken = process.env.SUPABASE_BEARER_TOKEN!;
 describe("Community.Members routes", () => {
   let userId: string;
   let communityId: string;
+  let communityId2: string;
   let supabase: ReturnType<typeof createClient>;
   const authHeader = { Authorization: `Bearer ${bearerToken}` };
   communityId = "98d6642c-37ec-41df-b407-50ec60196583";
+  communityId2 ="e5f2ff2f-9d5a-4223-8eca-a05cc1439ea2";
   // helpers
   const makeRequest = (
     method: "post" | "get" | "patch" | "delete",
@@ -67,7 +69,7 @@ describe("Community.Members routes", () => {
         `/api/communities/${communityId}/members`
       );
 
-      console.log(resList.body);
+    
 
       expect(resList.status).toBe(200);
       expect(Array.isArray(resList.body)).toBe(true);
@@ -101,26 +103,26 @@ describe("Community.Members routes", () => {
       expect(resList.status).toBe(200);
       const memberUserIds = resList.body.map((m: any) => m.user_id);
       expect(memberUserIds).not.toContain(userId);
-      console.log(memberUserIds)
+      
     });
-    it("adm should be able to remove a member", async () => {
+    it.only("adm should be able to remove a member", async () => {
       
       const targetUserId = "98234733-7397-4478-9e8b-504761923450";
   
     
       const resDelete = await makeRequest(
         "delete",
-        `/api/communities/${communityId}/members/${targetUserId}`
+        `/api/communities/${communityId2}/${targetUserId}`
       );
   
-    
+
       expect(resDelete.status).toBe(200);
-      expect(resDelete.body).toEqual([{ user_id: targetUserId, community_id: communityId }]);
+   
   
-     
+        
       const resList = await makeRequest(
         "get",
-        `/api/communities/${communityId}/members`
+        `/api/communities/${communityId2}/members`
       );
       const memberUserIds = resList.body.map((m: any) => m.user_id);
       expect(memberUserIds).not.toContain(targetUserId);

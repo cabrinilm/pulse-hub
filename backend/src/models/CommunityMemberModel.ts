@@ -22,7 +22,7 @@ class CommunityMemberModel {
       .insert({
         community_id,
         user_id,
-        role: role ?? "member",         
+        role: role ?? "member",
         status: status ?? "accepted",
         joined_at: new Date().toISOString(),
       })
@@ -42,78 +42,67 @@ class CommunityMemberModel {
 
     return data as CommunityMember;
   }
- 
+
   // Get members of a community
 
+  async getAllMembers(
+    supabase: SupabaseClient<Database>,
+    communityId: string
+  ): Promise<CommunityMember[]> {
+    const { data, error } = await supabase
+      .from("community_members")
+      .select("*")
+      .eq("community_id", communityId)
+      .order("joined_at", { ascending: false });
 
-    async getAllMembers(
-      supabase: SupabaseClient<Database>,
-      communityId: string
-    ): Promise<CommunityMember[]> {
-      const { data, error } = await supabase
-        .from("community_members")
-        .select("*")
-        .eq("community_id", communityId)
-        .order("joined_at", { ascending: false });
-  
-      if (error) {
-        throw new Error(`Failed to fetch members: ${error.message}`);
-      }
-  
-      return (data as CommunityMember[]) || [];
-    }
- 
-    //  Member leaves the community 
-
-    async leaveCommunity(
-      supabase: SupabaseClient<Database>,
-      communityId: string,
-      userId: string,
-    ): Promise<CommunityMember[]> {
-      const { data, error } = await supabase
-        .from("community_members")
-        .delete()
-        .eq("community_id", communityId)
-        .eq("user_id", userId)
-        .select(); 
-    
-      if (error) {
-        throw new Error(`Failed to leave community: ${error.message}`);
-      }
-    
-      return data as CommunityMember[];
-    
+    if (error) {
+      throw new Error(`Failed to fetch members: ${error.message}`);
     }
 
-    // Adm remove member
+    return (data as CommunityMember[]) || [];
+  }
 
-    async admRemove(
-      supabase: SupabaseClient<Database>,
-      communityId: string,
-      removedUserId: string
-    ): Promise<CommunityMember[]> {
-      const { data, error } = await supabase
-        .from("community_members")
-        .delete()
-        .eq("community_id", communityId)
-        .eq("user_id", removedUserId)
-        .select();
-    
-      if (error) {
-        throw new Error(`Failed to remove member: ${error.message}`);
-      }
-    
-      return data as CommunityMember[];
+  //  Member leaves the community
+
+  async leaveCommunity(
+    supabase: SupabaseClient<Database>,
+    communityId: string,
+    userId: string
+  ): Promise<CommunityMember[]> {
+    const { data, error } = await supabase
+      .from("community_members")
+      .delete()
+      .eq("community_id", communityId)
+      .eq("user_id", userId)
+      .select();
+
+    if (error) {
+      throw new Error(`Failed to leave community: ${error.message}`);
     }
 
-    
+    return data as CommunityMember[];
+  }
+
+  // Adm remove member
+
+  async admRemove(
+    supabase: SupabaseClient<Database>,
+    communityId: string,
+    removedUserId: string
+  ): Promise<CommunityMember[]> {
+    const { data, error } = await supabase
+      .from("community_members")
+      .delete()
+      .eq("community_id", communityId)
+      .eq("user_id", removedUserId)
+      .select();
+
+    if (error) {
+      throw new Error(`Failed to remove member: ${error.message}`);
     }
 
-    
-
-
-  
-  
-
+    return data as CommunityMember[];
+  }
+}
 
 export default new CommunityMemberModel();

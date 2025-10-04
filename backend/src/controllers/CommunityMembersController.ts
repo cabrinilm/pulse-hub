@@ -102,10 +102,12 @@ class CommunityMemberController {
   async admRemoveMember(req: Request, res: Response): Promise<void>{
     
     try{
+   
       const removedUserId = req.params.removedUserId;
       const supabase = req.supabase;
       const  communityId = req.params.communityId;
-    
+      console.log(removedUserId)
+      console.log(communityId)
       if (!removedUserId) {
         res.status(400).json({ error: "Community ID is required" });
         return;
@@ -127,7 +129,7 @@ class CommunityMemberController {
       removedUserId
     );
 
-    res.status(200).json({removedMember});
+    res.status(200).json({removedMember: removedMember[0]});
     } catch (error) {
       res.status(500).json({
         error: error instanceof Error ? error.message : "Unknown error",

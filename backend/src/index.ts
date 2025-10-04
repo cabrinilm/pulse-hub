@@ -37,8 +37,8 @@ app.delete('/api/communities/:id', authMiddleware, CommunityController.deleteCom
 
 app.post('/api/communities/:communityId/members', authMiddleware, communityMemberController.joinCommunityById);
 app.get('/api/communities/:communityId/members', authMiddleware, communityMemberController.getAllMembersCommunity);
-app.delete('/api/communities/:communityId/members', authMiddleware, communityMemberController.memberLeavesCommunity)
-app.delete('/api/communities/:communityId/:removedUserId', authMiddleware, communityMemberController.admRemoveMember)
+app.delete('/api/communities/:communityId/members', authMiddleware, communityMemberController.memberLeavesCommunity);
+app.delete('/api/communities/:communityId/:removedUserId', authMiddleware, communityMemberController.admRemoveMember);
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
