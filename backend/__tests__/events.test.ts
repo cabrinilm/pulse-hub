@@ -205,4 +205,42 @@ describe("Events routes", () => {
       expect(resNewEvent.body.error).toMatch('Forbidden: creator_id does not match authenticated user');
     });
   });
+  describe.only("UPDATE /api/events", () => {
+    it("should update event succefully without community", async () => {
+      const eventData = {
+        creator_id: creatorId,
+        community_id: null,
+        title: "Allowed Event",
+        description: "User created event without community",
+        event_date: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
+        is_public: true,
+        price: 0,
+        location: "Online",
+      };
+
+      const resNewEvent = await makeRequest("post", "/api/events", eventData);
+        
+    
+   
+      expect(resNewEvent.status).toBe(201);
+
+      const updateEvent =  {
+        creator_id: creatorId,
+        community_id: null,
+        title: "Pizza day Event",
+        description: "User created event without community",
+        event_date: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
+        is_public: true,
+        price: 0,
+        location: "Online",
+      };
+        
+      const resUpdateEvent =   await makeRequest("patch", `/api/events/${resNewEvent.body.id}`,  updateEvent);
+      
+      expect(resUpdateEvent.status).toBe(200);
+      expect(resUpdateEvent.body.title).toBe(updateEvent.title);
+      expect(resUpdateEvent.body.description).toBe(updateEvent.description);
+
+   });
+  });
 });
