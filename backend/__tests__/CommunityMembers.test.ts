@@ -105,7 +105,7 @@ describe("Community.Members routes", () => {
       expect(memberUserIds).not.toContain(userId);
       
     });
-    it.only("adm should be able to remove a member", async () => {
+    it("adm should be able to remove a member", async () => {
       
       const targetUserId = "98234733-7397-4478-9e8b-504761923450";
   

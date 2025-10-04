@@ -86,7 +86,7 @@ describe("Events routes", () => {
     it("should create event successfully for community where user is a member", async () => {
       const eventData = {
         creator_id: creatorId,
-        community_id: "e5f2ff2f-9d5a-4223-8eca-a05cc1439ea2",
+        community_id: "6af95627-c2f9-42bc-bd04-559daf11027e",
         title: "Authorized Event",
         description: "User is a member of this community",
         event_date: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
@@ -97,13 +97,13 @@ describe("Events routes", () => {
 
       const resNewEvent = await makeRequest("post", "/api/events", eventData);
 
-     
+    
       expect(resNewEvent.status).toBe(201);
 
       const event: Event = resNewEvent.body;
       expect(event).toHaveProperty("id");
       expect(event.title).toBe("Authorized Event");
-      expect(event.community_id).toBe('e5f2ff2f-9d5a-4223-8eca-a05cc1439ea2');
+      expect(event.community_id).toBe('6af95627-c2f9-42bc-bd04-559daf11027e');
     });
 
     it("should fail to create event for community where user is not a member", async () => {
@@ -205,7 +205,7 @@ describe("Events routes", () => {
       expect(resNewEvent.body.error).toMatch('Forbidden: creator_id does not match authenticated user');
     });
   });
-  describe.only("UPDATE /api/events", () => {
+  describe("UPDATE /api/events", () => {
     it("should update event succefully without community", async () => {
       const eventData = {
         creator_id: creatorId,
@@ -246,7 +246,7 @@ describe("Events routes", () => {
    it("should update event successfully for community where user is a member", async () => {
     const eventData = {
       creator_id: creatorId,
-      community_id: 'e5f2ff2f-9d5a-4223-8eca-a05cc1439ea2',
+      community_id: '6af95627-c2f9-42bc-bd04-559daf11027e',
       title: "Community Event",
       description: "Event for community",
       event_date: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
@@ -260,7 +260,7 @@ describe("Events routes", () => {
 
     const updateEvent = {
       creator_id: creatorId,
-      community_id: 'e5f2ff2f-9d5a-4223-8eca-a05cc1439ea2',
+      community_id: '6af95627-c2f9-42bc-bd04-559daf11027e',
       title: "Updated Community Event",
       description: "Updated event for community",
       event_date: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),

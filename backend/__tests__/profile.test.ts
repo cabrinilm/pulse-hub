@@ -68,7 +68,7 @@ describe('Profile Routes (Integration)', () => {
       .set('Content-Type', 'application/json')
       .send({ username });
   
-   
+             console.log(duplicateResponse.body)
     expect(duplicateResponse.status).toBe(400);
     expect(duplicateResponse.body).toHaveProperty('error', 'Username already taken');
     expect(duplicateResponse.headers['content-type']).toMatch(/application\/json/);
