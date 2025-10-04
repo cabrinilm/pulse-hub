@@ -85,11 +85,11 @@ class EventsModel {
 
   // update event
 
-  async updateEventByOwner(
+  async updateEvent(
     supabase: SupabaseClient<Database>,
+    event_id: string,
     creator_id: string,
     eventData: {
-      id: string;
       title: string;
       description?: string | null;
       event_date: string;
@@ -98,12 +98,12 @@ class EventsModel {
       location?: string | null;
       community_id?: string | null;
     }
-  ): Promise<Event> {
+  ): Promise<Event | null> {
     const validation = this.validateTitle(eventData.title);
     if (!validation.isValid) {
       throw new Error(validation.error);
     }
-
+  
     const { data, error } = await supabase
       .from("events")
       .update({
@@ -116,20 +116,22 @@ class EventsModel {
         community_id: eventData.community_id ?? null,
         updated_at: new Date().toISOString(),
       })
-      .eq("id", eventData.id)
+      .eq("id", event_id)
       .eq("creator_id", creator_id)
       .select()
-      .single();
-
+      .maybeSingle();
+  
     if (error) {
+      if (error.code === "42501") {
+        throw new Error("Forbidden: user is not the creator of the event or not a member of the specified community");
+      }
+      if (error.code === "23505") {
+        throw new Error("Event with this title already exists");
+      }
       throw new Error(`Failed to update event: ${error.message}`);
     }
-
-    if (!data) {
-      throw new Error("Event not found or not authorized");
-    }
-
-    return data as Event;
+  
+    return data as Event | null;
   }
 }
 
