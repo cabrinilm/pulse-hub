@@ -82,8 +82,37 @@ class CommunityMemberModel {
       }
     
       return data as CommunityMember[];
+    
     }
-  }
+
+    // Adm remove member
+
+    async admRemove(
+      supabase: SupabaseClient<Database>,
+      communityId: string,
+      removedUserId: string
+    ): Promise<CommunityMember[]> {
+      const { data, error } = await supabase
+        .from("community_members")
+        .delete()
+        .eq("community_id", communityId)
+        .eq("user_id", removedUserId)
+        .select();
+    
+      if (error) {
+        throw new Error(`Failed to remove member: ${error.message}`);
+      }
+    
+      return data as CommunityMember[];
+    }
+
+    
+    }
+
+    
+
+
+  
   
 
 
