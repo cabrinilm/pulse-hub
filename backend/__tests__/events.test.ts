@@ -15,18 +15,20 @@ type Event = Database["public"]["Tables"]["events"]["Row"];
 describe("Events routes", () => {
   let creatorId: string;
   let supabase: SupabaseClient<Database>;
+  let eventId: string;
   const authHeader = { Authorization: `Bearer ${bearerToken}` };
 
   // Helper
   const makeRequest = (
     method: "post" | "get" | "patch" | "delete",
     url: string,
-    body?: object
+    body?: object,
+    headers: { [key: string]: string } = authHeader 
   ) => {
     let req = request(app)[method](url)
-      .set("Authorization", `Bearer ${bearerToken}`)
       .set("Content-Type", "application/json");
-
+  
+    if (headers) req = req.set(headers);
     if (body) req = req.send(body);
     return req;
   };
@@ -44,7 +46,8 @@ describe("Events routes", () => {
 
     if (!user) throw new Error("Test user not found");
     creatorId = user.id;
- 
+   
+
   });
 
   afterEach(async () => {
@@ -355,30 +358,86 @@ describe("Events routes", () => {
     expect(resUpdateEvent.body.error).toMatch("Event not found or update failed");
   });
   });
-  describe("DELETE  /api/events/:id", () => {
-    it("should delete an event create by a user", async () => {
+  describe("DELETE /api/events/:id", () => {
+    it("should delete event successfully by creator", async () => {
 
-      const eventData = {
-        creator_id: creatorId,
-        community_id: null,
-        title: "Allowed Event",
-        description: "User created event without community",
-        event_date: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
-        is_public: true,
-        price: 0,
-        location: "Online",
-      };
+      const { data: event } = await supabase
+        .from("events")
+        .insert({
+          creator_id: creatorId,
+          community_id: null,
+          title: "Test Event",
+          description: "Event for testing deletion",
+          event_date: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
+          is_public: true,
+          price: 0,
+          location: "Online",
+        })
+        .select()
+        .single();
+      const eventId = event!.id;
 
-      const resNewEvent = await makeRequest("post", "/api/events", eventData);
+      const resDeleteEvent = await makeRequest("delete", `/api/events/${eventId}`);
 
-   
-      expect(resNewEvent.status).toBe(201);
       
+      expect(resDeleteEvent.status).toBe(204);
+      expect(resDeleteEvent.body).toEqual({});
 
 
+      const { data } = await supabase
+        .from("events")
+        .select()
+        .eq("id", eventId)
+        .maybeSingle();
+      expect(data).toBeNull();
+    });
 
+    it("should fail to delete event by non-creator", async () => {
+      const nonCreatorEventId = "05f185de-e280-4119-9f02-d5f456909f43"; 
 
+      const resDeleteEvent = await makeRequest("delete", `/api/events/${nonCreatorEventId}`);
 
-    })
-  })
+     
+      expect(resDeleteEvent.status).toBe(404);
+      expect(resDeleteEvent.body).toHaveProperty("error");
+      expect(resDeleteEvent.body.error).toMatch(/Forbidden|not found/i);
+    });
+
+    it("should fail to delete non-existent event", async () => {
+      const invalidEventId = "05f185de-e280-4119-9f02-d5f456909f11";
+
+      const resDeleteEvent = await makeRequest("delete", `/api/events/${invalidEventId}`);
+
+     
+      expect(resDeleteEvent.status).toBe(404);
+      expect(resDeleteEvent.body).toHaveProperty("error");
+      expect(resDeleteEvent.body.error).toMatch(/not found/i);
+    });
+
+    it("should fail to delete event if user is not authenticated", async () => {
+     
+      const { data: event } = await supabase
+        .from("events")
+        .insert({
+          creator_id: creatorId,
+          community_id: null,
+          title: "Test Event Unauthenticated",
+          description: "Event for testing unauthenticated deletion",
+          event_date: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
+          is_public: true,
+          price: 0,
+          location: "Online",
+        })
+        .select()
+        .single();
+      const eventId = event!.id;
+
+      const resDeleteEvent = await makeRequest("delete", `/api/events/${eventId}`, undefined, {});
+
+     
+      expect(resDeleteEvent.status).toBe(401);
+      expect(resDeleteEvent.body).toHaveProperty("error");
+      expect(resDeleteEvent.body.error).toMatch('No token provided');
+    });
+  });
 });

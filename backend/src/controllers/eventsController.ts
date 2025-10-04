@@ -112,7 +112,7 @@ class EventsController {
       const creatorId = req.user?.id;
       const supabase = req.supabase;
       const eventId = req.params.id;
-
+       
       if (!creatorId) {
         res.status(401).json({ error: "Unauthorized: No user ID found" });
         return;
@@ -129,7 +129,7 @@ class EventsController {
         return;
       }
 
-      res.status(204).send(); // Status 204 para exclusão bem-sucedida
+      res.status(204).send(); 
     } catch (error) {
       if (error instanceof Error && error.message.includes("Forbidden")) {
         res.status(403).json({ error: error.message });

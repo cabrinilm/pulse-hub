@@ -141,20 +141,22 @@ class EventsModel {
     event_id: string,
     creator_id: string
   ): Promise<boolean> {
-    const { error, count } = await supabase
+    const { data, error } = await supabase
       .from("events")
       .delete()
       .eq("id", event_id)
-      .eq("creator_id", creator_id);
-
+      .eq("creator_id", creator_id)
+      .select(); 
+  
     if (error) {
       if (error.code === "42501") {
         throw new Error("Forbidden: user is not the creator of the event");
       }
       throw new Error(`Failed to delete event: ${error.message}`);
     }
+  
 
-    return count! > 0;
+    return !!data && data.length > 0;
   }
 }
 

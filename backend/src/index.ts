@@ -46,7 +46,7 @@ app.delete('/api/communities/:communityId/:removedUserId', authMiddleware, commu
 
 app.post('/api/events', authMiddleware, eventsController.createEventByUser);
 app.patch(`/api/events/:id`, authMiddleware, eventsController.updateEventByUser);
-
+app.delete(`/api/events/:id`, authMiddleware, eventsController.deleteEventByUser);
 
 
 
