@@ -7,7 +7,6 @@ class CommunityController {
       const { name, description } = req.body;
       const creatorId = req.user?.id;
       const supabase = req.supabase;
-   
 
       if (!creatorId) {
         res.status(401).json({ error: "Unauthorized: No user ID found" });
@@ -30,11 +29,9 @@ class CommunityController {
       );
       res.status(201).json(community);
     } catch (error) {
-      res
-        .status(400)
-        .json({
-          error: error instanceof Error ? error.message : "Unknown error",
-        });
+      res.status(400).json({
+        error: error instanceof Error ? error.message : "Unknown error",
+      });
     }
   }
 
@@ -49,11 +46,9 @@ class CommunityController {
       const communities = await CommunityModel.getAll(supabase);
       res.status(200).json(communities);
     } catch (error) {
-      res
-        .status(500)
-        .json({
-          error: error instanceof Error ? error.message : "Unknown error",
-        });
+      res.status(500).json({
+        error: error instanceof Error ? error.message : "Unknown error",
+      });
     }
   }
 
@@ -79,11 +74,9 @@ class CommunityController {
 
       res.status(200).json(community);
     } catch (error) {
-      res
-        .status(500)
-        .json({
-          error: error instanceof Error ? error.message : "Unknown error",
-        });
+      res.status(500).json({
+        error: error instanceof Error ? error.message : "Unknown error",
+      });
     }
   }
 
@@ -120,11 +113,9 @@ class CommunityController {
       if (error instanceof Error && error.message === "Community not found") {
         res.status(404).json({ error: "Community not found" });
       } else {
-        res
-          .status(400)
-          .json({
-            error: error instanceof Error ? error.message : "Unknown error",
-          });
+        res.status(400).json({
+          error: error instanceof Error ? error.message : "Unknown error",
+        });
       }
     }
   }
@@ -150,11 +141,9 @@ class CommunityController {
       await CommunityModel.delete(supabase, id);
       res.status(204).send();
     } catch (error) {
-      res
-        .status(400)
-        .json({
-          error: error instanceof Error ? error.message : "Unknown error",
-        });
+      res.status(400).json({
+        error: error instanceof Error ? error.message : "Unknown error",
+      });
     }
   }
 }

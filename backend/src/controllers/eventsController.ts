@@ -1,7 +1,10 @@
 import type { Request, Response } from "express";
 import EventsModel from "../models/EventsModel";
 
+
 class EventsController {
+
+  // create event 
   async createEventByUser(req: Request, res: Response): Promise<void> {
     try {
       const creatorId = req.user?.id;
@@ -47,6 +50,51 @@ class EventsController {
         return;
       }
       res.status(500).json({
+        error: error instanceof Error ? error.message : "Unknown error",
+      });
+    }
+  }
+
+  // update event 
+
+  async updateEventByOwner(req: Request, res: Response): Promise<void> {
+    try {
+      const creatorId = req.user?.id;
+      const supabase = req.supabase;
+      const { title, description, event_date, is_public, price, location, community_id } = req.body;
+      const { id } = req.params;
+  
+      if (!creatorId) {
+        res.status(401).json({ error: "Unauthorized: No user ID found" });
+        return;
+      }
+      if (!supabase) {
+        res.status(500).json({ error: "Supabase client not found in request" });
+        return;
+      }
+      if (!id) {
+        res.status(400).json({ error: "Event ID is required" });
+        return;
+      }
+      if (!title || !event_date) {
+        res.status(400).json({ error: "Title and event_date are required" });
+        return;
+      }
+  
+      const updatedEvent = await EventsModel.updateEvent(supabase, creatorId, {
+        id,
+        title,
+        description,
+        event_date,
+        is_public,
+        price,
+        location,
+        community_id,
+      });
+  
+      res.status(200).json(updatedEvent);
+    } catch (error) {
+      res.status(400).json({
         error: error instanceof Error ? error.message : "Unknown error",
       });
     }
