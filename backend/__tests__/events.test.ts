@@ -440,4 +440,30 @@ describe("Events routes", () => {
       expect(resDeleteEvent.body.error).toMatch('No token provided');
     });
   });
+  describe("GET /api/events", () => {
+    it.only("should list public events", async () => {
+         
+      const eventData = {
+        creator_id: creatorId,
+        community_id: null,
+        title: "Allowed Event",
+        description: "User created event without community",
+        event_date: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
+        is_public: true,
+        price: 0,
+        location: "Online",
+      };
+
+      const resNewEvent = await makeRequest("post", "/api/events", eventData);
+    
+
+    
+      const res = await makeRequest("get", "/api/events", {});
+
+      console.log("Response body:", JSON.stringify(res.body, null, 2));
+      expect(res.status).toBe(200);
+      expect(Array.isArray(res.body)).toBe(true);
+      expect(res.body.some((event: Event) => event.title === "Allowed Event")).toBe(true);
+    });
+  });
 });

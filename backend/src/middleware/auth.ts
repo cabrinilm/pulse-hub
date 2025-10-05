@@ -24,9 +24,10 @@ export async function authMiddleware(req: Request, res: Response, next: NextFunc
   );
 
 
-
+  
   req.user = { id: user.id };
   req.supabase = userSupabase;
+
  
   next();
 }
