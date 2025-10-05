@@ -23,11 +23,10 @@ describe("Events routes", () => {
     method: "post" | "get" | "patch" | "delete",
     url: string,
     body?: object,
-    headers: { [key: string]: string } = authHeader 
+    headers: { [key: string]: string } = authHeader
   ) => {
-    let req = request(app)[method](url)
-      .set("Content-Type", "application/json");
-  
+    let req = request(app)[method](url).set("Content-Type", "application/json");
+
     if (headers) req = req.set(headers);
     if (body) req = req.send(body);
     return req;
@@ -46,15 +45,10 @@ describe("Events routes", () => {
 
     if (!user) throw new Error("Test user not found");
     creatorId = user.id;
-   
-
   });
 
   afterEach(async () => {
-    await supabase
-      .from("events")
-      .delete()
-      .eq("creator_id", creatorId);
+    await supabase.from("events").delete().eq("creator_id", creatorId);
   });
 
   describe("POST /api/events", () => {
@@ -72,7 +66,6 @@ describe("Events routes", () => {
 
       const resNewEvent = await makeRequest("post", "/api/events", eventData);
 
-   
       expect(resNewEvent.status).toBe(201);
 
       const event: Event = resNewEvent.body;
@@ -100,13 +93,12 @@ describe("Events routes", () => {
 
       const resNewEvent = await makeRequest("post", "/api/events", eventData);
 
-    
       expect(resNewEvent.status).toBe(201);
 
       const event: Event = resNewEvent.body;
       expect(event).toHaveProperty("id");
       expect(event.title).toBe("Authorized Event");
-      expect(event.community_id).toBe('6af95627-c2f9-42bc-bd04-559daf11027e');
+      expect(event.community_id).toBe("6af95627-c2f9-42bc-bd04-559daf11027e");
     });
 
     it("should fail to create event for community where user is not a member", async () => {
@@ -123,7 +115,6 @@ describe("Events routes", () => {
 
       const resNewEvent = await makeRequest("post", "/api/events", eventData);
 
-    
       expect(resNewEvent.status).toBe(403);
       expect(resNewEvent.body).toHaveProperty("error");
       expect(resNewEvent.body.error).toMatch(/Forbidden/i);
@@ -142,7 +133,6 @@ describe("Events routes", () => {
 
       const resNewEvent = await makeRequest("post", "/api/events", eventData);
 
-     
       expect(resNewEvent.status).toBe(400);
       expect(resNewEvent.body).toHaveProperty("error");
       expect(resNewEvent.body.error).toMatch(/Title.*required/i);
@@ -152,7 +142,7 @@ describe("Events routes", () => {
       const eventData = {
         creator_id: creatorId,
         community_id: null,
-        title: "!!", 
+        title: "!!",
         description: "Event with invalid title",
         event_date: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
         is_public: true,
@@ -162,7 +152,6 @@ describe("Events routes", () => {
 
       const resNewEvent = await makeRequest("post", "/api/events", eventData);
 
-  
       expect(resNewEvent.status).toBe(500);
       expect(resNewEvent.body).toHaveProperty("error");
       expect(resNewEvent.body.error).toMatch(/title must be 3-50 characters/i);
@@ -170,7 +159,7 @@ describe("Events routes", () => {
 
     it("should fail if creator_id does not match authenticated user", async () => {
       const eventData = {
-        creator_id: "different-user-id", 
+        creator_id: "different-user-id",
         community_id: null,
         title: "Invalid Creator Event",
         description: "Creator ID does not match",
@@ -181,8 +170,7 @@ describe("Events routes", () => {
       };
 
       const resNewEvent = await makeRequest("post", "/api/events", eventData);
- 
-  
+
       expect(resNewEvent.status).toBe(403);
       expect(resNewEvent.body).toHaveProperty("error");
       expect(resNewEvent.body.error).toMatch(/Forbidden.*creator_id/i);
@@ -202,10 +190,11 @@ describe("Events routes", () => {
 
       const resNewEvent = await makeRequest("post", "/api/events", eventData);
 
-     
       expect(resNewEvent.status).toBe(403);
       expect(resNewEvent.body).toHaveProperty("error");
-      expect(resNewEvent.body.error).toMatch('Forbidden: creator_id does not match authenticated user');
+      expect(resNewEvent.body.error).toMatch(
+        "Forbidden: creator_id does not match authenticated user"
+      );
     });
   });
   describe("UPDATE /api/events", () => {
@@ -222,12 +211,10 @@ describe("Events routes", () => {
       };
 
       const resNewEvent = await makeRequest("post", "/api/events", eventData);
-        
-    
-   
+
       expect(resNewEvent.status).toBe(201);
 
-      const updateEvent =  {
+      const updateEvent = {
         creator_id: creatorId,
         community_id: null,
         title: "Pizza day Event",
@@ -237,130 +224,152 @@ describe("Events routes", () => {
         price: 0,
         location: "Online",
       };
-        
-      const resUpdateEvent =   await makeRequest("patch", `/api/events/${resNewEvent.body.id}`,  updateEvent);
-         
-  
+
+      const resUpdateEvent = await makeRequest(
+        "patch",
+        `/api/events/${resNewEvent.body.id}`,
+        updateEvent
+      );
+
       expect(resUpdateEvent.status).toBe(200);
       expect(resUpdateEvent.body.title).toBe(updateEvent.title);
       expect(resUpdateEvent.body.description).toBe(updateEvent.description);
+    });
+    it("should update event successfully for community where user is a member", async () => {
+      const eventData = {
+        creator_id: creatorId,
+        community_id: "6af95627-c2f9-42bc-bd04-559daf11027e",
+        title: "Community Event",
+        description: "Event for community",
+        event_date: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
+        is_public: true,
+        price: 0,
+        location: "Online",
+      };
 
-   });
-   it("should update event successfully for community where user is a member", async () => {
-    const eventData = {
-      creator_id: creatorId,
-      community_id: '6af95627-c2f9-42bc-bd04-559daf11027e',
-      title: "Community Event",
-      description: "Event for community",
-      event_date: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
-      is_public: true,
-      price: 0,
-      location: "Online",
-    };
+      const resNewEvent = await makeRequest("post", "/api/events", eventData);
+      expect(resNewEvent.status).toBe(201);
 
-    const resNewEvent = await makeRequest("post", "/api/events", eventData);
-    expect(resNewEvent.status).toBe(201);
+      const updateEvent = {
+        creator_id: creatorId,
+        community_id: "6af95627-c2f9-42bc-bd04-559daf11027e",
+        title: "Updated Community Event",
+        description: "Updated event for community",
+        event_date: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
+        is_public: false,
+        price: 10,
+        location: "In-person",
+      };
 
-    const updateEvent = {
-      creator_id: creatorId,
-      community_id: '6af95627-c2f9-42bc-bd04-559daf11027e',
-      title: "Updated Community Event",
-      description: "Updated event for community",
-      event_date: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
-      is_public: false,
-      price: 10,
-      location: "In-person",
-    };
+      const resUpdateEvent = await makeRequest(
+        "patch",
+        `/api/events/${resNewEvent.body.id}`,
+        updateEvent
+      );
 
-    const resUpdateEvent = await makeRequest("patch", `/api/events/${resNewEvent.body.id}`, updateEvent);
-    
-   
-    expect(resUpdateEvent.status).toBe(200);
-    expect(resUpdateEvent.body.title).toBe(updateEvent.title);
-    expect(resUpdateEvent.body.is_public).toBe(false);
-    expect(resUpdateEvent.body.price).toBe(10);
-  });
-  it("should fail to update event for community where user is not a member", async () => {
-    const updateEvent = {
-      creator_id: creatorId,
-      community_id: "98d6642c-37ec-41df-b407-50ec60196583", 
-      title: "Unauthorized Update",
-      description: "User is not a member of this community",
-      event_date: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
-      is_public: true,
-      price: 0,
-      location: "Online",
-    };
-    let eventId = '05f185de-e280-4119-9f02-d5f456909f43';
-    const resUpdateEvent = await makeRequest("patch", `/api/events/${eventId}`, updateEvent);
+      expect(resUpdateEvent.status).toBe(200);
+      expect(resUpdateEvent.body.title).toBe(updateEvent.title);
+      expect(resUpdateEvent.body.is_public).toBe(false);
+      expect(resUpdateEvent.body.price).toBe(10);
+    });
+    it("should fail to update event for community where user is not a member", async () => {
+      const updateEvent = {
+        creator_id: creatorId,
+        community_id: "98d6642c-37ec-41df-b407-50ec60196583",
+        title: "Unauthorized Update",
+        description: "User is not a member of this community",
+        event_date: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
+        is_public: true,
+        price: 0,
+        location: "Online",
+      };
+      let eventId = "05f185de-e280-4119-9f02-d5f456909f43";
+      const resUpdateEvent = await makeRequest(
+        "patch",
+        `/api/events/${eventId}`,
+        updateEvent
+      );
 
-   
-    expect(resUpdateEvent.status).toBe(404);
-    expect(resUpdateEvent.body).toHaveProperty("error");
-    expect(resUpdateEvent.body.error).toMatch('Event not found or update failed');
-  });
-  it("should fail to update event by non-creator", async () => {
-    const eventId = "05f185de-e280-4119-9f02-d5f456909f43"; 
+      expect(resUpdateEvent.status).toBe(404);
+      expect(resUpdateEvent.body).toHaveProperty("error");
+      expect(resUpdateEvent.body.error).toMatch(
+        "Event not found or update failed"
+      );
+    });
+    it("should fail to update event by non-creator", async () => {
+      const eventId = "05f185de-e280-4119-9f02-d5f456909f43";
 
-    const updateEvent = {
-      creator_id: creatorId,
-      community_id: null,
-      title: "Non Creator Update",
-      description: "Attempt by non-creator",
-      event_date: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
-      is_public: true,
-      price: 0,
-      location: "Online",
-    };
+      const updateEvent = {
+        creator_id: creatorId,
+        community_id: null,
+        title: "Non Creator Update",
+        description: "Attempt by non-creator",
+        event_date: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
+        is_public: true,
+        price: 0,
+        location: "Online",
+      };
 
-    const resUpdateEvent = await makeRequest("patch", `/api/events/${eventId}`, updateEvent);
+      const resUpdateEvent = await makeRequest(
+        "patch",
+        `/api/events/${eventId}`,
+        updateEvent
+      );
 
-  
-    expect(resUpdateEvent.status).toBe(404);
-    expect(resUpdateEvent.body).toHaveProperty("error");
-    expect(resUpdateEvent.body.error).toMatch(/Event not found or update failed/i);
-  });
-  it("should fail if title is missing", async () => {
-    const updateEvent = {
-      creator_id: creatorId,
-      community_id: null,
-      description: "Event without title",
-      event_date: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
-      is_public: true,
-      price: 0,
-      location: "Online",
-    };
-    const eventId = '5fcd3276-657f-417b-bf9e-c0039214172c';
-    const resUpdateEvent = await makeRequest("patch", `/api/events/${eventId}`, updateEvent);
+      expect(resUpdateEvent.status).toBe(404);
+      expect(resUpdateEvent.body).toHaveProperty("error");
+      expect(resUpdateEvent.body.error).toMatch(
+        /Event not found or update failed/i
+      );
+    });
+    it("should fail if title is missing", async () => {
+      const updateEvent = {
+        creator_id: creatorId,
+        community_id: null,
+        description: "Event without title",
+        event_date: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
+        is_public: true,
+        price: 0,
+        location: "Online",
+      };
+      const eventId = "5fcd3276-657f-417b-bf9e-c0039214172c";
+      const resUpdateEvent = await makeRequest(
+        "patch",
+        `/api/events/${eventId}`,
+        updateEvent
+      );
 
-  
-    expect(resUpdateEvent.status).toBe(400);
-    expect(resUpdateEvent.body).toHaveProperty("error");
-    expect(resUpdateEvent.body.error).toMatch(/Title.*required/i);
-  });
-  it("should fail if user is not authenticated", async () => {
-    const updateEvent = {
-      creator_id: creatorId,
-      community_id: null,
-      title: "Unauthenticated Update",
-      description: "No authenticated user",
-      event_date: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
-      is_public: true,
-      price: 0,
-      location: "Online",
-    };
-    const eventId = '5fcd3276-657f-417b-bf9e-c0039214172c';
-    const resUpdateEvent = await makeRequest("patch", `/api/events/${eventId}`, updateEvent);
+      expect(resUpdateEvent.status).toBe(400);
+      expect(resUpdateEvent.body).toHaveProperty("error");
+      expect(resUpdateEvent.body.error).toMatch(/Title.*required/i);
+    });
+    it("should fail if user is not authenticated", async () => {
+      const updateEvent = {
+        creator_id: creatorId,
+        community_id: null,
+        title: "Unauthenticated Update",
+        description: "No authenticated user",
+        event_date: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
+        is_public: true,
+        price: 0,
+        location: "Online",
+      };
+      const eventId = "5fcd3276-657f-417b-bf9e-c0039214172c";
+      const resUpdateEvent = await makeRequest(
+        "patch",
+        `/api/events/${eventId}`,
+        updateEvent
+      );
 
- 
-    expect(resUpdateEvent.status).toBe(404);
-    expect(resUpdateEvent.body).toHaveProperty("error");
-    expect(resUpdateEvent.body.error).toMatch("Event not found or update failed");
-  });
+      expect(resUpdateEvent.status).toBe(404);
+      expect(resUpdateEvent.body).toHaveProperty("error");
+      expect(resUpdateEvent.body.error).toMatch(
+        "Event not found or update failed"
+      );
+    });
   });
   describe("DELETE /api/events/:id", () => {
     it("should delete event successfully by creator", async () => {
-
       const { data: event } = await supabase
         .from("events")
         .insert({
@@ -377,12 +386,13 @@ describe("Events routes", () => {
         .single();
       const eventId = event!.id;
 
-      const resDeleteEvent = await makeRequest("delete", `/api/events/${eventId}`);
+      const resDeleteEvent = await makeRequest(
+        "delete",
+        `/api/events/${eventId}`
+      );
 
-      
       expect(resDeleteEvent.status).toBe(204);
       expect(resDeleteEvent.body).toEqual({});
-
 
       const { data } = await supabase
         .from("events")
@@ -393,11 +403,13 @@ describe("Events routes", () => {
     });
 
     it("should fail to delete event by non-creator", async () => {
-      const nonCreatorEventId = "05f185de-e280-4119-9f02-d5f456909f43"; 
+      const nonCreatorEventId = "05f185de-e280-4119-9f02-d5f456909f43";
 
-      const resDeleteEvent = await makeRequest("delete", `/api/events/${nonCreatorEventId}`);
+      const resDeleteEvent = await makeRequest(
+        "delete",
+        `/api/events/${nonCreatorEventId}`
+      );
 
-     
       expect(resDeleteEvent.status).toBe(404);
       expect(resDeleteEvent.body).toHaveProperty("error");
       expect(resDeleteEvent.body.error).toMatch(/Forbidden|not found/i);
@@ -406,16 +418,17 @@ describe("Events routes", () => {
     it("should fail to delete non-existent event", async () => {
       const invalidEventId = "05f185de-e280-4119-9f02-d5f456909f11";
 
-      const resDeleteEvent = await makeRequest("delete", `/api/events/${invalidEventId}`);
+      const resDeleteEvent = await makeRequest(
+        "delete",
+        `/api/events/${invalidEventId}`
+      );
 
-     
       expect(resDeleteEvent.status).toBe(404);
       expect(resDeleteEvent.body).toHaveProperty("error");
       expect(resDeleteEvent.body.error).toMatch(/not found/i);
     });
 
     it("should fail to delete event if user is not authenticated", async () => {
-     
       const { data: event } = await supabase
         .from("events")
         .insert({
@@ -432,17 +445,20 @@ describe("Events routes", () => {
         .single();
       const eventId = event!.id;
 
-      const resDeleteEvent = await makeRequest("delete", `/api/events/${eventId}`, undefined, {});
+      const resDeleteEvent = await makeRequest(
+        "delete",
+        `/api/events/${eventId}`,
+        undefined,
+        {}
+      );
 
-     
       expect(resDeleteEvent.status).toBe(401);
       expect(resDeleteEvent.body).toHaveProperty("error");
-      expect(resDeleteEvent.body.error).toMatch('No token provided');
+      expect(resDeleteEvent.body.error).toMatch("No token provided");
     });
   });
   describe("GET /api/events", () => {
     it("should list public events", async () => {
-         
       const eventData = {
         creator_id: creatorId,
         community_id: null,
@@ -455,53 +471,99 @@ describe("Events routes", () => {
       };
 
       const resNewEvent = await makeRequest("post", "/api/events", eventData);
-    
 
-    
       const res = await makeRequest("get", "/api/events", {});
 
       console.log("Response body:", JSON.stringify(res.body, null, 2));
       expect(res.status).toBe(200);
       expect(Array.isArray(res.body)).toBe(true);
-      expect(res.body.some((event: Event) => event.title === "Allowed Event")).toBe(true);
+      expect(
+        res.body.some((event: Event) => event.title === "Allowed Event")
+      ).toBe(true);
     });
     it("should list events for community where user is a member", async () => {
       const res = await makeRequest("get", "/api/events");
-        console.log(res.body)
-        
-      console.log("Response body:", JSON.stringify(res.body, null, 2));
+ 
+
+    
       expect(res.status).toBe(200);
       expect(Array.isArray(res.body)).toBe(true);
-      expect(res.body.some((event: Event) => event.title === "event to testert" && event.community_id === '959e1a73-f59d-4450-bc16-9becae6d87ca')).toBe(true);
+      expect(
+        res.body.some(
+          (event: Event) =>
+            event.title === "event to testert" &&
+            event.community_id === "959e1a73-f59d-4450-bc16-9becae6d87ca"
+        )
+      ).toBe(true);
     });
     it("should not list private events not accessible", async () => {
       const res = await makeRequest("get", "/api/events");
 
-      console.log("Response body:", JSON.stringify(res.body, null, 2));
-      
+    
+
       expect(res.status).toBe(200);
       expect(Array.isArray(res.body)).toBe(true);
-      expect(res.body.some((event: Event) => event.title === "anual meeting")).toBe(false);
-  });
-  it("should fail to list events if user is not authenticated", async () => {
-    const res = await makeRequest("get", "/api/events", undefined, {});
-
-    console.log("Response body:", JSON.stringify(res.body, null, 2));
-    expect(res.status).toBe(401);
-    expect(res.body).toHaveProperty("error");
-    expect(res.body.error).toMatch('No token provided');
-  });
-  describe("GET /api/events/:id", () => {
-    it.only("should get public event details", async () => {
-      const publicEventId = '94b58b43-60df-4077-ac58-d2269b75a56f'
-      const res = await makeRequest("get", `/api/events/${publicEventId}`);
+      expect(
+        res.body.some((event: Event) => event.title === "anual meeting")
+      ).toBe(false);
+    });
+    it("should fail to list events if user is not authenticated", async () => {
+      const res = await makeRequest("get", "/api/events", undefined, {});
 
       console.log("Response body:", JSON.stringify(res.body, null, 2));
-      expect(res.status).toBe(200);
-      expect(res.body).toHaveProperty("id", publicEventId);
-      expect(res.body.title).toBe("event to testert");
-      expect(res.body.is_public).toBe(true);
+      expect(res.status).toBe(401);
+      expect(res.body).toHaveProperty("error");
+      expect(res.body.error).toMatch("No token provided");
     });
-});
-});
+    describe("GET /api/events/:id", () => {
+      it("should get public event details", async () => {
+        const publicEventId = "94b58b43-60df-4077-ac58-d2269b75a56f";
+        const res = await makeRequest("get", `/api/events/${publicEventId}`);
+
+   
+        expect(res.status).toBe(200);
+        expect(res.body).toHaveProperty("id", publicEventId);
+        expect(res.body.title).toBe("event to testert");
+        expect(res.body.is_public).toBe(true);
+      });
+      it("should get event details for community where user is a member", async () => {
+        const communityEventId = "94b58b43-60df-4077-ac58-d2269b75a56f";
+        const res = await makeRequest("get", `/api/events/${communityEventId}`);
+
+   
+        expect(res.status).toBe(200);
+        expect(res.body).toHaveProperty("id", communityEventId);
+        expect(res.body.title).toBe("event to testert");
+      });
+      it("should fail to get private event not accessible", async () => {
+        const privateEventId = "2450fc5c-4271-4a5b-8fb2-9b0d5dd04261";
+        const res = await makeRequest("get", `/api/events/${privateEventId}`);
+
+      
+        expect(res.status).toBe(404);
+        expect(res.body).toHaveProperty("error");
+        expect(res.body.error).toMatch(/not found|not accessible/i);
+      });
+      it("should fail to get non-existent event", async () => {
+        const invalidEventId = "2450fc5c-4271-4a5b-8fb2-9b0d5dd04333";
+  
+        const res = await makeRequest("get", `/api/events/${invalidEventId}`);
+  
+     
+        expect(res.status).toBe(404);
+        expect(res.body).toHaveProperty("error");
+        expect(res.body.error).toMatch(/not found/i);
+      });
+  
+      it("should fail to get event if user is not authenticated", async () => {
+        const publicEventId = '94b58b43-60df-4077-ac58-d2269b75a56f'
+        const res = await makeRequest("get", `/api/events/${publicEventId}`, undefined, {});
+  
+     
+        expect(res.status).toBe(401);
+        expect(res.body).toHaveProperty("error");
+        expect(res.body.error).toMatch('No token provided');
+      });
+    });
+  });
 });
