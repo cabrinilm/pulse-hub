@@ -474,7 +474,7 @@ describe("Events routes", () => {
 
       const res = await makeRequest("get", "/api/events", {});
 
-        expect(res.status).toBe(200);
+      expect(res.status).toBe(200);
       expect(Array.isArray(res.body)).toBe(true);
       expect(
         res.body.some((event: Event) => event.title === "Allowed Event")
@@ -482,9 +482,7 @@ describe("Events routes", () => {
     });
     it("should list events for community where user is a member", async () => {
       const res = await makeRequest("get", "/api/events");
- 
 
-    
       expect(res.status).toBe(200);
       expect(Array.isArray(res.body)).toBe(true);
       expect(
@@ -498,8 +496,6 @@ describe("Events routes", () => {
     it("should not list private events not accessible", async () => {
       const res = await makeRequest("get", "/api/events");
 
-    
-
       expect(res.status).toBe(200);
       expect(Array.isArray(res.body)).toBe(true);
       expect(
@@ -509,7 +505,6 @@ describe("Events routes", () => {
     it("should fail to list events if user is not authenticated", async () => {
       const res = await makeRequest("get", "/api/events", undefined, {});
 
-     
       expect(res.status).toBe(401);
       expect(res.body).toHaveProperty("error");
       expect(res.body.error).toMatch("No token provided");
@@ -519,7 +514,6 @@ describe("Events routes", () => {
         const publicEventId = "94b58b43-60df-4077-ac58-d2269b75a56f";
         const res = await makeRequest("get", `/api/events/${publicEventId}`);
 
-   
         expect(res.status).toBe(200);
         expect(res.body).toHaveProperty("id", publicEventId);
         expect(res.body.title).toBe("event to testert");
@@ -529,7 +523,6 @@ describe("Events routes", () => {
         const communityEventId = "94b58b43-60df-4077-ac58-d2269b75a56f";
         const res = await makeRequest("get", `/api/events/${communityEventId}`);
 
-   
         expect(res.status).toBe(200);
         expect(res.body).toHaveProperty("id", communityEventId);
         expect(res.body.title).toBe("event to testert");
@@ -538,30 +531,32 @@ describe("Events routes", () => {
         const privateEventId = "2450fc5c-4271-4a5b-8fb2-9b0d5dd04261";
         const res = await makeRequest("get", `/api/events/${privateEventId}`);
 
-      
         expect(res.status).toBe(404);
         expect(res.body).toHaveProperty("error");
         expect(res.body.error).toMatch(/not found|not accessible/i);
       });
       it("should fail to get non-existent event", async () => {
         const invalidEventId = "2450fc5c-4271-4a5b-8fb2-9b0d5dd04333";
-  
+
         const res = await makeRequest("get", `/api/events/${invalidEventId}`);
-  
-     
+
         expect(res.status).toBe(404);
         expect(res.body).toHaveProperty("error");
         expect(res.body.error).toMatch(/not found/i);
       });
-  
+
       it("should fail to get event if user is not authenticated", async () => {
-        const publicEventId = '94b58b43-60df-4077-ac58-d2269b75a56f'
-        const res = await makeRequest("get", `/api/events/${publicEventId}`, undefined, {});
-  
-     
+        const publicEventId = "94b58b43-60df-4077-ac58-d2269b75a56f";
+        const res = await makeRequest(
+          "get",
+          `/api/events/${publicEventId}`,
+          undefined,
+          {}
+        );
+
         expect(res.status).toBe(401);
         expect(res.body).toHaveProperty("error");
-        expect(res.body.error).toMatch('No token provided');
+        expect(res.body.error).toMatch("No token provided");
       });
     });
   });
