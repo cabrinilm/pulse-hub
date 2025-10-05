@@ -441,7 +441,7 @@ describe("Events routes", () => {
     });
   });
   describe("GET /api/events", () => {
-    it.only("should list public events", async () => {
+    it("should list public events", async () => {
          
       const eventData = {
         creator_id: creatorId,
@@ -465,5 +465,31 @@ describe("Events routes", () => {
       expect(Array.isArray(res.body)).toBe(true);
       expect(res.body.some((event: Event) => event.title === "Allowed Event")).toBe(true);
     });
+    it("should list events for community where user is a member", async () => {
+      const res = await makeRequest("get", "/api/events");
+        console.log(res.body)
+        
+      console.log("Response body:", JSON.stringify(res.body, null, 2));
+      expect(res.status).toBe(200);
+      expect(Array.isArray(res.body)).toBe(true);
+      expect(res.body.some((event: Event) => event.title === "event to testert" && event.community_id === '959e1a73-f59d-4450-bc16-9becae6d87ca')).toBe(true);
+    });
+    it("should not list private events not accessible", async () => {
+      const res = await makeRequest("get", "/api/events");
+
+      console.log("Response body:", JSON.stringify(res.body, null, 2));
+      
+      expect(res.status).toBe(200);
+      expect(Array.isArray(res.body)).toBe(true);
+      expect(res.body.some((event: Event) => event.title === "anual meeting")).toBe(false);
   });
+  it.only("should fail to list events if user is not authenticated", async () => {
+    const res = await makeRequest("get", "/api/events", undefined, {});
+
+    console.log("Response body:", JSON.stringify(res.body, null, 2));
+    expect(res.status).toBe(401);
+    expect(res.body).toHaveProperty("error");
+    expect(res.body.error).toMatch('No token provided');
+  });
+});
 });
