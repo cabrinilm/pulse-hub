@@ -483,7 +483,7 @@ describe("Events routes", () => {
       expect(Array.isArray(res.body)).toBe(true);
       expect(res.body.some((event: Event) => event.title === "anual meeting")).toBe(false);
   });
-  it.only("should fail to list events if user is not authenticated", async () => {
+  it("should fail to list events if user is not authenticated", async () => {
     const res = await makeRequest("get", "/api/events", undefined, {});
 
     console.log("Response body:", JSON.stringify(res.body, null, 2));
@@ -491,5 +491,17 @@ describe("Events routes", () => {
     expect(res.body).toHaveProperty("error");
     expect(res.body.error).toMatch('No token provided');
   });
+  describe("GET /api/events/:id", () => {
+    it.only("should get public event details", async () => {
+      const publicEventId = '94b58b43-60df-4077-ac58-d2269b75a56f'
+      const res = await makeRequest("get", `/api/events/${publicEventId}`);
+
+      console.log("Response body:", JSON.stringify(res.body, null, 2));
+      expect(res.status).toBe(200);
+      expect(res.body).toHaveProperty("id", publicEventId);
+      expect(res.body.title).toBe("event to testert");
+      expect(res.body.is_public).toBe(true);
+    });
+});
 });
 });
