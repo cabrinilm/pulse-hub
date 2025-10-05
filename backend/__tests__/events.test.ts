@@ -474,8 +474,7 @@ describe("Events routes", () => {
 
       const res = await makeRequest("get", "/api/events", {});
 
-      console.log("Response body:", JSON.stringify(res.body, null, 2));
-      expect(res.status).toBe(200);
+        expect(res.status).toBe(200);
       expect(Array.isArray(res.body)).toBe(true);
       expect(
         res.body.some((event: Event) => event.title === "Allowed Event")
@@ -510,7 +509,7 @@ describe("Events routes", () => {
     it("should fail to list events if user is not authenticated", async () => {
       const res = await makeRequest("get", "/api/events", undefined, {});
 
-      console.log("Response body:", JSON.stringify(res.body, null, 2));
+     
       expect(res.status).toBe(401);
       expect(res.body).toHaveProperty("error");
       expect(res.body.error).toMatch("No token provided");
