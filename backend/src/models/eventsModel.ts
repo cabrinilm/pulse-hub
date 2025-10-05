@@ -175,6 +175,24 @@ class EventsModel {
     return data as Event[];
     
   }
-}
+
+    async getEventById(supabase: SupabaseClient<Database>, event_id: string): Promise<Event | null> {
+      const { data, error } = await supabase
+        .from("events")
+        .select("*")
+        .eq("id", event_id)
+        .maybeSingle();
+  
+      if (error) {
+        if (error.code === "42501") {
+          throw new Error("Forbidden: user is not authorized to view this event");
+        }
+        throw new Error(`Failed to fetch event: ${error.message}`);
+      }
+  
+      return data as Event | null;
+    }
+  }
+
 
 export default new EventsModel();
