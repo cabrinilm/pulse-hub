@@ -119,5 +119,20 @@ describe("Signups routes", () => {
       expect(res.body).toHaveProperty("error");
       expect(res.body.error).toMatch(/unauthorized|no token provided/i);
     });
+    it("should signup to a community event successfully as a verified community member", async () => {
+      const communityEventId = "0882c7d6-2bc1-41af-bbbd-4f1c3d23fc73";
+      const signupData = {
+        presence_status: "pending",
+      };
+    
+      const res = await makeRequest("post", `/api/events/${communityEventId}/signups`, signupData);
+    
+      expect(res.status).toBe(201);
+      expect(res.body).toHaveProperty("user_id", userId);
+      expect(res.body).toHaveProperty("event_id", communityEventId);
+      expect(res.body).toHaveProperty("signup_date");
+      expect(res.body).toHaveProperty("payment_status", "pending");
+      expect(res.body).toHaveProperty("presence_status", "pending");
+    });
   });
 });
