@@ -53,7 +53,7 @@ class SignupsModel {
       }
       if (error.code === "42501") {
         throw new Error(
-          "Forbidden: user is not authorized to signup for this event"
+          "Forbidden: user is not authorized to signup for this event or event doesnt exist"
         );
       }
       throw new Error(`Failed to signup for event: ${error.message}`);

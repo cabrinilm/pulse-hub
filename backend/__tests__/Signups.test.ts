@@ -64,13 +64,60 @@ describe("Signups routes", () => {
         "post",
         `/api/events/${publicEventId}/signups`
       , PaymentAndPresente);
-      console.log(res.status)
-      console.log(res.body)
+     
       expect(res.body).toHaveProperty("user_id", userId);
       expect(res.body).toHaveProperty("event_id", publicEventId);
       expect(res.body).toHaveProperty("signup_date");
       expect(res.body).toHaveProperty("payment_status", "pending");
       expect(res.body).toHaveProperty("presence_status", "pending");
+    });
+    it("should fail to signup to a private event as a non-creator", async () => {
+      const privateEventId = "0f5ddea2-2d92-417e-837b-5999ea808470";
+      const signupData = {
+        presence_status: "pending",
+      };
+  
+      const res = await makeRequest("post", `/api/events/${privateEventId}/signups`, signupData);
+  
+      expect(res.status).toBe(403);
+      expect(res.body).toHaveProperty("error");
+      expect(res.body.error).toMatch(/not authorized/i);
+    });
+    it("should fail to signup to a non-existent event", async () => {
+      const nonExistentEventId = "0f5ddea2-2d92-417e-837b-5999ea808411";
+      const signupData = {
+        presence_status: "pending",
+      };
+  
+      const res = await makeRequest("post", `/api/events/${nonExistentEventId}/signups`, signupData);
+  
+      expect(res.status).toBe(403);
+      expect(res.body).toHaveProperty("error");
+      expect(res.body.error).toMatch("Forbidden: user is not authorized to signup for this event or event doesnt exist");
+    });
+    it("should fail to signup to an event in a community where user is not a member", async () => {
+      const communityEventId = "0f5ddea2-2d92-417e-837b-5999ea808470";
+      const signupData = {
+        presence_status: "pending",
+      };
+  
+      const res = await makeRequest("post", `/api/events/${communityEventId}/signups`, signupData);
+  
+      expect(res.status).toBe(403);
+      expect(res.body).toHaveProperty("error");
+      expect(res.body.error).toMatch("Forbidden: user is not authorized to signup for this event or event doesnt exist");
+    });
+    it("should fail if user is not authenticated", async () => {
+      const publicEventId = "07ff0188-7382-4c68-9ba2-8b1c9111c5ee";
+      const signupData = {
+        presence_status: "pending",
+      };
+  
+      const res = await makeRequest("post", `/api/events/${publicEventId}/signups`, signupData, {});
+  
+      expect(res.status).toBe(401);
+      expect(res.body).toHaveProperty("error");
+      expect(res.body.error).toMatch(/unauthorized|no token provided/i);
     });
   });
 });
