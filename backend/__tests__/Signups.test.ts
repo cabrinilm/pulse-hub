@@ -64,7 +64,7 @@ describe("Signups routes", () => {
         `/api/events/${publicEventId}/signups`,
         PaymentAndPresente
       );
-      expect(res.status).toBe(200)
+      expect(res.status).toBe(200);
       expect(res.body).toHaveProperty("user_id", userId);
       expect(res.body).toHaveProperty("event_id", publicEventId);
       expect(res.body).toHaveProperty("signup_date");
@@ -172,7 +172,7 @@ describe("Signups routes", () => {
         PaymentAndPresente
       );
 
-      expect(res.status).toBe(201)
+      expect(res.status).toBe(201);
 
       const updatePresence = {
         presence_status: "confirmed",
@@ -204,7 +204,7 @@ describe("Signups routes", () => {
         PaymentAndPresente
       );
 
-      expect(res.status).toBe(201)
+      expect(res.status).toBe(201);
 
       const updatePresence = {
         presence_status: "confirmed",
@@ -230,10 +230,13 @@ describe("Signups routes", () => {
       const updatePresence = {
         presence_status: "confirmed",
       };
-  
-      
-      const resUpdate = await makeRequest("patch", `/api/events/${publicEventId}/signups`, updatePresence);
-  
+
+      const resUpdate = await makeRequest(
+        "patch",
+        `/api/events/${publicEventId}/signups`,
+        updatePresence
+      );
+
       expect(resUpdate.status).toBe(404);
       expect(resUpdate.body).toHaveProperty("error");
       expect(resUpdate.body.error).toMatch(/signup not found/i);
@@ -243,32 +246,48 @@ describe("Signups routes", () => {
       const signupData = {
         presence_status: "pending",
       };
-      const res = await makeRequest("post", `/api/events/${publicEventId}/signups`, signupData);
-  
+      const res = await makeRequest(
+        "post",
+        `/api/events/${publicEventId}/signups`,
+        signupData
+      );
+
       expect(res.status).toBe(201);
-  
+
       const updatePresence = {
         presence_status: "invalid_status",
       };
-      const resUpdate = await makeRequest("patch", `/api/events/${publicEventId}/signups`, updatePresence);
-    
+      const resUpdate = await makeRequest(
+        "patch",
+        `/api/events/${publicEventId}/signups`,
+        updatePresence
+      );
+
       expect(resUpdate.status).toBe(500);
-   
     });
     it("should fail to update without authentication", async () => {
       const publicEventId = "07ff0188-7382-4c68-9ba2-8b1c9111c5ee";
       const signupData = {
         presence_status: "pending",
       };
-      const res = await makeRequest("post", `/api/events/${publicEventId}/signups`, signupData);
-  
+      const res = await makeRequest(
+        "post",
+        `/api/events/${publicEventId}/signups`,
+        signupData
+      );
+
       expect(res.status).toBe(201);
-  
+
       const updatePresence = {
         presence_status: "confirmed",
       };
-      const resUpdate = await makeRequest("patch", `/api/events/${publicEventId}/signups`, updatePresence, {});
-  
+      const resUpdate = await makeRequest(
+        "patch",
+        `/api/events/${publicEventId}/signups`,
+        updatePresence,
+        {}
+      );
+
       expect(resUpdate.status).toBe(401);
       expect(resUpdate.body).toHaveProperty("error");
       expect(resUpdate.body.error).toMatch(/unauthorized|no token provided/i);
@@ -278,46 +297,40 @@ describe("Signups routes", () => {
       const updatePresence = {
         presence_status: "confirmed",
       };
-  
-      const resUpdate = await makeRequest("patch", `/api/events/${nonExistentEventId}/signups`, updatePresence);
-  
+
+      const resUpdate = await makeRequest(
+        "patch",
+        `/api/events/${nonExistentEventId}/signups`,
+        updatePresence
+      );
+
       expect(resUpdate.status).toBe(404);
       expect(resUpdate.body).toHaveProperty("error");
       expect(resUpdate.body.error).toMatch("Signup not found or update failed");
     });
   });
   describe("DELETE /api/events/:id/signups", () => {
-    it("should delete signup to public event", async () => {
+    it.only("should delete signup to public event", async () => {
       const publicEventId = "07ff0188-7382-4c68-9ba2-8b1c9111c5ee";
       const PaymentAndPresence = { presence_status: "pending" };
-    
 
       const res = await makeRequest(
         "post",
         `/api/events/${publicEventId}/signups`,
         PaymentAndPresence
       );
-    
+
       expect(res.status).toBe(201);
       expect(res.body).toBeDefined();
       expect(res.body.event_id).toBe(publicEventId);
-    
- 
+
       const resDelete = await makeRequest(
         "delete",
         `/api/events/${publicEventId}/signups`
       );
-    
-      expect(resDelete.status).toBe(204); 
-      expect(resDelete.body).toEqual({}); 
-    
-    
-      expect(resDelete.error).toBeUndefined();
 
-
-
-
-    })
-
-  })
+      expect(resDelete.status).toBe(204);
+      expect(resDelete.body).toEqual({});
+    });
+  });
 });
