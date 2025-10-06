@@ -46,7 +46,53 @@ class SignupsController {
       });
     }
   }
-}
+
+  async updatePresence(req: Request, res: Response): Promise<void> {
+    try {
+      const eventId = req.params.id;
+      const supabase = req.supabase;
+      const user_id = req.user?.id;
+      const { presence_status } = req.body;
+  
+      if (!eventId) {
+        res.status(400).json({ error: "Event ID is required" });
+        return;
+      }
+      if (!supabase) {
+        res.status(500).json({ error: "Supabase client not found in request" });
+        return;
+      }
+      if (!user_id) {
+        res.status(401).json({ error: "Unauthorized: No user ID found" });
+        return;
+      }
+      if (!presence_status) {
+        res.status(400).json({ error: "Presence status is required" });
+        return;
+      }
+  
+      const success = await SignupsModel.updatePresence(supabase, user_id, eventId, presence_status);
+  
+      if (!success) {
+        res.status(404).json({ error: "Signup not found or update failed" });
+        return;
+      }
+  
+      res.status(200).json(success);
+    } catch (error) {
+      if (error instanceof Error && error.message.includes("Forbidden")) {
+        res.status(403).json({ error: error.message });
+        return;
+      }
+      res.status(500).json({
+        error: error instanceof Error ? error.message : "Unknown error",
+      });
+    }
+  }
+     
+  }
+
+
 
 const signupsController = new SignupsController();
 export default signupsController;

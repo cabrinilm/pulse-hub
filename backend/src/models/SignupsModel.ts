@@ -65,6 +65,40 @@ class SignupsModel {
 
     return data as Signups;
   }
+
+  async updatePresence(
+    supabase: SupabaseClient<Database>,
+    user_id: string,
+    event_id: string,
+    presence_status: "pending" | "confirmed" | "rejected"
+  ): Promise<Signups | null> {
+    const { data, error } = await supabase
+      .from("signups")
+      .update({ presence_status })
+      .eq("user_id", user_id)
+      .eq("event_id", event_id)
+      .select()
+      .maybeSingle();
+
+    if (error) {
+      if (error.code === "42501") {
+        throw new Error(
+          "Forbidden: user is not authorized to update this signup"
+        );
+      }
+      throw new Error(`Failed to update presence: ${error.message}`);
+    }
+
+    if (!data) {
+      return null; 
+    }
+
+    return data as Signups;
+  }
 }
+  
+
+
+
 
 export default new SignupsModel();
