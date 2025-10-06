@@ -11,6 +11,7 @@ interface Signups {
 
 class SignupsModel {
 
+   // post 
   async signupEvent(
     supabase: SupabaseClient<Database>,
     user_id: string,
@@ -20,7 +21,6 @@ class SignupsModel {
       presence_status: "pending" | "confirmed" | "rejected";
     }
   ): Promise<Signups> {
-
     const validPaymentStatus = ["pending", "completed", "failed"];
     const validPresenceStatus = ["pending", "confirmed", "rejected"];
 
@@ -32,7 +32,6 @@ class SignupsModel {
       throw new Error("Invalid presence_status");
     }
 
- 
     const { data, error } = await supabase
       .from("signups")
       .insert([
@@ -45,7 +44,6 @@ class SignupsModel {
       ])
       .select()
       .single();
-
 
     if (error) {
       if (error.code === "23505") {
@@ -65,6 +63,8 @@ class SignupsModel {
 
     return data as Signups;
   }
+
+  // update
 
   async updatePresence(
     supabase: SupabaseClient<Database>,
@@ -90,15 +90,36 @@ class SignupsModel {
     }
 
     if (!data) {
-      return null; 
+      return null;
     }
 
     return data as Signups;
   }
+
+  // delete 
+  async delete(
+    supabase: SupabaseClient<Database>,
+    event_id: string,
+    user_id: string
+  ): Promise<boolean> {
+    const { data, error } = await supabase
+      .from("signups")
+      .delete()
+      .eq("event_id", event_id)
+      .eq("user_id", user_id)
+      .select();
+
+    if (error) {
+      if (error.code === "42501") {
+        throw new Error(
+          "Forbidden: user is not authorized to delete this signup"
+        );
+      }
+      throw new Error(`Failed to delete signup: ${error.message}`);
+    }
+
+    return !!data && data.length > 0;
+  }
 }
-  
-
-
-
 
 export default new SignupsModel();
