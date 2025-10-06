@@ -193,5 +193,67 @@ describe("Signups routes", () => {
 
       expect(resUpdate.body.presence_status).toBe("confirmed");
     });
+    it("should update presence in the event with community", async () => {
+      const communityEventId = "9144c3fc-4785-4755-aaaa-b9b02be30174";
+      const PaymentAndPresente = {
+        presence_status: "pending",
+      };
+      const res = await makeRequest(
+        "post",
+        `/api/events/${communityEventId}/signups`,
+        PaymentAndPresente
+      );
+
+      expect(res.status).toBe(201)
+
+      const updatePresence = {
+        presence_status: "confirmed",
+      };
+
+      const resUpdate = await makeRequest(
+        "patch",
+        `/api/events/${communityEventId}/signups`,
+        updatePresence
+      );
+
+      expect(resUpdate.status).toBe(200);
+
+      expect(resUpdate.body).toBeDefined();
+
+      expect(resUpdate.body.event_id).toBe(communityEventId);
+      expect(resUpdate.body.user_id).toBeDefined();
+
+      expect(resUpdate.body.presence_status).toBe("confirmed");
+    });
+    it("should fail to update non-existent signup", async () => {
+      const publicEventId = "07ff0188-7382-4c68-9ba2-8b1c9111c5ee";
+      const updatePresence = {
+        presence_status: "confirmed",
+      };
+  
+      
+      const resUpdate = await makeRequest("patch", `/api/events/${publicEventId}/signups`, updatePresence);
+  
+      expect(resUpdate.status).toBe(404);
+      expect(resUpdate.body).toHaveProperty("error");
+      expect(resUpdate.body.error).toMatch(/signup not found/i);
+    });
+    it("should fail to update with invalid presence_status", async () => {
+      const publicEventId = "07ff0188-7382-4c68-9ba2-8b1c9111c5ee";
+      const signupData = {
+        presence_status: "pending",
+      };
+      const res = await makeRequest("post", `/api/events/${publicEventId}/signups`, signupData);
+  
+      expect(res.status).toBe(201);
+  
+      const updatePresence = {
+        presence_status: "invalid_status",
+      };
+      const resUpdate = await makeRequest("patch", `/api/events/${publicEventId}/signups`, updatePresence);
+    
+      expect(resUpdate.status).toBe(500);
+   
+    });
   });
 });
