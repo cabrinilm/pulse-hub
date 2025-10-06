@@ -24,9 +24,9 @@ class SignupsModel {
     const validPaymentStatus = ["pending", "completed", "failed"];
     const validPresenceStatus = ["pending", "confirmed", "rejected"];
 
-    if (!validPaymentStatus.includes(signupEvent.payment_status)) {
-      throw new Error("Invalid payment_status");
-    }
+    // if (!validPaymentStatus.includes(signupEvent.payment_status)) {
+    //   throw new Error("Invalid payment_status");
+    // }
 
     if (!validPresenceStatus.includes(signupEvent.presence_status)) {
       throw new Error("Invalid presence_status");
@@ -39,7 +39,7 @@ class SignupsModel {
         {
           user_id,
           event_id: signupEvent.event_id,
-          payment_status: signupEvent.payment_status,
+          payment_status: signupEvent.payment_status ?? "pending",
           presence_status: signupEvent.presence_status,
         },
       ])

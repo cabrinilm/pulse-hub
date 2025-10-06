@@ -4,7 +4,7 @@ import SignupsModel from "../models/SignupsModel";
 class SignupsController {
   // signup event
 
-  async SignupEvent(req: Request, res: Response): Promise<void> {
+  async signupEvent(req: Request, res: Response): Promise<void> {
     try {
       const eventId = req.params.id;
       const supabase = req.supabase;
@@ -29,7 +29,7 @@ class SignupsController {
         payment_status,
         presence_status,
       });
-
+       
       if (!sucess) {
         res.status(404).json({ error: "Event creation failed" });
         return;

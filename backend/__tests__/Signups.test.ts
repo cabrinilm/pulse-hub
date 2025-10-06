@@ -56,12 +56,16 @@ describe("Signups routes", () => {
   describe("POST /api/signups", () => {
     it("should signup to an public event successfully without community", async () => {
       const publicEventId = "07ff0188-7382-4c68-9ba2-8b1c9111c5ee";
-
+      const PaymentAndPresente  ={
+    
+         presence_status: "pending"
+      }
       const res = await makeRequest(
         "post",
         `/api/events/${publicEventId}/signups`
-      );
-
+      , PaymentAndPresente);
+      console.log(res.status)
+      console.log(res.body)
       expect(res.body).toHaveProperty("user_id", userId);
       expect(res.body).toHaveProperty("event_id", publicEventId);
       expect(res.body).toHaveProperty("signup_date");

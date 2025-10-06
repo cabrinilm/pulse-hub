@@ -7,6 +7,7 @@ import { ProfileController } from './controllers/ProfileController.ts';
 import communityMemberController from './controllers/CommunityMembersController.ts';
 import { authMiddleware } from './middleware/auth.ts';
 import eventsController from './controllers/EventsController.ts';
+import signupsController from './controllers/SignupsController.ts';
 
 
 dotenv.config();
@@ -50,6 +51,10 @@ app.delete(`/api/events/:id`, authMiddleware, eventsController.deleteEventByUser
 app.get('/api/events', authMiddleware, eventsController.listEvents);
 app.get('/api/events/:id', authMiddleware, eventsController.getEventById);
 
+
+// Signups 
+
+app.post('/api/events/:id/signups', authMiddleware, signupsController.signupEvent)
 
 
 const PORT = process.env.PORT || 3000;
