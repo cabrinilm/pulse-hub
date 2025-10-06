@@ -54,9 +54,9 @@ app.get('/api/events/:id', authMiddleware, eventsController.getEventById);
 
 // Signups 
 
-app.post('/api/events/:id/signups', authMiddleware, signupsController.signupEvent)
-app.patch('/api/events/:id/signups', authMiddleware, signupsController.updatePresence)
-
+app.post('/api/events/:id/signups', authMiddleware, signupsController.signupEvent);
+app.patch('/api/events/:id/signups', authMiddleware, signupsController.updatePresence);
+app.delete('/api/events/:id/signups', authMiddleware, signupsController.deleteSignups);
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
