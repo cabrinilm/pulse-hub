@@ -255,5 +255,35 @@ describe("Signups routes", () => {
       expect(resUpdate.status).toBe(500);
    
     });
+    it("should fail to update without authentication", async () => {
+      const publicEventId = "07ff0188-7382-4c68-9ba2-8b1c9111c5ee";
+      const signupData = {
+        presence_status: "pending",
+      };
+      const res = await makeRequest("post", `/api/events/${publicEventId}/signups`, signupData);
+  
+      expect(res.status).toBe(201);
+  
+      const updatePresence = {
+        presence_status: "confirmed",
+      };
+      const resUpdate = await makeRequest("patch", `/api/events/${publicEventId}/signups`, updatePresence, {});
+  
+      expect(resUpdate.status).toBe(401);
+      expect(resUpdate.body).toHaveProperty("error");
+      expect(resUpdate.body.error).toMatch(/unauthorized|no token provided/i);
+    });
+    it("should fail to update signup for non-existent event", async () => {
+      const nonExistentEventId = "07ff0188-7382-4c68-9ba2-8b1c9111c511";
+      const updatePresence = {
+        presence_status: "confirmed",
+      };
+  
+      const resUpdate = await makeRequest("patch", `/api/events/${nonExistentEventId}/signups`, updatePresence);
+  
+      expect(resUpdate.status).toBe(404);
+      expect(resUpdate.body).toHaveProperty("error");
+      expect(resUpdate.body.error).toMatch("Signup not found or update failed");
+    });
   });
 });
