@@ -55,6 +55,7 @@ app.get('/api/events/:id', authMiddleware, eventsController.getEventById);
 // Signups 
 
 app.post('/api/events/:id/signups', authMiddleware, signupsController.signupEvent)
+app.patch('/api/events/:id/signups', authMiddleware, signupsController.updatePresence)
 
 
 const PORT = process.env.PORT || 3000;
