@@ -55,7 +55,7 @@ describe("Signups routes", () => {
 
   describe("POST /api/signups", () => {
     it("should signup to an public event successfully without community", async () => {
-      const publicEventId = "07ff0188-7382-4c68-9ba2-8b1c9111c5ee";
+      const publicEventId = "ab15021d-4ee1-4a17-a34f-d25d738c7bc1";
       const PaymentAndPresente = {
         presence_status: "pending",
       };
@@ -64,7 +64,8 @@ describe("Signups routes", () => {
         `/api/events/${publicEventId}/signups`,
         PaymentAndPresente
       );
-      expect(res.status).toBe(200);
+     
+      expect(res.status).toBe(201);
       expect(res.body).toHaveProperty("user_id", userId);
       expect(res.body).toHaveProperty("event_id", publicEventId);
       expect(res.body).toHaveProperty("signup_date");
@@ -309,7 +310,7 @@ describe("Signups routes", () => {
       expect(resUpdate.body.error).toMatch("Signup not found or update failed");
     });
   });
-  describe("DELETE /api/events/:id/signups", () => {
+    describe("DELETE /api/events/:id/signups" , () => {
     it("should delete signup to public event", async () => {
       const publicEventId = "07ff0188-7382-4c68-9ba2-8b1c9111c5ee";
       const PaymentAndPresence = { presence_status: "pending" };
@@ -332,36 +333,41 @@ describe("Signups routes", () => {
       expect(resDelete.status).toBe(204);
       expect(resDelete.body).toEqual({});
     });
-    it.only("should delete signup to community event as a member", async () => {
+    it("should delete signup to community event as a member", async () => {
       const communityEventId = "9144c3fc-4785-4755-aaaa-b9b02be30174";
       const signupData = { presence_status: "pending" };
-  
-    
+
       const { data: event } = await supabase
         .from("events")
         .select("community_id")
         .eq("id", communityEventId)
         .single();
-  
+
       if (!event?.community_id) {
         throw new Error("Event is not associated with a community");
       }
-  
+
       await supabase
         .from("community_members")
         .upsert({ user_id: userId, community_id: event.community_id });
-  
-      const res = await makeRequest("post", `/api/events/${communityEventId}/signups`, signupData);
-  
+
+      const res = await makeRequest(
+        "post",
+        `/api/events/${communityEventId}/signups`,
+        signupData
+      );
+
       expect(res.status).toBe(201);
       expect(res.body).toBeDefined();
       expect(res.body.event_id).toBe(communityEventId);
-  
-      const resDelete = await makeRequest("delete", `/api/events/${communityEventId}/signups`);
-  
+
+      const resDelete = await makeRequest(
+        "delete",
+        `/api/events/${communityEventId}/signups`
+      );
+
       expect(resDelete.status).toBe(204);
       expect(resDelete.body).toEqual({});
-  
 
       const { data } = await supabase
         .from("signups")
@@ -370,6 +376,54 @@ describe("Signups routes", () => {
         .eq("event_id", communityEventId)
         .maybeSingle();
       expect(data).toBeNull();
+    });
+    it("should fail to delete non-existent signup", async () => {
+      const publicEventId = "07ff0188-7382-4c68-9ba2-8b1c9111c5ee";
+
+      const resDelete = await makeRequest(
+        "delete",
+        `/api/events/${publicEventId}/signups`
+      );
+
+      expect(resDelete.status).toBe(404);
+      expect(resDelete.body).toHaveProperty("error");
+      expect(resDelete.body.error).toMatch(/signup not found/i);
+    });
+
+    it("should fail to delete without authentication", async () => {
+      const publicEventId = "07ff0188-7382-4c68-9ba2-8b1c9111c5ee";
+      const signupData = { presence_status: "pending" };
+
+      const res = await makeRequest(
+        "post",
+        `/api/events/${publicEventId}/signups`,
+        signupData
+      );
+      expect(res.status).toBe(201);
+
+      const resDelete = await makeRequest(
+        "delete",
+        `/api/events/${publicEventId}/signups`,
+        undefined,
+        {}
+      );
+
+      expect(resDelete.status).toBe(401);
+      expect(resDelete.body).toHaveProperty("error");
+      expect(resDelete.body.error).toMatch(/unauthorized|no token provided/i);
+    });
+
+    it("should fail to delete signup for non-existent event", async () => {
+      const nonExistentEventId = "07ff0188-7382-4c68-9ba2-8b1c9111c511";
+
+      const resDelete = await makeRequest(
+        "delete",
+        `/api/events/${nonExistentEventId}/signups`
+      );
+
+      expect(resDelete.status).toBe(404);
+      expect(resDelete.body).toHaveProperty("error");
+      expect(resDelete.body.error).toMatch("Signup not found or delete failed");
+    });
   });
-});
 });
