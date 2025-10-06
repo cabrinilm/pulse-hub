@@ -53,6 +53,9 @@ class SignupsController {
       const supabase = req.supabase;
       const user_id = req.user?.id;
       const { presence_status } = req.body;
+
+      console.log(user_id, "<userid")
+      console.log(eventId, "<--- eventid ")
   
       if (!eventId) {
         res.status(400).json({ error: "Event ID is required" });
