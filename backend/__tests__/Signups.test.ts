@@ -310,7 +310,7 @@ describe("Signups routes", () => {
     });
   });
   describe("DELETE /api/events/:id/signups", () => {
-    it.only("should delete signup to public event", async () => {
+    it("should delete signup to public event", async () => {
       const publicEventId = "07ff0188-7382-4c68-9ba2-8b1c9111c5ee";
       const PaymentAndPresence = { presence_status: "pending" };
 
@@ -332,5 +332,44 @@ describe("Signups routes", () => {
       expect(resDelete.status).toBe(204);
       expect(resDelete.body).toEqual({});
     });
+    it.only("should delete signup to community event as a member", async () => {
+      const communityEventId = "9144c3fc-4785-4755-aaaa-b9b02be30174";
+      const signupData = { presence_status: "pending" };
+  
+    
+      const { data: event } = await supabase
+        .from("events")
+        .select("community_id")
+        .eq("id", communityEventId)
+        .single();
+  
+      if (!event?.community_id) {
+        throw new Error("Event is not associated with a community");
+      }
+  
+      await supabase
+        .from("community_members")
+        .upsert({ user_id: userId, community_id: event.community_id });
+  
+      const res = await makeRequest("post", `/api/events/${communityEventId}/signups`, signupData);
+  
+      expect(res.status).toBe(201);
+      expect(res.body).toBeDefined();
+      expect(res.body.event_id).toBe(communityEventId);
+  
+      const resDelete = await makeRequest("delete", `/api/events/${communityEventId}/signups`);
+  
+      expect(resDelete.status).toBe(204);
+      expect(resDelete.body).toEqual({});
+  
+
+      const { data } = await supabase
+        .from("signups")
+        .select("*")
+        .eq("user_id", userId)
+        .eq("event_id", communityEventId)
+        .maybeSingle();
+      expect(data).toBeNull();
   });
+});
 });
