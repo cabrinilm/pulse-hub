@@ -56,15 +56,15 @@ describe("Signups routes", () => {
   describe("POST /api/signups", () => {
     it("should signup to an public event successfully without community", async () => {
       const publicEventId = "07ff0188-7382-4c68-9ba2-8b1c9111c5ee";
-      const PaymentAndPresente  ={
-    
-         presence_status: "pending"
-      }
+      const PaymentAndPresente = {
+        presence_status: "pending",
+      };
       const res = await makeRequest(
         "post",
-        `/api/events/${publicEventId}/signups`
-      , PaymentAndPresente);
-     
+        `/api/events/${publicEventId}/signups`,
+        PaymentAndPresente
+      );
+
       expect(res.body).toHaveProperty("user_id", userId);
       expect(res.body).toHaveProperty("event_id", publicEventId);
       expect(res.body).toHaveProperty("signup_date");
@@ -76,9 +76,13 @@ describe("Signups routes", () => {
       const signupData = {
         presence_status: "pending",
       };
-  
-      const res = await makeRequest("post", `/api/events/${privateEventId}/signups`, signupData);
-  
+
+      const res = await makeRequest(
+        "post",
+        `/api/events/${privateEventId}/signups`,
+        signupData
+      );
+
       expect(res.status).toBe(403);
       expect(res.body).toHaveProperty("error");
       expect(res.body.error).toMatch(/not authorized/i);
@@ -88,33 +92,50 @@ describe("Signups routes", () => {
       const signupData = {
         presence_status: "pending",
       };
-  
-      const res = await makeRequest("post", `/api/events/${nonExistentEventId}/signups`, signupData);
-  
+
+      const res = await makeRequest(
+        "post",
+        `/api/events/${nonExistentEventId}/signups`,
+        signupData
+      );
+
       expect(res.status).toBe(403);
       expect(res.body).toHaveProperty("error");
-      expect(res.body.error).toMatch("Forbidden: user is not authorized to signup for this event or event doesnt exist");
+      expect(res.body.error).toMatch(
+        "Forbidden: user is not authorized to signup for this event or event doesnt exist"
+      );
     });
     it("should fail to signup to an event in a community where user is not a member", async () => {
       const communityEventId = "0f5ddea2-2d92-417e-837b-5999ea808470";
       const signupData = {
         presence_status: "pending",
       };
-  
-      const res = await makeRequest("post", `/api/events/${communityEventId}/signups`, signupData);
-  
+
+      const res = await makeRequest(
+        "post",
+        `/api/events/${communityEventId}/signups`,
+        signupData
+      );
+
       expect(res.status).toBe(403);
       expect(res.body).toHaveProperty("error");
-      expect(res.body.error).toMatch("Forbidden: user is not authorized to signup for this event or event doesnt exist");
+      expect(res.body.error).toMatch(
+        "Forbidden: user is not authorized to signup for this event or event doesnt exist"
+      );
     });
     it("should fail if user is not authenticated", async () => {
       const publicEventId = "07ff0188-7382-4c68-9ba2-8b1c9111c5ee";
       const signupData = {
         presence_status: "pending",
       };
-  
-      const res = await makeRequest("post", `/api/events/${publicEventId}/signups`, signupData, {});
-  
+
+      const res = await makeRequest(
+        "post",
+        `/api/events/${publicEventId}/signups`,
+        signupData,
+        {}
+      );
+
       expect(res.status).toBe(401);
       expect(res.body).toHaveProperty("error");
       expect(res.body.error).toMatch(/unauthorized|no token provided/i);
@@ -124,9 +145,13 @@ describe("Signups routes", () => {
       const signupData = {
         presence_status: "pending",
       };
-    
-      const res = await makeRequest("post", `/api/events/${communityEventId}/signups`, signupData);
-    
+
+      const res = await makeRequest(
+        "post",
+        `/api/events/${communityEventId}/signups`,
+        signupData
+      );
+
       expect(res.status).toBe(201);
       expect(res.body).toHaveProperty("user_id", userId);
       expect(res.body).toHaveProperty("event_id", communityEventId);
@@ -136,31 +161,37 @@ describe("Signups routes", () => {
     });
   });
   describe("PATCH /api/events/:id/signups", () => {
-  //   it.only("should update presence in the event", async () => {
-  //     const publicEventId = "07ff0188-7382-4c68-9ba2-8b1c9111c5ee";
-  
-  //     const updatePresence = {
-  //       presence_status: "confirmed",
-  //     };
-  
-  //     const res = await makeRequest(
-  //       "patch",
-  //       `/api/events/${publicEventId}/signups`,
-  //       updatePresence
-  //     );
-  
- 
-  //     expect(res.status).toBe(200);
-  
-  //   console.log(res.body)
-  //     expect(res.body).toBeDefined();
-  
-  
-  //     expect(res.body.event_id).toBe(publicEventId);
-  //     expect(res.body.user_id).toBeDefined();
-  
-     
-  //     expect(res.body.presence_status).toBe("confirmed");
-  // });
-});
+    it("should update presence in the event without a community", async () => {
+      const publicEventId = "07ff0188-7382-4c68-9ba2-8b1c9111c5ee";
+      const PaymentAndPresente = {
+        presence_status: "pending",
+      };
+      const res = await makeRequest(
+        "post",
+        `/api/events/${publicEventId}/signups`,
+        PaymentAndPresente
+      );
+
+      expect(res.status).toBe(201)
+
+      const updatePresence = {
+        presence_status: "confirmed",
+      };
+
+      const resUpdate = await makeRequest(
+        "patch",
+        `/api/events/${publicEventId}/signups`,
+        updatePresence
+      );
+
+      expect(resUpdate.status).toBe(200);
+
+      expect(resUpdate.body).toBeDefined();
+
+      expect(resUpdate.body.event_id).toBe(publicEventId);
+      expect(resUpdate.body.user_id).toBeDefined();
+
+      expect(resUpdate.body.presence_status).toBe("confirmed");
+    });
+  });
 });
