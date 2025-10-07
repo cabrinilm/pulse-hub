@@ -443,11 +443,32 @@ describe("Signups routes", () => {
 
       const resGet = await makeRequest(
         "get",
-        `api/events/signups`
+        `/api/signups`
       )
-
+       console.log(resGet.body)
       expect(resGet.status).toBe(200)
       
     })
-  })
+  it.only("should list signup events in a community", async () => {
+    const communityEventId = "0882c7d6-2bc1-41af-bbbd-4f1c3d23fc73";
+    const signupData = {
+      presence_status: "pending",
+    };
+
+    const res = await makeRequest(
+      "post",
+      `/api/events/${communityEventId}/signups`,
+      signupData
+    );
+
+    expect(res.status).toBe(201);
+    const resGet = await makeRequest(
+      "get",
+      `/api/signups`
+    )
+     console.log(resGet.body)
+    expect(resGet.status).toBe(200)
+    
+  });
 });
+})
