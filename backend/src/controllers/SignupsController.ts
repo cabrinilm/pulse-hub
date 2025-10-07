@@ -130,7 +130,39 @@ class SignupsController {
       });
     }
   }
-   }
 
+  // get
+
+  async getAllSignups(req: Request, res: Response): Promise<void> {
+    try {
+      const supabase = req.supabase;
+      const userId = req.user?.id;
+  
+      if (!userId) {
+        res.status(401).json({ error: "Unauthorized: No user ID found" });
+        return;
+      }
+  
+      if (!supabase) {
+        res.status(500).json({ error: "Supabase client not found in request" });
+        return;
+      }
+  
+      const success = await SignupsModel.allSignups(supabase, userId);
+  
+      if (!success || success.length === 0) {
+        res.status(200).json({ message: "No signups found for this user", data: [] });
+        return;
+      }
+  
+      res.status(200).json(success);
+    } catch (error) {
+      res.status(500).json({
+        error: error instanceof Error ? error.message : "Internal server error",
+      });
+    }
+  }
+    
+  }
 const signupsController = new SignupsController();
 export default signupsController;

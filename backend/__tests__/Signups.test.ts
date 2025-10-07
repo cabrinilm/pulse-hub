@@ -426,4 +426,28 @@ describe("Signups routes", () => {
       expect(resDelete.body.error).toMatch("Signup not found or delete failed");
     });
   });
+  describe("GET /api/events/:id/signups" ,() => {
+    it("should get all signups events" , async () => {
+
+      const communityEventId = "9144c3fc-4785-4755-aaaa-b9b02be30174";
+      const PaymentAndPresente = {
+        presence_status: "pending",
+      };
+      const resPost = await makeRequest(
+        "post",
+        `/api/events/${communityEventId}/signups`,
+        PaymentAndPresente
+      );
+
+      expect(resPost.status).toBe(201);
+
+      const resGet = await makeRequest(
+        "get",
+        `api/events/signups`
+      )
+
+      expect(resGet.status).toBe(200)
+      
+    })
+  })
 });
