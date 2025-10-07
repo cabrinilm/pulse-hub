@@ -148,7 +148,7 @@ class SignupsController {
         return;
       }
   
-      const success = await SignupsModel.allSignups(supabase, userId);
+      const success = await SignupsModel.getAllSignups(supabase, userId);
   
       if (!success || success.length === 0) {
         res.status(200).json({ message: "No signups found for this user", data: [] });

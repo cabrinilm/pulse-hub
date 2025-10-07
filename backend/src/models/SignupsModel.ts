@@ -120,6 +120,27 @@ class SignupsModel {
 
     return !!data && data.length > 0;
   }
+
+  // get 
+
+  async getAllSignups(
+    supabase: SupabaseClient<Database>,
+    user_id: string
+  ): Promise<Signups[]> {
+    const { data, error } = await supabase
+      .from("signups")
+      .select("*")
+      .eq("user_id", user_id);
+  
+    if (error) {
+      if (error.code === "42501") {
+        throw new Error("Forbidden: user is not authorized to view these signups");
+      }
+      throw new Error(`Failed to fetch signups: ${error.message}`);
+    }
+  
+    return data || [];
+  }
 }
 
 export default new SignupsModel();
