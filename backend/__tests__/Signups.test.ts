@@ -427,48 +427,163 @@ describe("Signups routes", () => {
     });
   });
   describe("GET /api/events/:id/signups" ,() => {
-    it("should get all signups events" , async () => {
-
+    it("should get all signups events", async () => {
       const communityEventId = "9144c3fc-4785-4755-aaaa-b9b02be30174";
-      const PaymentAndPresente = {
+      const signupData = {
         presence_status: "pending",
       };
+    
       const resPost = await makeRequest(
         "post",
         `/api/events/${communityEventId}/signups`,
-        PaymentAndPresente
+        signupData
       );
-
-      expect(resPost.status).toBe(201);
-
-      const resGet = await makeRequest(
-        "get",
-        `/api/signups`
-      )
-       console.log(resGet.body)
-      expect(resGet.status).toBe(200)
-      
-    })
-  it.only("should list signup events in a community", async () => {
-    const communityEventId = "0882c7d6-2bc1-41af-bbbd-4f1c3d23fc73";
-    const signupData = {
-      presence_status: "pending",
-    };
-
-    const res = await makeRequest(
-      "post",
-      `/api/events/${communityEventId}/signups`,
-      signupData
-    );
-
-    expect(res.status).toBe(201);
-    const resGet = await makeRequest(
-      "get",
-      `/api/signups`
-    )
-     console.log(resGet.body)
-    expect(resGet.status).toBe(200)
     
-  });
+      expect(resPost.status).toBe(201);
+      expect(resPost.body).toMatchObject({
+        event_id: communityEventId,
+        presence_status: signupData.presence_status,
+        payment_status: "pending", 
+        user_id: expect.any(String), 
+        signup_date: expect.any(String), 
+      });
+    
+      const resGet = await makeRequest("get", `/api/signups`);
+  
+    
+      expect(resGet.status).toBe(200);
+      expect(resGet.body).toBeInstanceOf(Array);
+      expect(resGet.body).toContainEqual(
+        expect.objectContaining({
+          event_id: communityEventId,
+          presence_status: signupData.presence_status,
+          payment_status: "pending",
+          user_id: expect.any(String),
+          signup_date: expect.any(String),
+        })
+      );
+    });
+    it("should list signup events in a community", async () => {
+      const communityEventId = "0882c7d6-2bc1-41af-bbbd-4f1c3d23fc73";
+      const signupData = {
+        presence_status: "pending",
+      };
+    
+      const resPost = await makeRequest(
+        "post",
+        `/api/events/${communityEventId}/signups`,
+        signupData
+      );
+    
+      expect(resPost.status).toBe(201);
+      expect(resPost.body).toMatchObject({
+        event_id: communityEventId,
+        presence_status: signupData.presence_status,
+        payment_status: "pending",
+        user_id: expect.any(String),
+        signup_date: expect.any(String),
+      });
+    
+      const resGet = await makeRequest("get", `/api/signups`);
+     
+    
+      expect(resGet.status).toBe(200);
+      expect(resGet.body).toBeInstanceOf(Array);
+      expect(resGet.body).toContainEqual(
+        expect.objectContaining({
+          event_id: communityEventId,
+          presence_status: signupData.presence_status,
+          payment_status: "pending",
+          user_id: expect.any(String),
+          signup_date: expect.any(String),
+        })
+      );
+    });
+    it("should list multiple signup events", async () => {
+      const publicEventId = "9144c3fc-4785-4755-aaaa-b9b02be30174";
+      const communityEventId = "0882c7d6-2bc1-41af-bbbd-4f1c3d23fc73";
+      const signupData = {
+        presence_status: "pending",
+      };
+    
+
+      const resPost1 = await makeRequest(
+        "post",
+        `/api/events/${publicEventId}/signups`,
+        signupData
+      );
+    
+      expect(resPost1.status).toBe(201);
+      expect(resPost1.body).toMatchObject({
+        event_id: publicEventId,
+        presence_status: signupData.presence_status,
+        payment_status: "pending",
+        user_id: expect.any(String),
+        signup_date: expect.any(String),
+      });
+    
+     
+      const resPost2 = await makeRequest(
+        "post",
+        `/api/events/${communityEventId}/signups`,
+        signupData
+      );
+    
+      expect(resPost2.status).toBe(201);
+      expect(resPost2.body).toMatchObject({
+        event_id: communityEventId,
+        presence_status: signupData.presence_status,
+        payment_status: "pending",
+        user_id: expect.any(String),
+        signup_date: expect.any(String),
+      });
+    
+      const resGet = await makeRequest("get", `/api/signups`);
+    
+    
+      expect(resGet.status).toBe(200);
+      expect(resGet.body).toBeInstanceOf(Array);
+      expect(resGet.body).toContainEqual(
+        expect.objectContaining({
+          event_id: publicEventId,
+          presence_status: signupData.presence_status,
+          payment_status: "pending",
+          user_id: expect.any(String),
+          signup_date: expect.any(String),
+        })
+      );
+      expect(resGet.body).toContainEqual(
+        expect.objectContaining({
+          event_id: communityEventId,
+          presence_status: signupData.presence_status,
+          payment_status: "pending",
+          user_id: expect.any(String),
+          signup_date: expect.any(String),
+        })
+      );
+    });
+    it("should return an empty array when no signups exist", async () => {
+      const resGet = await makeRequest("get", `/api/signups`);
+ 
+    
+      expect(resGet.status).toBe(200);
+      expect(resGet.body.message).toEqual("No signups found for this user"); 
+    });
+    it("should return 401 when user is not authenticated", async () => {
+      
+      const resGet = await makeRequest("get", `/api/signups`, {}, {}); 
+       
+      expect(resGet.status).toBe(401);
+      expect(resGet.body).toMatchObject({
+        error: expect.stringContaining("No token provided"),
+      });
+    });
+    it("should return 200 but empty array for signups from another user", async () => {
+     
+      const resGet = await makeRequest("get", `/api/signups`);
+    
+      expect(resGet.status).toBe(200);
+      expect(resGet.body.message).toEqual("No signups found for this user");
+    });
 });
 })

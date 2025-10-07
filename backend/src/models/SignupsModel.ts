@@ -126,7 +126,9 @@ class SignupsModel {
   async getAllSignups(
     supabase: SupabaseClient<Database>,
     user_id: string
+  
   ): Promise<Signups[]> {
+
     const { data, error } = await supabase
       .from("signups")
       .select("*")
@@ -138,7 +140,7 @@ class SignupsModel {
       }
       throw new Error(`Failed to fetch signups: ${error.message}`);
     }
-  
+    
     return data || [];
   }
 }
