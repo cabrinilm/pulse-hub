@@ -48,6 +48,70 @@ class EventsController {
       });
     }
   }
+  
+  // list 
+
+  async listEvents(req: Request, res: Response): Promise<void> {
+    try {
+      const supabase = req.supabase;
+      const user_id = req.user?.id;
+
+      if (!supabase) {
+        res.status(500).json({ error: "Supabase client not found in request" });
+        return;
+      }
+
+      if (!user_id) {
+        res.status(401).json({ error: "Unauthorized: No user ID found" });
+        return;
+      }
+
+      const events = await eventsModel.listEvents(supabase, user_id);
+
+      res.status(200).json(events);
+    } catch (error) {
+      res.status(500).json({
+        error: error instanceof Error ? error.message : "Unknown error",
+      });
+    }
+  }
+
+ 
+  async getEventById(req: Request, res: Response): Promise<void> {
+    try {
+      const supabase = req.supabase;
+      const user_id = req.user?.id;
+      const { id } = req.params;
+
+      if (!supabase) {
+        res.status(500).json({ error: "Supabase client not found in request" });
+        return;
+      }
+
+      if (!user_id) {
+        res.status(401).json({ error: "Unauthorized: No user ID found" });
+        return;
+      }
+
+      if (!id) {
+        res.status(400).json({ error: "Event ID is required" });
+        return;
+      }
+
+      const event = await eventsModel.getEventById(supabase, user_id, id);
+
+      if (!event) {
+        res.status(404).json({ error: "Event not found" });
+        return;
+      }
+
+      res.status(200).json(event);
+    } catch (error) {
+      res.status(500).json({
+        error: error instanceof Error ? error.message : "Unknown error",
+      });
+    }
+  }
 
 }
 
