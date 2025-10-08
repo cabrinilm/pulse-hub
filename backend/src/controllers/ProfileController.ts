@@ -1,5 +1,5 @@
 import type { Request, Response } from "express";
-import { ProfileModel } from "../models/ProfileModel";
+import ProfileModel from "../models/ProfileModel";
 
 class ProfilesController {
   // create profile
@@ -59,7 +59,7 @@ class ProfilesController {
         return;
       }
 
-      const profile = await ProfilesModel.getProfile(supabase, user_id);
+      const profile = await ProfileModel.getProfile(supabase, user_id);
 
       if (!profile) {
         res.status(404).json({ error: "Profile not found" });
