@@ -267,8 +267,7 @@ describe("Events routes", () => {
         `/api/events/${resNewEvent.body.id}`,
         updateEvent
       );
-      console.log(resUpdateEvent.body)
-      console.log(resUpdateEvent.status)
+      
       expect(resUpdateEvent.status).toBe(200);
       expect(resUpdateEvent.body.title).toBe(updateEvent.title);
       expect(resUpdateEvent.body.is_public).toBe(false);

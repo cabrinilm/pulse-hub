@@ -587,10 +587,24 @@ describe("Signups routes", () => {
     });
 });
 describe("Event Signups Inclusion by Owner with Immediate Access", () => {
-  it.only("should allow owner to include another user in private event", async () => {
+  it("should allow owner to include another user in public event", async () => {
     // IDs inseridos diretamente no Supabase (substitua com seus valores reais)
-    const privateEventId = "e47827da-1792-42f3-a466-37770f937bcd";  // Evento privado (is_public = false, sem comunidade)
-    const otherUserId = "01bab1b6-0b3d-4475-97a1-f8260c4d0d1e";  // User a ser incluído
+    const publicEventId = "e47827da-1792-42f3-a466-37770f937bcd";  
+    const otherUserId = "01bab1b6-0b3d-4475-97a1-f8260c4d0d1e";  
+  
+  
+    // Execute o request
+    const signupData = { user_id: otherUserId, presence_status: "pending" };
+    const res = await makeRequest("post", `/api/events/${publicEventId}/add-user`, signupData);
+     console.log(res.body, '<------')
+    expect(res.status).toBe(201);
+    expect(res.body.user_id).toBe(otherUserId);
+    expect(res.body.presence_status).toBe("pending");
+  });
+  it("should allow owner to include another user in private event", async () => {
+    // IDs inseridos diretamente no Supabase (substitua com seus valores reais)
+    const privateEventId = "e47827da-1792-42f3-a466-37770f937bcd";  
+    const otherUserId = "01bab1b6-0b3d-4475-97a1-f8260c4d0d1e";  
   
   
     // Execute o request
