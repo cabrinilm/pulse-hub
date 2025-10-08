@@ -94,6 +94,68 @@ class SignupsController {
       });
     }
   }
+
+  async addUserToEvent(req: Request, res: Response): Promise<void> {
+    try {
+      const eventId = req.params.event_id;
+      const supabase = req.supabase;
+      const creator_id = req.user?.id;
+      const { user_id, presence_status } = req.body;
+  
+     
+      if (!eventId) {
+        res.status(400).json({ error: "Event ID is required" });
+        return;
+      }
+      if (!supabase) {
+        res.status(500).json({ error: "Supabase client not found in request" });
+        return;
+      }
+      if (!creator_id) {
+        res.status(401).json({ error: "Unauthorized: No user ID found" });
+        return;
+      }
+      if (!user_id) {
+        res.status(400).json({ error: "User ID to add is required" });
+        return;
+      }
+  
+
+      const { data: event, error: eventError } = await supabase
+        .from("events")
+        .select("creator_id")
+        .eq("id", eventId)
+        .single();
+  
+      if (eventError || !event) {
+        res.status(404).json({ error: "Event not found" });
+        return;
+      }
+  
+      if (event.creator_id !== creator_id) {
+        res.status(403).json({ error: "Forbidden: Only event creator can add users" });
+        return;
+      }
+  
+      
+      const signup = await SignupsModel.signupEvent(supabase, user_id, {
+        event_id: eventId,
+        payment_status: "pending",
+        presence_status: presence_status || "pending",
+      });
+  
+      res.status(201).json(signup);
+    } catch (error) {
+      if (error instanceof Error && error.message.includes("Forbidden")) {
+        res.status(403).json({ error: error.message });
+        return;
+      }
+      res.status(500).json({
+        error: error instanceof Error ? error.message : "Unknown error",
+      });
+    }
+  }
+
   // delete
   async deleteSignups(req: Request, res: Response): Promise<void> {
     try {

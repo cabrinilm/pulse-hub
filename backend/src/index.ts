@@ -58,7 +58,8 @@ app.post('/api/events/:id/signups', authMiddleware, signupsController.signupEven
 app.patch('/api/events/:id/signups', authMiddleware, signupsController.updatePresence);
 app.delete('/api/events/:id/signups', authMiddleware, signupsController.deleteSignups);
 app.get('/api/signups', authMiddleware, signupsController.getAllSignups);
-
+app.post('/api/events/:id/add-user', authMiddleware, signupsController.addUserToEvent
+);
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`Backend running on port ${PORT}`);
