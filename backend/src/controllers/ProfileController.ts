@@ -147,4 +147,9 @@ class ProfilesController {
   }
 }
 
-export default new ProfilesController();
+
+
+const profilesController =  new ProfilesController();
+export default profilesController;
+
+
