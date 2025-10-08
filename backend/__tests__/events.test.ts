@@ -177,7 +177,7 @@ describe("Events routes", () => {
       const res = await makeRequest("get", "/api/events", undefined, {});
 
       expect(res.status).toBe(401);
-      expect(res.body).toHaveProperty("error", "Unauthorized: No user ID found");
+      expect(res.body).toHaveProperty("error", "No token provided");
     });
   });
 
@@ -221,16 +221,16 @@ describe("Events routes", () => {
 
     it("should fail to get a private event of another user", async () => {
    
-      const otherPrivateId = "known-private-id-of-other-user";
+      const otherPrivateId = "763253e3-ce43-4056-adca-9055a36b92f8";
 
       const res = await makeRequest("get", `/api/events/${otherPrivateId}`);
-
+       console.log(res.body)
       expect(res.status).toBe(404);
       expect(res.body).toHaveProperty("error", "Event not found");
     });
 
     it("should fail to get event if ID does not exist", async () => {
-      const res = await makeRequest("get", "/api/events/invalid-id");
+      const res = await makeRequest("get", "/api/events/6a7b40ff-2a0f-4475-a891-2ae41ab059f4");
 
       expect(res.status).toBe(404);
       expect(res.body).toHaveProperty("error", "Event not found");
@@ -240,7 +240,7 @@ describe("Events routes", () => {
       const res = await makeRequest("get", `/api/events/${publicEventId}`, undefined, {});
 
       expect(res.status).toBe(401);
-      expect(res.body).toHaveProperty("error", "Unauthorized: No user ID found");
+      expect(res.body).toHaveProperty("error", "No token provided");
     });
   });
 
