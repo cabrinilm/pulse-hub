@@ -138,5 +138,110 @@ describe("Events routes", () => {
       expect(res.body.price).toBeNull();
     });
   });
+  describe("GET Events (List)", () => {
+    beforeEach(async () => {
+     
+      await makeRequest("post", "/api/events", {
+        title: `${testTitlePrefix}Public List Event`,
+        event_date: new Date().toISOString(),
+        is_public: true,
+      });
+
+      await makeRequest("post", "/api/events", {
+        title: `${testTitlePrefix}Private Own Event`,
+        event_date: new Date().toISOString(),
+        is_public: false,
+      });
+    });
+
+    it("should list public events and user's own events for authenticated user", async () => {
+      const res = await makeRequest("get", "/api/events");
+
+      expect(res.status).toBe(200);
+      expect(Array.isArray(res.body)).toBe(true);
+      expect(res.body.length).toBeGreaterThanOrEqual(2); 
+      expect(res.body.some((e: any) => e.title.includes("Public List Event"))).toBe(true);
+      expect(res.body.some((e: any) => e.title.includes("Private Own Event"))).toBe(true);
+    });
+
+    it("should not list private events of others", async () => {
+    
+      const res = await makeRequest("get", "/api/events");
+
+      expect(res.status).toBe(200);
+  
+      expect(res.body.every((e: any) => e.is_public || e.creator_id === userId)).toBe(true);
+    });
+
+    it("should fail to list events if user is not authenticated", async () => {
+      const res = await makeRequest("get", "/api/events", undefined, {});
+
+      expect(res.status).toBe(401);
+      expect(res.body).toHaveProperty("error", "Unauthorized: No user ID found");
+    });
+  });
+
+  describe("GET Event by ID", () => {
+    let publicEventId: string;
+    let privateOwnEventId: string;
+
+    beforeEach(async () => {
+
+      const publicRes = await makeRequest("post", "/api/events", {
+        title: `${testTitlePrefix}Public By ID Event`,
+        event_date: new Date().toISOString(),
+        is_public: true,
+      });
+      publicEventId = publicRes.body.id;
+
+      const privateRes = await makeRequest("post", "/api/events", {
+        title: `${testTitlePrefix}Private Own By ID Event`,
+        event_date: new Date().toISOString(),
+        is_public: false,
+      });
+      privateOwnEventId = privateRes.body.id;
+    });
+
+    it("should get a public event by ID for authenticated user", async () => {
+      const res = await makeRequest("get", `/api/events/${publicEventId}`);
+
+      expect(res.status).toBe(200);
+      expect(res.body).toHaveProperty("id", publicEventId);
+      expect(res.body).toHaveProperty("is_public", true);
+    });
+
+    it("should get user's own private event by ID", async () => {
+      const res = await makeRequest("get", `/api/events/${privateOwnEventId}`);
+
+      expect(res.status).toBe(200);
+      expect(res.body).toHaveProperty("id", privateOwnEventId);
+      expect(res.body).toHaveProperty("is_public", false);
+      expect(res.body).toHaveProperty("creator_id", userId);
+    });
+
+    it("should fail to get a private event of another user", async () => {
+   
+      const otherPrivateId = "known-private-id-of-other-user";
+
+      const res = await makeRequest("get", `/api/events/${otherPrivateId}`);
+
+      expect(res.status).toBe(404);
+      expect(res.body).toHaveProperty("error", "Event not found");
+    });
+
+    it("should fail to get event if ID does not exist", async () => {
+      const res = await makeRequest("get", "/api/events/invalid-id");
+
+      expect(res.status).toBe(404);
+      expect(res.body).toHaveProperty("error", "Event not found");
+    });
+
+    it("should fail to get event by ID if user is not authenticated", async () => {
+      const res = await makeRequest("get", `/api/events/${publicEventId}`, undefined, {});
+
+      expect(res.status).toBe(401);
+      expect(res.body).toHaveProperty("error", "Unauthorized: No user ID found");
+    });
+  });
 
 });
