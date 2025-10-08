@@ -83,8 +83,36 @@ class EventsModel {
 
     return data as Event | null;
   }
+ // update
 
- 
+ async updateEvent(
+  supabase: SupabaseClient<Database>,
+  creator_id: string,
+  event_id: string,
+  updates: Partial<EventInput>
+): Promise<Event> {
+  const { data, error } = await supabase
+    .from("events")
+    .update(updates)
+    .eq("id", event_id)
+    .eq("creator_id", creator_id) 
+    .select()
+    .single();
+
+  if (error) {
+    throw new Error(`Failed to update event: ${error.message}`);
+  }
+
+  if (!data) {
+    throw new Error("Event not found");
+  }
+
+  return data as Event;
 }
+
+// Métodos para delete serão adicionados no próximo passo
+}
+ 
+
 
 export default new EventsModel();

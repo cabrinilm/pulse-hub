@@ -48,7 +48,7 @@ class EventsController {
       });
     }
   }
-  
+
   // list 
 
   async listEvents(req: Request, res: Response): Promise<void> {
@@ -107,6 +107,69 @@ class EventsController {
 
       res.status(200).json(event);
     } catch (error) {
+      res.status(500).json({
+        error: error instanceof Error ? error.message : "Unknown error",
+      });
+    }
+  }
+  async updateEvent(req: Request, res: Response): Promise<void> {
+    try {
+      const supabase = req.supabase;
+      const user_id = req.user?.id;
+      const { id } = req.params;
+      const { title, description, location, event_date, is_public, price, min_participants, max_participants, image_url } = req.body;
+
+      if (!supabase) {
+        res.status(500).json({ error: "Supabase client not found in request" });
+        return;
+      }
+
+      if (!user_id) {
+        res.status(401).json({ error: "Unauthorized: No user ID found" });
+        return;
+      }
+
+      if (!id) {
+        res.status(400).json({ error: "Event ID is required" });
+        return;
+      }
+
+      const updates: Partial<{ title: string; description: string; location: string; event_date: string; is_public: boolean; price: number; min_participants: number; max_participants: number; image_url: string }> = {};
+      if (title) updates.title = title;
+      if (description !== undefined) updates.description = description;
+      if (location !== undefined) updates.location = location;
+      if (event_date) updates.event_date = event_date;
+      if (is_public !== undefined) updates.is_public = is_public;
+      if (price !== undefined) {
+        if (price < 0) {
+          res.status(400).json({ error: "Price must be >= 0" });
+          return;
+        }
+        updates.price = price;
+      }
+      if (min_participants !== undefined) updates.min_participants = min_participants;
+      if (max_participants !== undefined) updates.max_participants = max_participants;
+      if (image_url !== undefined) updates.image_url = image_url;
+
+      if (Object.keys(updates).length === 0) {
+        res.status(400).json({ error: "No updates provided" });
+        return;
+      }
+
+      const updatedEvent = await eventsModel.updateEvent(supabase, user_id, id, updates);
+
+      res.status(200).json(updatedEvent);
+    } catch (error) {
+      if (error instanceof Error && error.message === "Event not found") {
+        res.status(404).json({ error: error.message });
+        return;
+      }
+
+      if (error instanceof Error && error.message.includes("not authorized")) {
+        res.status(403).json({ error: "Not authorized to update this event" });
+        return;
+      }
+
       res.status(500).json({
         error: error instanceof Error ? error.message : "Unknown error",
       });

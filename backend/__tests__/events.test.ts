@@ -243,5 +243,88 @@ describe("Events routes", () => {
       expect(res.body).toHaveProperty("error", "No token provided");
     });
   });
+  describe("UPDATE Event", () => {
+    let eventId: string;
 
+    beforeEach(async () => {
+      // Cria um fixture de evento para update
+      const createRes = await makeRequest("post", "/api/events", {
+        title: `${testTitlePrefix}Update Event`,
+        description: "Original description",
+        event_date: new Date().toISOString(),
+        is_public: true,
+      });
+      eventId = createRes.body.id;
+    });
+
+    it("should update an event's title and description for the creator", async () => {
+      const updates = {
+        title: `${testTitlePrefix}Updated Title`,
+        description: "Updated description",
+      };
+
+      const res = await makeRequest("patch", `/api/events/${eventId}`, updates);
+
+      expect(res.status).toBe(200);
+      expect(res.body).toHaveProperty("id", eventId);
+      expect(res.body).toHaveProperty("title", updates.title);
+      expect(res.body).toHaveProperty("description", updates.description);
+    });
+
+    it("should fail to update if not the creator", async () => {
+      
+      const otherEventId = "763253e3-ce43-4056-adca-9055a36b92f8";
+
+      const updates = {
+        title: "Unauthorized Update",
+      };
+
+      const res = await makeRequest("patch", `/api/events/${otherEventId}`, updates);
+
+      expect(res.status).toBe(404); // Ou 403, dependendo do controller; ajuste se retornar "not authorized"
+      expect(res.body.error).toMatch(/not found|unauthorized/i);
+    });
+
+    it("should fail to update if event ID does not exist", async () => {
+      const updates = {
+        title: "Non-existent Update",
+      };
+
+      const res = await makeRequest("patch", "/api/events/invalid-id", updates);
+
+      expect(res.status).toBe(404);
+      expect(res.body).toHaveProperty("error", "Event not found");
+    });
+
+    it("should fail to update if no updates provided", async () => {
+      const res = await makeRequest("patch", `/api/events/${eventId}`, {});
+
+      expect(res.status).toBe(400);
+      expect(res.body).toHaveProperty("error", "No updates provided");
+    });
+
+    it("should fail to update with invalid data (e.g., negative price)", async () => {
+      const updates = {
+        price: -10,
+      };
+
+      const res = await makeRequest("patch", `/api/events/${eventId}`, updates);
+
+      expect(res.status).toBe(400);
+      expect(res.body).toHaveProperty("error", "Price must be >= 0");
+    });
+
+    it("should fail to update if user is not authenticated", async () => {
+      const updates = {
+        title: "Unauth Update",
+      };
+
+      const res = await makeRequest("patch", `/api/events/${eventId}`, updates, {});
+
+      expect(res.status).toBe(401);
+      expect(res.body).toHaveProperty("error", "Unauthorized: No user ID found");
+    });
+  });
+
+ 
 });
