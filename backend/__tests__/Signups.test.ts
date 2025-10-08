@@ -64,7 +64,7 @@ describe("Signups routes", () => {
         `/api/events/${publicEventId}/signups`,
         PaymentAndPresente
       );
-      console.log(res.body,'signuppp')
+
       expect(res.status).toBe(201);
       expect(res.body).toHaveProperty("user_id", userId);
       expect(res.body).toHaveProperty("event_id", publicEventId);
@@ -588,12 +588,12 @@ describe("Signups routes", () => {
 });
 describe("Event Signups Inclusion by Owner with Immediate Access", () => {
   it("should allow owner to include another user in public event", async () => {
-    // IDs inseridos diretamente no Supabase (substitua com seus valores reais)
-    const publicEventId = "e47827da-1792-42f3-a466-37770f937bcd";  
+    
+    const publicEventId = "aa761493-169d-423d-8328-dfc8ac43fe2a";  
     const otherUserId = "01bab1b6-0b3d-4475-97a1-f8260c4d0d1e";  
   
   
-    // Execute o request
+    
     const signupData = { user_id: otherUserId, presence_status: "pending" };
     const res = await makeRequest("post", `/api/events/${publicEventId}/add-user`, signupData);
      console.log(res.body, '<------')
@@ -602,12 +602,40 @@ describe("Event Signups Inclusion by Owner with Immediate Access", () => {
     expect(res.body.presence_status).toBe("pending");
   });
   it("should allow owner to include another user in private event", async () => {
-    // IDs inseridos diretamente no Supabase (substitua com seus valores reais)
-    const privateEventId = "e47827da-1792-42f3-a466-37770f937bcd";  
+    
+    const privateEventId = "d63270f1-0849-4ff8-a42b-b68d6d016656";  
+    const otherUserId = "89c96f4b-1eda-475c-a422-f78f917fd15f";  
+  
+  
+   
+    const signupData = { user_id: otherUserId, presence_status: "pending" };
+    const res = await makeRequest("post", `/api/events/${privateEventId}/add-user`, signupData);
+     console.log(res.body, '<------')
+    expect(res.status).toBe(201);
+    expect(res.body.user_id).toBe(otherUserId);
+    expect(res.body.presence_status).toBe("pending");
+  });
+  it("should allow owner to include another user in a community event", async () => {
+    
+    const privateEventId = "6c4fb867-a365-4376-94e4-9ee00a252cb3";  
+    const otherUserId = "b849653a-6d41-473d-b378-be90e24ce495";  
+  
+  
+   
+    const signupData = { user_id: otherUserId, presence_status: "pending" };
+    const res = await makeRequest("post", `/api/events/${privateEventId}/add-user`, signupData);
+     console.log(res.body, '<------')
+    expect(res.status).toBe(201);
+    expect(res.body.user_id).toBe(otherUserId);
+    expect(res.body.presence_status).toBe("pending");
+  });
+  it.only("should allow owner to include another user in a community event but user is not member", async () => {
+    
+    const privateEventId = "6c4fb867-a365-4376-94e4-9ee00a252cb3";  
     const otherUserId = "01bab1b6-0b3d-4475-97a1-f8260c4d0d1e";  
   
   
-    // Execute o request
+   
     const signupData = { user_id: otherUserId, presence_status: "pending" };
     const res = await makeRequest("post", `/api/events/${privateEventId}/add-user`, signupData);
      console.log(res.body, '<------')
