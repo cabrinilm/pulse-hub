@@ -589,14 +589,14 @@ describe("Signups routes", () => {
 describe("Event Signups Inclusion by Owner with Immediate Access", () => {
   it.only("should allow owner to include another user in private event", async () => {
     // IDs inseridos diretamente no Supabase (substitua com seus valores reais)
-    const privateEventId = "d63270f1-0849-4ff8-a42b-b68d6d016656";  // Evento privado (is_public = false, sem comunidade)
-    const otherUserId = "98234733-7397-4478-9e8b-504761923450";  // User a ser incluído
+    const privateEventId = "e47827da-1792-42f3-a466-37770f937bcd";  // Evento privado (is_public = false, sem comunidade)
+    const otherUserId = "01bab1b6-0b3d-4475-97a1-f8260c4d0d1e";  // User a ser incluído
   
   
     // Execute o request
     const signupData = { user_id: otherUserId, presence_status: "pending" };
-    const res = await makeRequest("post", `/api/events/${privateEventId}/signups`, signupData);
-     console.log(res.body)
+    const res = await makeRequest("post", `/api/events/${privateEventId}/add-user`, signupData);
+     console.log(res.body, '<------')
     expect(res.status).toBe(201);
     expect(res.body.user_id).toBe(otherUserId);
     expect(res.body.presence_status).toBe("pending");
