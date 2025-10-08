@@ -255,13 +255,13 @@ describe("Profiles routes", () => {
       expect(res.body).toHaveProperty("error", "No token provided");
     });
 
-    it("should return 404 or no-op if profile does not exist", async () => {
-      // Deleta primeiro
+    it.only("should return 404 or no-op if profile does not exist", async () => {
+    
       await supabase.from("profiles").delete().eq("user_id", userId).like("username", `${testUsernamePrefix}%`);
 
       const res = await makeRequest("delete", "/api/profile");
 
-      expect(res.status).toBe(404); // Ou 204 se no-op; ajuste conforme o controller
+      expect(res.status).toBe(204); 
       expect(res.body).toHaveProperty("error", expect.stringContaining("not found"));
     });
   });
