@@ -29,29 +29,29 @@ app.get('/api/profile', authMiddleware, profilesController.getProfile);
 app.patch('/api/profile', authMiddleware, profilesController.updateProfile);
 app.delete('/api/profile', authMiddleware, profilesController.deleteProfile);
 
-// Community routes
+// // Community routes
 
-app.post('/api/communities', authMiddleware, CommunityController.createCommunity);
-app.get('/api/communities', authMiddleware, CommunityController.getCommunities);
-app.get('/api/communities/:id', authMiddleware, CommunityController.getCommunityById);
-app.patch('/api/communities/:id', authMiddleware, CommunityController.updateCommunity);
-app.delete('/api/communities/:id', authMiddleware, CommunityController.deleteCommunity);
+// app.post('/api/communities', authMiddleware, CommunityController.createCommunity);
+// app.get('/api/communities', authMiddleware, CommunityController.getCommunities);
+// app.get('/api/communities/:id', authMiddleware, CommunityController.getCommunityById);
+// app.patch('/api/communities/:id', authMiddleware, CommunityController.updateCommunity);
+// app.delete('/api/communities/:id', authMiddleware, CommunityController.deleteCommunity);
 
-// Community members 
+// // Community members 
 
-app.post('/api/communities/:communityId/members', authMiddleware, communityMemberController.joinCommunityById);
-app.get('/api/communities/:communityId/members', authMiddleware, communityMemberController.getAllMembersCommunity);
-app.delete('/api/communities/:communityId/members', authMiddleware, communityMemberController.memberLeavesCommunity);
-app.delete('/api/communities/:communityId/:removedUserId', authMiddleware, communityMemberController.admRemoveMember);
+// app.post('/api/communities/:communityId/members', authMiddleware, communityMemberController.joinCommunityById);
+// app.get('/api/communities/:communityId/members', authMiddleware, communityMemberController.getAllMembersCommunity);
+// app.delete('/api/communities/:communityId/members', authMiddleware, communityMemberController.memberLeavesCommunity);
+// app.delete('/api/communities/:communityId/:removedUserId', authMiddleware, communityMemberController.admRemoveMember);
 
 
 // Events 
 
-app.post('/api/events', authMiddleware, eventsController.createEventByUser);
-app.patch(`/api/events/:id`, authMiddleware, eventsController.updateEventByUser);
-app.delete(`/api/events/:id`, authMiddleware, eventsController.deleteEventByUser);
-app.get('/api/events', authMiddleware, eventsController.listEvents);
-app.get('/api/events/:id', authMiddleware, eventsController.getEventById);
+app.post('/api/events', authMiddleware, eventsController.createEvent);
+// app.patch(`/api/events/:id`, authMiddleware, eventsController.updateEventByUser);
+// app.delete(`/api/events/:id`, authMiddleware, eventsController.deleteEventByUser);
+// app.get('/api/events', authMiddleware, eventsController.listEvents);
+// app.get('/api/events/:id', authMiddleware, eventsController.getEventById);
 
 
 // Signups 
