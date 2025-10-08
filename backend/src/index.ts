@@ -3,7 +3,7 @@ import cors from 'cors';
 import dotenv from 'dotenv';
 import AuthController from './controllers/AuthController.ts';
 import CommunityController from './controllers/CommunityController.ts';
-import { ProfileController } from './controllers/ProfileController.ts';
+import ProfileController from './controllers/ProfileController.ts';
 import communityMemberController from './controllers/CommunityMembersController.ts';
 import { authMiddleware } from './middleware/auth.ts';
 import eventsController from './controllers/EventsController.ts';
@@ -24,8 +24,8 @@ app.get('/api', (_req, res) => {
 app.post('/api/signup', AuthController.signup);
 
 // Profile routes
-app.post('/api/profile', authMiddleware, ProfileController.create);
-app.get('/api/profile', authMiddleware, ProfileController.get);
+app.post('/api/profile', authMiddleware, ProfileController.createProfile);
+app.get('/api/profile', authMiddleware, ProfileController.getProfile);
 
 // Community routes
 

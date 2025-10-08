@@ -50,17 +50,29 @@ describe("Profiles routes", () => {
 
   it("should create a profile for the authenticated user", async () => {
     const body = {
+      username: "Userfirst",
+      full_name: "Test User",
+      avatar: "https://example.com/avatar.png",
+    };
+
+    const res = await makeRequest("post", "/api/profile", body);
+    console.log(res.body)
+    expect(res.status).toBe(201);
+    expect(res.body).toHaveProperty("user_id", userId);
+    expect(res.body).toHaveProperty("username", "Userfirst");
+    expect(res.body).toHaveProperty("full_name", "Test User");
+    expect(res.body).toHaveProperty("avatar", "https://example.com/avatar.png");
+  });
+  it("should fail for a profile for already exist", async () => {
+    const body = {
       username: "testuser",
       full_name: "Test User",
       avatar: "https://example.com/avatar.png",
     };
 
-    const res = await makeRequest("post", "/api/profiles", body);
-
-    expect(res.status).toBe(201);
-    expect(res.body).toHaveProperty("user_id", userId);
-    expect(res.body).toHaveProperty("username", "testuser");
-    expect(res.body).toHaveProperty("full_name", "Test User");
-    expect(res.body).toHaveProperty("avatar", "https://example.com/avatar.png");
+    const res = await makeRequest("post", "/api/profile", body);
+   
+    expect(res.status).toBe(409);
+    
   });
 });
