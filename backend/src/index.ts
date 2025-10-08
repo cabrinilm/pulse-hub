@@ -50,8 +50,7 @@ app.delete('/api/profile', authMiddleware, profilesController.deleteProfile);
 app.post('/api/events', authMiddleware, eventsController.createEvent);
 app.get('/api/events', authMiddleware, eventsController.listEvents);
 app.get('/api/events/:id', authMiddleware, eventsController.getEventById);
-
-// app.patch(`/api/events/:id`, authMiddleware, eventsController.updateEventByUser);
+app.patch(`/api/events/:id`, authMiddleware, eventsController.updateEvent);
 // app.delete(`/api/events/:id`, authMiddleware, eventsController.deleteEventByUser);
 
 

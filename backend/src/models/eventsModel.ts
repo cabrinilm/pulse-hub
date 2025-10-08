@@ -90,12 +90,12 @@ class EventsModel {
   creator_id: string,
   event_id: string,
   updates: Partial<EventInput>
-): Promise<Event> {
+): Promise<Event | null> {
   const { data, error } = await supabase
     .from("events")
     .update(updates)
     .eq("id", event_id)
-    .eq("creator_id", creator_id) 
+    .eq("creator_id", creator_id) // Garante que só o criador atualize (RLS reforça isso)
     .select()
     .single();
 
@@ -103,11 +103,7 @@ class EventsModel {
     throw new Error(`Failed to update event: ${error.message}`);
   }
 
-  if (!data) {
-    throw new Error("Event not found");
-  }
-
-  return data as Event;
+  return data as Event | null; // Retorna null se nenhum row atualizado (ex.: não dono ou não encontrado)
 }
 
 // Métodos para delete serão adicionados no próximo passo

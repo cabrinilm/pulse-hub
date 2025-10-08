@@ -158,18 +158,13 @@ class EventsController {
 
       const updatedEvent = await eventsModel.updateEvent(supabase, user_id, id, updates);
 
+      if (!updatedEvent) {
+        res.status(404).json({ error: "Event not found" });
+        return;
+      }
+
       res.status(200).json(updatedEvent);
     } catch (error) {
-      if (error instanceof Error && error.message === "Event not found") {
-        res.status(404).json({ error: error.message });
-        return;
-      }
-
-      if (error instanceof Error && error.message.includes("not authorized")) {
-        res.status(403).json({ error: "Not authorized to update this event" });
-        return;
-      }
-
       res.status(500).json({
         error: error instanceof Error ? error.message : "Unknown error",
       });
