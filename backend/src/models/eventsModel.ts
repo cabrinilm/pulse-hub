@@ -51,6 +51,39 @@ class EventsModel {
     return data as Event;
   }
 
+  async listEvents(
+    supabase: SupabaseClient<Database>,
+    user_id: string
+  ): Promise<Event[]> {
+    const { data, error } = await supabase
+      .from("events")
+      .select("*")
+      .or(`is_public.eq.true,creator_id.eq.${user_id}`);
+    if (error) {
+      throw new Error(`Failed to list events: ${error.message}`);
+    }
+
+    return data as Event[];
+  }
+
+  async getEventById(
+    supabase: SupabaseClient<Database>,
+    user_id: string,
+    event_id: string
+  ): Promise<Event | null> {
+    const { data, error } = await supabase
+      .from("events")
+      .select("*")
+      .eq("id", event_id)
+      .maybeSingle();
+
+    if (error) {
+      throw new Error(`Failed to fetch event: ${error.message}`);
+    }
+
+    return data as Event | null;
+  }
+
  
 }
 
