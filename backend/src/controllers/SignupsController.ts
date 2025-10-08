@@ -1,220 +1,148 @@
 import type { Request, Response } from "express";
-import SignupsModel from "../models/SignupsModel";
+import signupsModel from "../models/signusModel";
 
 class SignupsController {
-  // signup event
-  async signupEvent(req: Request, res: Response): Promise<void> {
+  // create
+
+  async createSignup(req: Request, res: Response): Promise<void> {
     try {
-      const eventId = req.params.id;
       const supabase = req.supabase;
       const user_id = req.user?.id;
-      const { payment_status, presence_status } = req.body;
+      const { event_id } = req.body;
 
-      if (!eventId) {
-        res.status(400).json({ error: "Event ID is required" });
-        return;
-      }
       if (!supabase) {
         res.status(500).json({ error: "Supabase client not found in request" });
         return;
       }
+
       if (!user_id) {
         res.status(401).json({ error: "Unauthorized: No user ID found" });
         return;
       }
 
-      const sucess = await SignupsModel.signupEvent(supabase, user_id, {
-        event_id: eventId,
-        payment_status,
-        presence_status,
-      });
-
-      if (!sucess) {
-        res.status(404).json({ error: "Event creation failed" });
-        return;
-      }
-
-      res.status(201).json(sucess);
-    } catch (error) {
-      if (error instanceof Error && error.message.includes("Forbidden")) {
-        res.status(403).json({ error: error.message });
-        return;
-      }
-      res.status(500).json({
-        error: error instanceof Error ? error.message : "Unknown error",
-      });
-    }
-  }
-  // update
-  async updatePresence(req: Request, res: Response): Promise<void> {
-    try {
-      const eventId = req.params.id;
-      const supabase = req.supabase;
-      const user_id = req.user?.id;
-      const { presence_status } = req.body;
-
-
-      if (!eventId) {
+      if (!event_id) {
         res.status(400).json({ error: "Event ID is required" });
         return;
       }
-      if (!supabase) {
-        res.status(500).json({ error: "Supabase client not found in request" });
-        return;
-      }
-      if (!user_id) {
-        res.status(401).json({ error: "Unauthorized: No user ID found" });
-        return;
-      }
-      if (!presence_status) {
-        res.status(400).json({ error: "Presence status is required" });
-        return;
-      }
 
-      const success = await SignupsModel.updatePresence(
+      const signup = await signupsModel.createSignup(
         supabase,
         user_id,
-        eventId,
-        presence_status
+        event_id
       );
 
-      if (!success) {
-        res.status(404).json({ error: "Signup not found or update failed" });
+      res.status(201).json(signup);
+    } catch (error) {
+      if (error instanceof Error && error.message.includes("already exists")) {
+        res.status(409).json({ error: error.message });
         return;
       }
 
-      res.status(200).json(success);
-    } catch (error) {
-      if (error instanceof Error && error.message.includes("Forbidden")) {
-        res.status(403).json({ error: error.message });
+      if (
+        error instanceof Error &&
+        error.message.includes("violates row-level security")
+      ) {
+        res
+          .status(403)
+          .json({ error: "Not authorized for this private event" });
         return;
       }
+
       res.status(500).json({
         error: error instanceof Error ? error.message : "Unknown error",
       });
     }
   }
 
-  async addUserToEvent(req: Request, res: Response): Promise<void> {
+  // list
+
+  async listSignups(req: Request, res: Response): Promise<void> {
     try {
-      const eventId = req.params.event_id;
       const supabase = req.supabase;
-      const ownerId = req.user?.id; // quem está autenticado (o dono)
-      const { user_id, presence_status } = req.body;
-  
-      console.log(eventId, "<..controller eventId");
-      console.log(ownerId, "<--controller owner id");
-      console.log(user_id, "<--controller user id");
-  
-      if (!eventId) {
-        res.status(400).json({ error: "Event ID is required" });
+      const user_id = req.user?.id;
+
+      if (!supabase) {
+        res.status(500).json({ error: "Supabase client not found in request" });
         return;
       }
+
       if (!user_id) {
-        res.status(400).json({ error: "User ID to add is required" });
+        res.status(401).json({ error: "Unauthorized: No user ID found" });
         return;
       }
-      if (!presence_status) {
-        res.status(400).json({ error: "Presence status is required" });
-        return;
-      }
-      if (!supabase) {
-        res.status(500).json({ error: "Supabase client not found in request" });
-        return;
-      }
-      if (!ownerId) {
-        res.status(401).json({ error: "Unauthorized: No owner ID found" });
-        return;
-      }
-  
-      // chama o model usando o user_id passado (não o autenticado)
-      const result = await SignupsModel.signupEvent(supabase, user_id, {
-        event_id: eventId,
-        payment_status: "pending",
-        presence_status,
-      });
-  
-      res.status(201).json(result);
+
+      const signups = await signupsModel.listSignups(supabase, user_id);
+
+      res.status(200).json(signups);
     } catch (error) {
-      if (error instanceof Error && error.message.includes("Forbidden")) {
-        res.status(403).json({ error: error.message });
-        return;
-      }
       res.status(500).json({
         error: error instanceof Error ? error.message : "Unknown error",
       });
     }
   }
+  // update 
 
-  // delete
-  async deleteSignups(req: Request, res: Response): Promise<void> {
+  async updateSignup(req: Request, res: Response): Promise<void> {
     try {
-      const eventId = req.params.id;
       const supabase = req.supabase;
-      const userId = req.user?.id;
-  
-      if (!eventId) {
+      const user_id = req.user?.id;
+      const event_id = req.params.event_id; // Extraído de paramsff
+      const { payment_status, presence_status } = req.body;
+
+      if (!supabase) {
+        res.status(500).json({ error: "Supabase client not found in request" });
+        return;
+      }
+
+      if (!user_id) {
+        res.status(401).json({ error: "Unauthorized: No user ID found" });
+        return;
+      }
+
+      if (!event_id) {
         res.status(400).json({ error: "Event ID is required" });
         return;
       }
-  
-      if (!supabase) {
-        res.status(500).json({ error: "Supabase client not found in request" });
+
+      const updates: Partial<{ payment_status: string; presence_status: string }> = {};
+      if (payment_status && ['pending', 'completed', 'failed'].includes(payment_status)) {
+        updates.payment_status = payment_status;
+      } else if (payment_status) {
+        res.status(400).json({ error: "Invalid payment_status" });
         return;
       }
-  
-      if (!userId) {
-        res.status(401).json({ error: "Unauthorized: No user ID found" });
+
+      if (presence_status && ['pending', 'confirmed', 'rejected'].includes(presence_status)) {
+        updates.presence_status = presence_status;
+      } else if (presence_status) {
+        res.status(400).json({ error: "Invalid presence_status" });
         return;
       }
-  
-      const success = await SignupsModel.delete(supabase, eventId, userId);
-  
-      if (!success) {
-        res.status(404).json({ error: "Signup not found or delete failed" });
+
+      if (Object.keys(updates).length === 0) {
+        res.status(400).json({ error: "No updates provided" });
         return;
       }
-  
-      res.status(204).send(); 
+
+      const updatedSignup = await signupsModel.updateSignup(supabase, user_id, event_id, updates);
+
+      res.status(200).json(updatedSignup);
     } catch (error) {
+      if (error instanceof Error && error.message === "Signup not found") {
+        res.status(404).json({ error: error.message });
+        return;
+      }
+
+      if (error instanceof Error && error.message.includes("not authorized")) {
+        res.status(403).json({ error: "Not authorized to update this signup" });
+        return;
+      }
+
       res.status(500).json({
         error: error instanceof Error ? error.message : "Unknown error",
       });
     }
   }
-
-  // get
-
-  async getAllSignups(req: Request, res: Response): Promise<void> {
-    try {
-      const supabase = req.supabase;
-      const userId = req.user?.id;
-  
-      if (!userId) {
-        res.status(401).json({ error: "Unauthorized: No user ID found" });
-        return;
-      }
-  
-      if (!supabase) {
-        res.status(500).json({ error: "Supabase client not found in request" });
-        return;
-      }
-  
-      const success = await SignupsModel.getAllSignups(supabase, userId);
-  
-      if (!success || success.length === 0) {
-        res.status(200).json({ message: "No signups found for this user", data: [] });
-        return;
-      }
-  
-      res.status(200).json(success);
-    } catch (error) {
-      res.status(500).json({
-        error: error instanceof Error ? error.message : "Internal server error",
-      });
-    }
-  }
-    
-  }
+}
 const signupsController = new SignupsController();
 export default signupsController;
