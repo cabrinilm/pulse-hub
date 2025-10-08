@@ -63,9 +63,10 @@ describe("Events routes", () => {
         price: 0,
         location: "Online",
       };
-
+  
+     
       const resNewEvent = await makeRequest("post", "/api/events", eventData);
-
+        
       expect(resNewEvent.status).toBe(201);
 
       const event: Event = resNewEvent.body;
@@ -104,8 +105,8 @@ describe("Events routes", () => {
     it("should fail to create event for community where user is not a member", async () => {
       const eventData = {
         creator_id: creatorId,
-        community_id: "7622bf78-748b-49c4-9c29-a619cecc72e6",
-        title: "Unauthorized Event",
+        community_id: "82ad0e4e-6207-4307-9e91-d3fa5c2e59be",
+        title: "TESTE NOT ENTER",
         description: "User is not a member of this community",
         event_date: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
         is_public: true,
@@ -114,7 +115,7 @@ describe("Events routes", () => {
       };
 
       const resNewEvent = await makeRequest("post", "/api/events", eventData);
-
+    
       expect(resNewEvent.status).toBe(403);
       expect(resNewEvent.body).toHaveProperty("error");
       expect(resNewEvent.body.error).toMatch(/Forbidden/i);

@@ -10,7 +10,7 @@ class EventsController {
       const creatorId = req.user?.id;
       const supabase = req.supabase;
       const { creator_id, title, description, event_date, is_public, price, location, community_id } = req.body;
- 
+
 
       if (!creatorId) {
         res.status(401).json({ error: "Unauthorized: No user ID found" });
