@@ -1,62 +1,78 @@
-// src/controllers/ProfileController.ts
-import { createClient } from '@supabase/supabase-js';
-import { ProfileModel } from '../models/ProfileModel.ts';
-import type { Request, Response } from 'express';
+import type { Request, Response } from "express";
+import { ProfileModel } from "../models/ProfileModel";
 
-const supabaseUrl = process.env.SUPABASE_URL!;
-const supabaseKey = process.env.SUPABASE_ANON_KEY!; 
+class ProfilesController {
+  // create profile
+  async createProfile(req: Request, res: Response): Promise<void> {
+    try {
+      const supabase = req.supabase;
+      const user_id = req.user?.id;
+      const { username, full_name, avatar } = req.body;
 
-export class ProfileController {
-  static async create(req: Request, res: Response) {
-    const { username, avatar } = req.body;
-    const authHeader = req.headers.authorization;
+      if (!supabase) {
+        res.status(500).json({ error: "Supabase client not found in request" });
+        return;
+      }
 
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
-      return res.status(401).json({ error: 'Unauthorized: Missing or invalid token' });
+      if (!user_id) {
+        res.status(401).json({ error: "Unauthorized: No user ID found" });
+        return;
+      }
+
+      if (!username) {
+        res.status(400).json({ error: "Username is required" });
+        return;
+      }
+
+      const profile = await ProfileModel.createProfile(supabase, user_id, {
+        username,
+        full_name,
+        avatar,
+      });
+
+      res.status(201).json(profile);
+    } catch (error) {
+      if (error instanceof Error && error.message.includes("already exists")) {
+        res.status(409).json({ error: error.message });
+        return;
+      }
+
+      res.status(500).json({
+        error: error instanceof Error ? error.message : "Unknown error",
+      });
     }
-
-    const token = authHeader.split(' ')[1];
-
-  
-    const userSupabase = createClient(supabaseUrl, supabaseKey, {
-      global: { headers: { Authorization: `Bearer ${token}` } },
-    });
-
-
-    const { data: { user }, error: authError } = await userSupabase.auth.getUser(token);
-    if (authError || !user) return res.status(401).json({ error: 'Invalid token' });
-
-    if (!username) return res.status(400).json({ error: 'Username is required' });
-
-    const { success, error } = await ProfileModel.createOrUpdate(user.id, username, avatar, userSupabase);
-
-    if (!success) {
-      if (error?.code === '23505') return res.status(400).json({ error: 'Username already taken' });
-      return res.status(400).json({ error: error?.message || 'Failed to create/update' });
-    }
-
-    return res.status(201).json({ message: 'Profile created/updated' });
   }
 
-  static async get(req: Request, res: Response) {
-    const authHeader = req.headers.authorization;
+  // get profile by user_id
+  async getProfile(req: Request, res: Response): Promise<void> {
+    try {
+      const supabase = req.supabase;
+      const user_id = req.user?.id;
 
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
-      return res.status(401).json({ error: 'Unauthorized: Missing or invalid token' });
+      if (!supabase) {
+        res.status(500).json({ error: "Supabase client not found in request" });
+        return;
+      }
+
+      if (!user_id) {
+        res.status(401).json({ error: "Unauthorized: No user ID found" });
+        return;
+      }
+
+      const profile = await ProfilesModel.getProfile(supabase, user_id);
+
+      if (!profile) {
+        res.status(404).json({ error: "Profile not found" });
+        return;
+      }
+
+      res.status(200).json(profile);
+    } catch (error) {
+      res.status(500).json({
+        error: error instanceof Error ? error.message : "Unknown error",
+      });
     }
-
-    const token = authHeader.split(' ')[1];
-    const userSupabase = createClient(supabaseUrl, supabaseKey, {
-      global: { headers: { Authorization: `Bearer ${token}` } },
-    });
-
-    const { data: { user }, error: authError } = await userSupabase.auth.getUser(token);
-    if (authError || !user) return res.status(401).json({ error: 'Invalid token' });
-
-    const { data, error } = await ProfileModel.get(user.id, userSupabase);
-
-    if (error || !data) return res.status(404).json({ error: 'Profile not found' });
-
-    return res.status(200).json(data);
   }
 }
+
+export default new ProfilesController();
