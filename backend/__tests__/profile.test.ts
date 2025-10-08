@@ -162,7 +162,7 @@ describe("Profiles routes", () => {
 
     beforeEach(async () => {
       testUsername = `${testUsernamePrefix}update`;
-      // Cria um perfil fixture para atualização
+      
       await makeRequest("post", "/api/profile", {
         username: testUsername,
         full_name: "Original User",
