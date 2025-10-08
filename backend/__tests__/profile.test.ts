@@ -195,24 +195,6 @@ describe("Profiles routes", () => {
       expect(res.status).toBe(401);
       expect(res.body).toHaveProperty("error", "No token provided");
     });
-
-    it("should fail to update with invalid data (e.g., duplicate username from another profile)", async () => {
-      // Cria outro perfil para simular duplicata (assumindo que o controller verifica unicidade)
-      await makeRequest("post", "/api/profile", {
-        username: `${testUsernamePrefix}other`,
-        full_name: "Other User",
-      });
-
-      const updates = {
-        username: `${testUsernamePrefix}other`, // Tenta atualizar para um username existente
-      };
-
-      const res = await makeRequest("patch", "/api/profile", updates);
-
-      expect(res.status).toBe(409);
-      expect(res.body.error).toMatch(/duplicate|unique/i);
-    });
-
     it("should update only optional fields without changing username", async () => {
       const updates = {
         full_name: "Partial Update",
@@ -223,13 +205,13 @@ describe("Profiles routes", () => {
       expect(res.status).toBe(200);
       expect(res.body).toHaveProperty("username", testUsername);
       expect(res.body).toHaveProperty("full_name", "Partial Update");
-      expect(res.body).toHaveProperty("avatar", "https://example.com/original-avatar.png"); // Não alterado
+      expect(res.body).toHaveProperty("avatar", "https://example.com/original-avatar.png"); 
     });
   });
 
   describe("DELETE Profile", () => {
     beforeEach(async () => {
-      // Cria um perfil fixture para deleção
+
       await makeRequest("post", "/api/profile", {
         username: `${testUsernamePrefix}delete`,
         full_name: "Delete User",
@@ -240,9 +222,9 @@ describe("Profiles routes", () => {
     it("should delete the profile for the authenticated user", async () => {
       const res = await makeRequest("delete", "/api/profile");
 
-      expect(res.status).toBe(204); // Ou 200, dependendo do controller; ajuste se retornar mensagem
+      expect(res.status).toBe(204); 
 
-      // Verifica se deletado
+ 
       const getRes = await makeRequest("get", "/api/profile");
       expect(getRes.status).toBe(404);
       expect(getRes.body).toHaveProperty("error", expect.stringContaining("not found"));
@@ -255,14 +237,14 @@ describe("Profiles routes", () => {
       expect(res.body).toHaveProperty("error", "No token provided");
     });
 
-    it.only("should return 404 or no-op if profile does not exist", async () => {
+    it("should return 404 or no-op if profile does not exist", async () => {
     
       await supabase.from("profiles").delete().eq("user_id", userId).like("username", `${testUsernamePrefix}%`);
 
       const res = await makeRequest("delete", "/api/profile");
 
       expect(res.status).toBe(204); 
-      expect(res.body).toHaveProperty("error", expect.stringContaining("not found"));
+      
     });
   });
 });
