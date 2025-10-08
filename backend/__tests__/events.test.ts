@@ -8,12 +8,12 @@ dotenv.config();
 
 const supabaseUrl = process.env.SUPABASE_URL!;
 const supabaseKey = process.env.SUPABASE_ANON_KEY!;
-const bearerToken = process.env.SUPABASE_BEARER_TOKEN; 
+const bearerToken = process.env.SUPABASE_BEARER_TOKEN;
 
 describe("Events routes", () => {
   let supabase: SupabaseClient<Database>;
   let userId: string;
-  const testTitlePrefix = "test_event_"; 
+  const testTitlePrefix = "test_event_";
 
   const authHeader = { Authorization: `Bearer ${bearerToken}` };
 
@@ -43,14 +43,17 @@ describe("Events routes", () => {
     if (!user) throw new Error("Test user not found");
     userId = user.id;
 
-    
     await supabase.from("events").delete().like("title", `${testTitlePrefix}%`);
   });
 
   afterEach(async () => {
     if (!userId) return;
-  
-    await supabase.from("events").delete().eq("creator_id", userId).like("title", `${testTitlePrefix}%`);
+
+    await supabase
+      .from("events")
+      .delete()
+      .eq("creator_id", userId)
+      .like("title", `${testTitlePrefix}%`);
   });
 
   describe("CREATE Event", () => {
@@ -58,7 +61,7 @@ describe("Events routes", () => {
       const body = {
         title: `${testTitlePrefix}Public Event`,
         description: "Test description",
-        event_date: new Date().toISOString(), 
+        event_date: new Date().toISOString(),
         is_public: true,
         price: 10.5,
         location: "Test location",
@@ -140,7 +143,6 @@ describe("Events routes", () => {
   });
   describe("GET Events (List)", () => {
     beforeEach(async () => {
-     
       await makeRequest("post", "/api/events", {
         title: `${testTitlePrefix}Public List Event`,
         event_date: new Date().toISOString(),
@@ -159,18 +161,23 @@ describe("Events routes", () => {
 
       expect(res.status).toBe(200);
       expect(Array.isArray(res.body)).toBe(true);
-      expect(res.body.length).toBeGreaterThanOrEqual(2); 
-      expect(res.body.some((e: any) => e.title.includes("Public List Event"))).toBe(true);
-      expect(res.body.some((e: any) => e.title.includes("Private Own Event"))).toBe(true);
+      expect(res.body.length).toBeGreaterThanOrEqual(2);
+      expect(
+        res.body.some((e: any) => e.title.includes("Public List Event"))
+      ).toBe(true);
+      expect(
+        res.body.some((e: any) => e.title.includes("Private Own Event"))
+      ).toBe(true);
     });
 
     it("should not list private events of others", async () => {
-    
       const res = await makeRequest("get", "/api/events");
 
       expect(res.status).toBe(200);
-  
-      expect(res.body.every((e: any) => e.is_public || e.creator_id === userId)).toBe(true);
+
+      expect(
+        res.body.every((e: any) => e.is_public || e.creator_id === userId)
+      ).toBe(true);
     });
 
     it("should fail to list events if user is not authenticated", async () => {
@@ -186,7 +193,6 @@ describe("Events routes", () => {
     let privateOwnEventId: string;
 
     beforeEach(async () => {
-
       const publicRes = await makeRequest("post", "/api/events", {
         title: `${testTitlePrefix}Public By ID Event`,
         event_date: new Date().toISOString(),
@@ -220,24 +226,31 @@ describe("Events routes", () => {
     });
 
     it("should fail to get a private event of another user", async () => {
-   
       const otherPrivateId = "763253e3-ce43-4056-adca-9055a36b92f8";
 
       const res = await makeRequest("get", `/api/events/${otherPrivateId}`);
-       console.log(res.body)
+
       expect(res.status).toBe(404);
       expect(res.body).toHaveProperty("error", "Event not found");
     });
 
     it("should fail to get event if ID does not exist", async () => {
-      const res = await makeRequest("get", "/api/events/6a7b40ff-2a0f-4475-a891-2ae41ab059f4");
+      const res = await makeRequest(
+        "get",
+        "/api/events/6a7b40ff-2a0f-4475-a891-2ae41ab059f4"
+      );
 
       expect(res.status).toBe(404);
       expect(res.body).toHaveProperty("error", "Event not found");
     });
 
     it("should fail to get event by ID if user is not authenticated", async () => {
-      const res = await makeRequest("get", `/api/events/${publicEventId}`, undefined, {});
+      const res = await makeRequest(
+        "get",
+        `/api/events/${publicEventId}`,
+        undefined,
+        {}
+      );
 
       expect(res.status).toBe(401);
       expect(res.body).toHaveProperty("error", "No token provided");
@@ -247,7 +260,6 @@ describe("Events routes", () => {
     let eventId: string;
 
     beforeEach(async () => {
-      
       const createRes = await makeRequest("post", "/api/events", {
         title: `${testTitlePrefix}Update Event`,
         description: "Original description",
@@ -272,17 +284,22 @@ describe("Events routes", () => {
     });
 
     it("should fail to update if not the creator", async () => {
-      
       const otherEventId = "763253e3-ce43-4056-adca-9055a36b92f8";
 
       const updates = {
         title: "Unauthorized Update",
       };
 
-      const res = await makeRequest("patch", `/api/events/${otherEventId}`, updates);
-      
-      expect(res.status).toBe(500); 
-      expect(res.body.error).toMatch("Failed to update event: Cannot coerce the result to a single JSON object");
+      const res = await makeRequest(
+        "patch",
+        `/api/events/${otherEventId}`,
+        updates
+      );
+
+      expect(res.status).toBe(500);
+      expect(res.body.error).toMatch(
+        "Failed to update event: Cannot coerce the result to a single JSON object"
+      );
     });
     it("should fail to update if no updates provided", async () => {
       const res = await makeRequest("patch", `/api/events/${eventId}`, {});
@@ -307,12 +324,66 @@ describe("Events routes", () => {
         title: "Unauth Update",
       };
 
-      const res = await makeRequest("patch", `/api/events/${eventId}`, updates, {});
+      const res = await makeRequest(
+        "patch",
+        `/api/events/${eventId}`,
+        updates,
+        {}
+      );
 
       expect(res.status).toBe(401);
       expect(res.body).toHaveProperty("error", "No token provided");
     });
   });
 
- 
+  describe("DELETE Event", () => {
+    let eventId: string;
+
+    beforeEach(async () => {
+      const createRes = await makeRequest("post", "/api/events", {
+        title: `${testTitlePrefix}Delete Event`,
+        event_date: new Date().toISOString(),
+        is_public: true,
+      });
+      eventId = createRes.body.id;
+    });
+
+    it("should delete an event for the creator", async () => {
+      const res = await makeRequest("delete", `/api/events/${eventId}`);
+
+      expect(res.status).toBe(204);
+
+      const getRes = await makeRequest("get", `/api/events/${eventId}`);
+      expect(getRes.status).toBe(404);
+      expect(getRes.body).toHaveProperty("error", "Event not found");
+    });
+
+    it("should fail to delete if not the creator", async () => {
+      const otherEventId = "763253e3-ce43-4056-adca-9055a36b92f8";
+
+      const res = await makeRequest("delete", `/api/events/${otherEventId}`);
+
+      expect(res.status).toBe(404);
+      expect(res.body.error).toMatch(/not found|unauthorized/i);
+    });
+
+    it("should return 404 if event ID does not exist", async () => {
+      const res = await makeRequest("delete", "/api/events/763253e3-ce43-4056-adca-9055a36b9212");
+
+      expect(res.status).toBe(404);
+      expect(res.body).toHaveProperty("error", "Event not found");
+    });
+
+    it("should fail to delete if user is not authenticated", async () => {
+      const res = await makeRequest(
+        "delete",
+        `/api/events/${eventId}`,
+        undefined,
+        {}
+      );
+
+      expect(res.status).toBe(401);
+      expect(res.body).toHaveProperty("error", "No token provided");
+    });
+  });
 });

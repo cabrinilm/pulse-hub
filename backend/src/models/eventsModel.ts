@@ -95,7 +95,7 @@ class EventsModel {
     .from("events")
     .update(updates)
     .eq("id", event_id)
-    .eq("creator_id", creator_id) // Garante que só o criador atualize (RLS reforça isso)
+    .eq("creator_id", creator_id) 
     .select()
     .single();
 
@@ -103,11 +103,34 @@ class EventsModel {
     throw new Error(`Failed to update event: ${error.message}`);
   }
 
-  return data as Event | null; // Retorna null se nenhum row atualizado (ex.: não dono ou não encontrado)
+  return data as Event | null;
 }
 
-// Métodos para delete serão adicionados no próximo passo
+// delete 
+async deleteEvent(
+  supabase: SupabaseClient<Database>,
+  creator_id: string,
+  event_id: string
+): Promise<void> {
+  const { data, error } = await supabase
+    .from("events")
+    .delete()
+    .eq("id", event_id)
+    .eq("creator_id", creator_id)
+    .select(); // Retorna os rows deletados para verificar se existia
+
+  if (error) {
+    throw new Error(`Failed to delete event: ${error.message}`);
+  }
+
+  if (data.length === 0) {
+    throw new Error("Event not found");
+  }
 }
+
+}
+
+
  
 
 

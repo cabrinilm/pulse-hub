@@ -169,6 +169,45 @@ class EventsController {
         error: error instanceof Error ? error.message : "Unknown error",
       });
     }
+    
+  }
+
+  // delete 
+
+  async deleteEvent(req: Request, res: Response): Promise<void> {
+    try {
+      const supabase = req.supabase;
+      const user_id = req.user?.id;
+      const { id } = req.params;
+
+      if (!supabase) {
+        res.status(500).json({ error: "Supabase client not found in request" });
+        return;
+      }
+
+      if (!user_id) {
+        res.status(401).json({ error: "Unauthorized: No user ID found" });
+        return;
+      }
+
+      if (!id) {
+        res.status(400).json({ error: "Event ID is required" });
+        return;
+      }
+
+      await eventsModel.deleteEvent(supabase, user_id, id);
+
+      res.status(204).send();
+    } catch (error) {
+      if (error instanceof Error && error.message === "Event not found") {
+        res.status(404).json({ error: error.message });
+        return;
+      }
+
+      res.status(500).json({
+        error: error instanceof Error ? error.message : "Unknown error",
+      });
+    }
   }
 
 }
