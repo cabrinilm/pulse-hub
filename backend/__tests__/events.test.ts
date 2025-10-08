@@ -60,7 +60,7 @@ describe("Events routes", () => {
         description: "Test description",
         event_date: new Date().toISOString(), 
         is_public: true,
-        price: 10.5, 
+        price: 10.5,
         location: "Test location",
       };
 
@@ -71,6 +71,71 @@ describe("Events routes", () => {
       expect(res.body).toHaveProperty("title", body.title);
       expect(res.body).toHaveProperty("creator_id", userId);
       expect(res.body).toHaveProperty("is_public", true);
+    });
+
+    it("should fail to create an event if title is missing", async () => {
+      const body = {
+        description: "Test description",
+        event_date: new Date().toISOString(),
+      };
+
+      const res = await makeRequest("post", "/api/events", body);
+
+      expect(res.status).toBe(400);
+      expect(res.body).toHaveProperty("error", "Title is required");
+    });
+
+    it("should fail to create an event if event_date is missing", async () => {
+      const body = {
+        title: `${testTitlePrefix}No Date Event`,
+        description: "Test description",
+      };
+
+      const res = await makeRequest("post", "/api/events", body);
+
+      expect(res.status).toBe(400);
+      expect(res.body).toHaveProperty("error", "Event date is required");
+    });
+
+    it("should fail to create an event if price is negative", async () => {
+      const body = {
+        title: `${testTitlePrefix}Negative Price Event`,
+        event_date: new Date().toISOString(),
+        price: -5,
+      };
+
+      const res = await makeRequest("post", "/api/events", body);
+
+      expect(res.status).toBe(400);
+      expect(res.body).toHaveProperty("error", "Price must be >= 0");
+    });
+
+    it("should fail to create an event if user is not authenticated", async () => {
+      const body = {
+        title: `${testTitlePrefix}Unauth Event`,
+        event_date: new Date().toISOString(),
+      };
+
+      const res = await makeRequest("post", "/api/events", body, {});
+
+      expect(res.status).toBe(401);
+      expect(res.body).toHaveProperty("error", "No token provided");
+    });
+
+    it("should create a private event with optional fields empty", async () => {
+      const body = {
+        title: `${testTitlePrefix}Private Minimal Event`,
+        event_date: new Date().toISOString(),
+        is_public: false,
+      };
+
+      const res = await makeRequest("post", "/api/events", body);
+
+      expect(res.status).toBe(201);
+      expect(res.body).toHaveProperty("title", body.title);
+      expect(res.body).toHaveProperty("is_public", false);
+      expect(res.body.description).toBeNull();
+      expect(res.body.price).toBeNull();
     });
   });
 
