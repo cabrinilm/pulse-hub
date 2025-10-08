@@ -108,6 +108,9 @@ class EventsController {
       });
     }
   }
+
+  // delete 
+  
   async deleteEventByUser(req: Request, res: Response): Promise<void> {
     try {
       const creatorId = req.user?.id;

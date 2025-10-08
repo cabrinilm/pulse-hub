@@ -84,7 +84,6 @@ class EventsModel {
   }
 
   // update event
-
   async updateEvent(
     supabase: SupabaseClient<Database>,
     event_id: string,
@@ -103,8 +102,8 @@ class EventsModel {
     if (!validation.isValid) {
       throw new Error(validation.error);
     }
-
-    const { data, error } = await supabase
+  
+    const { error: updateError } = await supabase
       .from("events")
       .update({
         title: eventData.title,
@@ -117,22 +116,31 @@ class EventsModel {
         updated_at: new Date().toISOString(),
       })
       .eq("id", event_id)
-      .eq("creator_id", creator_id)
-      .select()
-      .maybeSingle();
-
-    if (error) {
-      if (error.code === "42501") {
+      .eq("creator_id", creator_id);
+  
+    if (updateError) {
+      if (updateError.code === "42501") {
         throw new Error(
           "Forbidden: user is not the creator of the event or not a member of the specified community"
         );
       }
-      if (error.code === "23505") {
+      if (updateError.code === "23505") {
         throw new Error("Event with this title already exists");
       }
-      throw new Error(`Failed to update event: ${error.message}`);
+      throw new Error(`Failed to update event: ${updateError.message}`);
     }
-
+  
+    // Select separado com colunas explícitas (ajuste com todas as colunas do seu schema Event)
+    const { data, error: selectError } = await supabase
+      .from("events")
+      .select("id, community_id, title, description, event_date, is_public, price, location, creator_id, created_at, updated_at, min_participants, max_participants")
+      .eq("id", event_id)
+      .maybeSingle();
+  
+    if (selectError) {
+      throw new Error(`Failed to fetch updated event: ${selectError.message}`);
+    }
+  
     return data as Event | null;
   }
 

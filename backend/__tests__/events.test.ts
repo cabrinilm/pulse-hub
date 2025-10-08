@@ -64,9 +64,9 @@ describe("Events routes", () => {
         location: "Online",
       };
   
-     
+      
       const resNewEvent = await makeRequest("post", "/api/events", eventData);
-        
+      
       expect(resNewEvent.status).toBe(201);
 
       const event: Event = resNewEvent.body;
@@ -250,7 +250,7 @@ describe("Events routes", () => {
 
       const resNewEvent = await makeRequest("post", "/api/events", eventData);
       expect(resNewEvent.status).toBe(201);
-
+     
       const updateEvent = {
         creator_id: creatorId,
         community_id: "6af95627-c2f9-42bc-bd04-559daf11027e",
@@ -267,7 +267,8 @@ describe("Events routes", () => {
         `/api/events/${resNewEvent.body.id}`,
         updateEvent
       );
-
+      console.log(resUpdateEvent.body)
+      console.log(resUpdateEvent.status)
       expect(resUpdateEvent.status).toBe(200);
       expect(resUpdateEvent.body.title).toBe(updateEvent.title);
       expect(resUpdateEvent.body.is_public).toBe(false);

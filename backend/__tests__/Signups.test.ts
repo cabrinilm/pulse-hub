@@ -64,7 +64,7 @@ describe("Signups routes", () => {
         `/api/events/${publicEventId}/signups`,
         PaymentAndPresente
       );
-   
+      console.log(res.body,'signuppp')
       expect(res.status).toBe(201);
       expect(res.body).toHaveProperty("user_id", userId);
       expect(res.body).toHaveProperty("event_id", publicEventId);
