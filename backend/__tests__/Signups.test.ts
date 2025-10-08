@@ -586,4 +586,20 @@ describe("Signups routes", () => {
       expect(resGet.body.message).toEqual("No signups found for this user");
     });
 });
+describe("Event Signups Inclusion by Owner with Immediate Access", () => {
+  it.only("should allow owner to include another user in private event", async () => {
+    // IDs inseridos diretamente no Supabase (substitua com seus valores reais)
+    const privateEventId = "d63270f1-0849-4ff8-a42b-b68d6d016656";  // Evento privado (is_public = false, sem comunidade)
+    const otherUserId = "98234733-7397-4478-9e8b-504761923450";  // User a ser incluído
+  
+  
+    // Execute o request
+    const signupData = { user_id: otherUserId, presence_status: "pending" };
+    const res = await makeRequest("post", `/api/events/${privateEventId}/signups`, signupData);
+     console.log(res.body)
+    expect(res.status).toBe(201);
+    expect(res.body.user_id).toBe(otherUserId);
+    expect(res.body.presence_status).toBe("pending");
+  });
+});
 })
