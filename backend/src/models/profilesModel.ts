@@ -1,3 +1,5 @@
+// src/models/profilesModel.ts
+
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { Database } from "../types/supabase";
 
@@ -65,6 +67,48 @@ class ProfilesModel {
     }
 
     return data as Profile | null;
+  }
+
+  // atualiza profile
+  async updateProfile(
+    supabase: SupabaseClient<Database>,
+    user_id: string,
+    updates: Partial<ProfileInput>
+  ): Promise<Profile> {
+    const { data, error } = await supabase
+      .from("profiles")
+      .update(updates)
+      .eq("user_id", user_id)
+      .select()
+      .single();
+
+    if (error) {
+      if (error.code === "23505") {
+        throw new Error("Username already exists");
+      }
+      throw new Error(`Failed to update profile: ${error.message}`);
+    }
+
+    if (!data) {
+      throw new Error("Profile not found");
+    }
+
+    return data as Profile;
+  }
+
+  // deleta profile
+  async deleteProfile(
+    supabase: SupabaseClient<Database>,
+    user_id: string
+  ): Promise<void> {
+    const { error } = await supabase
+      .from("profiles")
+      .delete()
+      .eq("user_id", user_id);
+
+    if (error) {
+      throw new Error(`Failed to delete profile: ${error.message}`);
+    }
   }
 }
 
