@@ -8,13 +8,13 @@ dotenv.config();
 
 const supabaseUrl = process.env.SUPABASE_URL!;
 const supabaseKey = process.env.SUPABASE_ANON_KEY!;
-const bearerToken = process.env.SUPABASE_BEARER_TOKEN; 
+const bearerToken = process.env.SUPABASE_BEARER_TOKEN;
 
 describe("Signups routes", () => {
   let supabase: SupabaseClient<Database>;
   let userId: string;
-  let publicEventId: string; 
-  let privateEventId: string; 
+  let publicEventId: string;
+  let privateEventId: string;
 
   const authHeader = { Authorization: `Bearer ${bearerToken}` };
 
@@ -37,20 +37,15 @@ describe("Signups routes", () => {
       global: { headers: authHeader },
     });
 
-    const {
-      data: { user },
-      error: userError,
-    } = await supabase.auth.getUser();
-
-    if (userError || !user) throw new Error("Test user not found or error: " + (userError?.message || "Unknown"));
-
+    const { data: { user }, error: userError } = await supabase.auth.getUser();
+    if (userError || !user) throw new Error("Test user not found");
     userId = user.id;
 
 
     const { data: publicData, error: publicError } = await supabase
       .from("events")
       .insert({
-        title: "Test Public Event for Signup",
+        title: "Test Public Event",
         event_date: new Date().toISOString(),
         is_public: true,
         creator_id: userId,
@@ -58,15 +53,14 @@ describe("Signups routes", () => {
       .select("id")
       .single();
 
-    if (publicError || !publicData) throw new Error("Failed to create public event fixture: " + (publicError?.message || "No data returned"));
-
+    if (publicError || !publicData) throw new Error("Failed to create public event");
     publicEventId = publicData.id;
 
-    
+
     const { data: privateData, error: privateError } = await supabase
       .from("events")
       .insert({
-        title: "Test Private Event for Signup",
+        title: "Test Private Event",
         event_date: new Date().toISOString(),
         is_public: false,
         creator_id: userId,
@@ -74,29 +68,22 @@ describe("Signups routes", () => {
       .select("id")
       .single();
 
-    if (privateError || !privateData) throw new Error("Failed to create private event fixture: " + (privateError?.message || "No data returned"));
-
+    if (privateError || !privateData) throw new Error("Failed to create private event");
     privateEventId = privateData.id;
 
 
-    
     await supabase.from("signups").delete().eq("user_id", userId);
   });
 
   afterEach(async () => {
-  
     await supabase.from("signups").delete().eq("user_id", userId);
   });
 
-  describe("CREATE Signup", () => {
+  describe("POST /api/events/:event_id/signups", () => {
     it("should create a signup for a public event", async () => {
-      const body = {
-        event_id: publicEventId,
-      };
+      const body = { presence_status: "pending" };
 
-   
-
-      const res = await makeRequest("post", "/api/signups", body);
+      const res = await makeRequest("post", `/api/events/${publicEventId}/signups`, body);
 
       expect(res.status).toBe(201);
       expect(res.body).toHaveProperty("user_id", userId);
@@ -105,45 +92,38 @@ describe("Signups routes", () => {
       expect(res.body).toHaveProperty("presence_status", "pending");
     });
 
-    it("should fail to create signup if event_id is missing", async () => {
-      const res = await makeRequest("post", "/api/signups", {});
+    it("should fail to create signup if presence_status is missing", async () => {
+      const res = await makeRequest("post", `/api/events/${publicEventId}/signups`, {});
 
       expect(res.status).toBe(400);
-      expect(res.body).toHaveProperty("error", "Event ID is required");
+      expect(res.body).toHaveProperty("error", "Presence status is required");
     });
 
     it("should fail to create duplicate signup for the same event", async () => {
- 
-      await makeRequest("post", "/api/signups", { event_id: publicEventId });
+      await makeRequest("post", `/api/events/${publicEventId}/signups`, { presence_status: "pending" });
 
-
-      const res = await makeRequest("post", "/api/signups", { event_id: publicEventId });
+      const res = await makeRequest("post", `/api/events/${publicEventId}/signups`, { presence_status: "pending" });
 
       expect(res.status).toBe(409);
       expect(res.body.error).toMatch(/already exists/i);
     });
 
     it("should fail to create signup for a private event if not added by creator", async () => {
+      const res = await makeRequest("post", `/api/events/${privateEventId}/signups`, { presence_status: "pending" });
 
-      const privateEventDb = "763253e3-ce43-4056-adca-9055a36b92f8"
-
-      const res = await makeRequest("post", "/api/signups", { event_id: privateEventDb });
-        console.log(res.body)
       expect(res.status).toBe(403);
       expect(res.body.error).toMatch(/not authorized/i);
     });
 
     it("should fail to create signup if user is not authenticated", async () => {
-      const body = {
-        event_id: publicEventId,
-      };
-
-      const res = await makeRequest("post", "/api/signups", body, {});
+      const body = { presence_status: "pending" };
+      const res = await makeRequest("post", `/api/events/${publicEventId}/signups`, body, {});
 
       expect(res.status).toBe(401);
-      expect(res.body).toHaveProperty("error", "No token provided");
+      expect(res.body).toHaveProperty("error", "Unauthorized: No user ID found");
     });
   });
+
 
   describe("GET Signups", () => {
     beforeEach(async () => {
