@@ -94,6 +94,8 @@ describe("Signups routes", () => {
         event_id: publicEventId,
       };
 
+   
+
       const res = await makeRequest("post", "/api/signups", body);
 
       expect(res.status).toBe(201);
@@ -145,7 +147,7 @@ describe("Signups routes", () => {
 
   describe("GET Signups", () => {
     beforeEach(async () => {
-     
+    
       await makeRequest("post", "/api/signups", { event_id: publicEventId });
     });
 
@@ -180,20 +182,24 @@ describe("Signups routes", () => {
   });
 
   describe.only("UPDATE Signup", () => {
-    let signupEventId: string = publicEventId; 
-
+   
+     const openEventId = "807b151f-20a2-4620-9aab-5a0af298af26"
+         
+   
     beforeEach(async () => {
-      await makeRequest("post", "/api/signups", { event_id: signupEventId });
+      const resPost =   await makeRequest("post", `/api/signups/${openEventId}`, { event_id: openEventId});
+      expect(resPost.status).toBe(200)
+      console.log(resPost.status, ",,,,,,")
     });
       
-    it.only("should update presence_status for user's own signup", async () => {
+    it("should update presence_status for an event ", async () => {
       const updates = {
-        event_id: signupEventId,
+        event_id: openEventId,
         presence_status: "confirmed",
       };
 
-      const res = await makeRequest("patch", `/api/signups/`, updates);
-         console.log(res.body)
+      const res = await makeRequest("patch", `/api/signups/${openEventId}`, updates);
+     
       expect(res.status).toBe(200);
       expect(res.body).toHaveProperty("presence_status", "confirmed");
     });
@@ -203,7 +209,7 @@ describe("Signups routes", () => {
       const otherUserSignupId = "known-other-user-signup-id"; 
 
       const updates = {
-        event_id: signupEventId,
+        // event_id: signupEventId,
         payment_status: "completed",
       };
 
