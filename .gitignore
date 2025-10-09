@@ -437,3 +437,4 @@ build/
 
 *get-jwt.js
 *types
+*get-jwt.testuser.js
