@@ -23,7 +23,9 @@ class SignupsController {
         res.status(400).json({ error: "Event ID is required" });
         return;
       }
-
+       console.log(event_id, "<--- controller, event_id")
+       console.log(user_id, "<--- controller, user_id")
+       
       const signup = await signupsModel.createSignup(supabase, user_id, event_id);
       res.status(201).json(signup);
     } catch (error) {

@@ -14,12 +14,16 @@ interface Signup extends SignupInput {
 
 class SignupsModel {
 
+
+  
   async createSignup(
     supabase: SupabaseClient<Database>,
     user_id: string,
     event_id: string
   ): Promise<Signup> {
-    const { data, error } = await supabase
+    const { data: authUser } = await supabase.auth.getUser();
+console.log("Auth user from model:", authUser?.user?.id);
+   const { data, error } = await supabase    
       .from("signups")
       .insert([{ user_id, event_id }])
       .select()

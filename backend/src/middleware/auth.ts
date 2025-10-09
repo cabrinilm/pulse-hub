@@ -2,6 +2,9 @@
 import type { Request, Response, NextFunction } from "express";
 import { createClient } from "@supabase/supabase-js";
 import { supabase } from "../services/supabaseClient";
+import { Database } from "../types/supabase";
+
+
 
 export async function authMiddleware(req: Request, res: Response, next: NextFunction) {
   const token = req.headers.authorization?.split("Bearer ")[1];
@@ -15,11 +18,12 @@ export async function authMiddleware(req: Request, res: Response, next: NextFunc
   }
 
 
-  const userSupabase = createClient(
+  const userSupabase = createClient<Database>(
     process.env.SUPABASE_URL!,
     process.env.SUPABASE_ANON_KEY!,
     {
       global: { headers: { Authorization: `Bearer ${token}` } },
+      auth: { autoRefreshToken: false, persistSession: false },
     }
   );
 

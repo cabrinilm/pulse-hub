@@ -81,7 +81,7 @@ class EventsController {
     try {
       const supabase = req.supabase;
       const user_id = req.user?.id;
-      const { id } = req.params;
+      const { event_id } = req.params;
 
       if (!supabase) {
         res.status(500).json({ error: "Supabase client not found in request" });
@@ -93,12 +93,12 @@ class EventsController {
         return;
       }
 
-      if (!id) {
+      if (!event_id) {
         res.status(400).json({ error: "Event ID is required" });
         return;
       }
 
-      const event = await eventsModel.getEventById(supabase, user_id, id);
+      const event = await eventsModel.getEventById(supabase, user_id, event_id);
 
       if (!event) {
         res.status(404).json({ error: "Event not found" });
@@ -116,7 +116,7 @@ class EventsController {
     try {
       const supabase = req.supabase;
       const user_id = req.user?.id;
-      const { id } = req.params;
+      const { event_id } = req.params;
       const { title, description, location, event_date, is_public, price, min_participants, max_participants, image_url } = req.body;
 
       if (!supabase) {
@@ -129,7 +129,7 @@ class EventsController {
         return;
       }
 
-      if (!id) {
+      if (!event_id) {
         res.status(400).json({ error: "Event ID is required" });
         return;
       }
@@ -156,7 +156,7 @@ class EventsController {
         return;
       }
 
-      const updatedEvent = await eventsModel.updateEvent(supabase, user_id, id, updates);
+      const updatedEvent = await eventsModel.updateEvent(supabase, user_id, event_id, updates);
 
       if (!updatedEvent) {
         res.status(404).json({ error: "Event not found" });
@@ -178,7 +178,7 @@ class EventsController {
     try {
       const supabase = req.supabase;
       const user_id = req.user?.id;
-      const { id } = req.params;
+      const { event_id } = req.params;
 
       if (!supabase) {
         res.status(500).json({ error: "Supabase client not found in request" });
@@ -190,12 +190,12 @@ class EventsController {
         return;
       }
 
-      if (!id) {
+      if (!event_id) {
         res.status(400).json({ error: "Event ID is required" });
         return;
       }
 
-      await eventsModel.deleteEvent(supabase, user_id, id);
+      await eventsModel.deleteEvent(supabase, user_id, event_id);
 
       res.status(204).send();
     } catch (error) {

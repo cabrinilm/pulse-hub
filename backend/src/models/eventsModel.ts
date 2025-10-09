@@ -117,7 +117,7 @@ async deleteEvent(
     .delete()
     .eq("id", event_id)
     .eq("creator_id", creator_id)
-    .select(); // Retorna os rows deletados para verificar se existia
+    .select(); 
 
   if (error) {
     throw new Error(`Failed to delete event: ${error.message}`);

@@ -47,17 +47,16 @@ app.delete("/api/profile", authMiddleware, profilesController.deleteProfile);
 
 app.post("/api/events", authMiddleware, eventsController.createEvent);
 app.get("/api/events", authMiddleware, eventsController.listEvents);
-app.get("/api/events/:id", authMiddleware, eventsController.getEventById);
-app.patch(`/api/events/:id`, authMiddleware, eventsController.updateEvent);
-app.delete(`/api/events/:id`, authMiddleware, eventsController.deleteEvent);
+app.get("/api/events/:event_id", authMiddleware, eventsController.getEventById);
+app.patch("/api/events/:event_id", authMiddleware, eventsController.updateEvent);
+app.delete("/api/events/:event_id", authMiddleware, eventsController.deleteEvent);
 
 // Signups
 
 app.post( "/api/events/:event_id/signups", authMiddleware, signupsController.createSignup);
 app.get("/api/signups", authMiddleware, signupsController.listSignups);
 app.patch("/api/events/:event_id/signups", authMiddleware, signupsController.updateSignup);
-app.delete("/api/events/:event_id/signups", authMiddleware, signupsController.deleteSignup
-);
+app.delete("/api/events/:event_id/signups", authMiddleware, signupsController.deleteSignup);
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
