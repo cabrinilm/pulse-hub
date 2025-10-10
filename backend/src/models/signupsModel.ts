@@ -34,7 +34,6 @@ class SignupsModel {
       .eq("id", event_id)
       .single();
     if (eventError || !event) {
-      console.error("Error fetching event:", eventError);
       throw new Error("Event not found or not authorized");
     }
 

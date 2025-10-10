@@ -82,18 +82,21 @@ describe("Signups API", () => {
   });
 
   afterAll(async () => {
-    await supabaseCreator.from("events").delete().in("id", [publicEventId, privateEventId]);
+    await supabaseCreator
+      .from("events")
+      .delete()
+      .in("id", [publicEventId, privateEventId]);
   });
 
-  // ======================================================
-  // POST /api/events/:event_id/signups
-  // ======================================================
   describe("POST /api/events/:event_id/signups", () => {
     it("should create a signup for a public event", async () => {
-   
-      const res = await makeRequest("post", `/api/events/${publicEventId}/signups`, {
-        presence_status: "pending",
-      });
+      const res = await makeRequest(
+        "post",
+        `/api/events/${publicEventId}/signups`,
+        {
+          presence_status: "pending",
+        }
+      );
 
       expect(res.status).toBe(201);
       expect(res.body).toHaveProperty("user_id", userId);
@@ -103,9 +106,13 @@ describe("Signups API", () => {
     });
 
     it("should fail to create signup for a private event if user is not added by creator", async () => {
-      const res = await makeRequest("post", `/api/events/${privateEventId}/signups`, {
-        presence_status: "pending",
-      });
+      const res = await makeRequest(
+        "post",
+        `/api/events/${privateEventId}/signups`,
+        {
+          presence_status: "pending",
+        }
+      );
       expect(res.status).toBe(403);
       expect(res.body.error).toMatch(/not authorized/i);
     });
@@ -120,42 +127,44 @@ describe("Signups API", () => {
       expect(res.body).toHaveProperty("error", "No token provided");
     });
   });
-  
-  // ======================================================
-  // GET /api/events/:event_id/signups
-  // ======================================================
+
   describe("GET /api/events/:event_id/signups", () => {
     it("should list signups for a public event (visible to all users)", async () => {
-     
-        const resPost =   await makeRequest("post", `/api/events/${publicEventId}/signups`, {
-        presence_status: "pending",
-      });
-         
-      expect(resPost.status).toBe(201)
-   
-      const res = await makeRequest("get", `/api/events/${publicEventId}/signups`);
-      console.log(res.body)
+      const resPost = await makeRequest(
+        "post",
+        `/api/events/${publicEventId}/signups`,
+        {
+          presence_status: "pending",
+        }
+      );
+
+      expect(resPost.status).toBe(201);
+
+      const res = await makeRequest(
+        "get",
+        `/api/events/${publicEventId}/signups`
+      );
+
       expect(res.status).toBe(200);
-      expect(res.body).toEqual(expect.objectContaining({
-        signup_count: 1,
-        confirmed_count: 0,
-        rejected_count: 0,
-      }));
+      expect(res.body).toEqual(
+        expect.objectContaining({
+          signup_count: 1,
+          confirmed_count: 0,
+          rejected_count: 0,
+        })
+      );
     });
     it("should not list signups for a private event if user is not participant or creator", async () => {
-      const res = await makeRequest("get", `/api/events/${privateEventId}/signups`);
-    
-      expect(res.status).toBe(200);
- 
+      const res = await makeRequest(
+        "get",
+        `/api/events/${privateEventId}/signups`
+      );
 
+      expect(res.status).toBe(200);
     });
   });
-  // ======================================================
-  // PATCH /api/events/:event_id/signups/:signup_id
-  // ======================================================
   describe("PATCH /api/events/:event_id/signups", () => {
     beforeAll(async () => {
-      // Crie um signup para testar update
       await makeRequest("post", `/api/events/${publicEventId}/signups`, {
         presence_status: "pending",
       });
@@ -164,7 +173,7 @@ describe("Signups API", () => {
     it("should allow a user to update their presence_status", async () => {
       const res = await makeRequest(
         "patch",
-        `/api/events/${publicEventId}/signups`, 
+        `/api/events/${publicEventId}/signups`,
         { presence_status: "confirmed" }
       );
 
@@ -173,42 +182,46 @@ describe("Signups API", () => {
     });
 
     it("should not allow another user to update someone else’s signup", async () => {
-  
       const res = await makeRequest(
         "patch",
-        `/api/events/${publicEventId}/signups`,  
+        `/api/events/${publicEventId}/signups`,
         { presence_status: "confirmed" },
         bearerTokenCreator
       );
-      console.log(res.body)
+
       expect(res.status).toBe(500);
-      expect(res.body.error).toMatch("Failed to update signup: Cannot coerce the result to a single JSON object");
+      expect(res.body.error).toMatch(
+        "Failed to update signup: Cannot coerce the result to a single JSON object"
+      );
     });
   });
 
   describe("DELETE /api/events/:event_id/signups", () => {
     beforeAll(async () => {
-      
       await makeRequest("post", `/api/events/${publicEventId}/signups`, {
         presence_status: "pending",
       });
     });
 
     it("should allow user to delete their own signup", async () => {
-      const res = await makeRequest("delete", `/api/events/${publicEventId}/signups`); 
+      const res = await makeRequest(
+        "delete",
+        `/api/events/${publicEventId}/signups`
+      );
 
       expect(res.status).toBe(204);
     });
 
     it("should not allow a different user (creator) to delete another user’s signup", async () => {
-      const res = await makeRequest("delete", `/api/events/${publicEventId}/signups`, undefined, bearerTokenCreator);
-      
+      const res = await makeRequest(
+        "delete",
+        `/api/events/${publicEventId}/signups`,
+        undefined,
+        bearerTokenCreator
+      );
+
       expect(res.status).toBe(404);
       expect(res.body.error).toMatch("Signup not found");
     });
   });
 });
-
-
-
-
