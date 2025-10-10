@@ -224,4 +224,87 @@ describe("Signups API", () => {
       expect(res.body.error).toMatch("Signup not found");
     });
   });
+  describe("POST /api/events/:event_id/add-user", () => {
+    it("should allow creator to add a user to private event by username", async () => {
+      const addUser = "bea42c7e-276f-4cdc-a4c2-9ec537761d80";
+      const res = await makeRequest(
+        "post",
+        `/api/events/${privateEventId}/add-user`,
+        {
+          username: "larissa@hotmail.com",
+        },
+        bearerTokenCreator
+      );
+
+      expect(res.status).toBe(201);
+
+      expect(res.body).toHaveProperty("event_id", privateEventId);
+      expect(res.body).toHaveProperty("user_id", addUser);
+      expect(res.body).toHaveProperty("presence_status", "pending");
+    });
+
+    it("should fail if username not found", async () => {
+      const res = await makeRequest(
+        "post",
+        `/api/events/${privateEventId}/add-user`,
+        {
+          username: "invalid_username",
+        },
+        bearerTokenCreator
+      );
+
+      expect(res.status).toBe(404);
+      expect(res.body.error).toMatch(/User not found/i);
+    });
+
+    it("should fail if not creator", async () => {
+      const res = await makeRequest(
+        "post",
+        `/api/events/${privateEventId}/add-user`,
+        {
+          username: "test_user_username",
+        },
+        bearerTokenUser
+      );
+
+      expect(res.status).toBe(404);
+      expect(res.body.error).toMatch("User not found");
+    });
+
+    it("should fail if adding to public event", async () => {
+      const res = await makeRequest(
+        "post",
+        `/api/events/${publicEventId}/add-user`,
+        {
+          username: "larissa@hotmail.com",
+        },
+        bearerTokenCreator
+      );
+
+      expect(res.status).toBe(500);
+      expect(res.body.error).toMatch("This feature is only for private events");
+    });
+
+    it("should fail if user already added (duplicate)", async () => {
+      await makeRequest(
+        "post",
+        `/api/events/${privateEventId}/add-user`,
+        {
+          username: "larissa@hotmail.com",
+        },
+        bearerTokenCreator
+      );
+
+      const res = await makeRequest(
+        "post",
+        `/api/events/${privateEventId}/add-user`,
+        {
+          username: "larissa@hotmail.com",
+        },
+        bearerTokenCreator
+      );
+
+      expect(res.status).toBe(500);
+    });
+  });
 });
