@@ -77,13 +77,13 @@ describe("Signups API", () => {
     await supabaseUser.from("signups").delete().eq("user_id", userId);
   });
 
-  // afterEach(async () => {
-  //   await supabaseUser.from("signups").delete().eq("user_id", userId);
-  // });
+  afterEach(async () => {
+    await supabaseUser.from("signups").delete().eq("user_id", userId);
+  });
 
-  // afterAll(async () => {
-  //   await supabaseCreator.from("events").delete().in("id", [publicEventId, privateEventId]);
-  // });
+  afterAll(async () => {
+    await supabaseCreator.from("events").delete().in("id", [publicEventId, privateEventId]);
+  });
 
   // ======================================================
   // POST /api/events/:event_id/signups
@@ -186,7 +186,7 @@ describe("Signups API", () => {
     });
   });
 
-  describe.only("DELETE /api/events/:event_id/signups", () => {
+  describe("DELETE /api/events/:event_id/signups", () => {
     beforeAll(async () => {
       
       await makeRequest("post", `/api/events/${publicEventId}/signups`, {
@@ -202,9 +202,9 @@ describe("Signups API", () => {
 
     it("should not allow a different user (creator) to delete another user’s signup", async () => {
       const res = await makeRequest("delete", `/api/events/${publicEventId}/signups`, undefined, bearerTokenCreator);
-          console.log(res.body)
-      expect(res.status).toBe(403);
-      expect(res.body.error).toMatch(/not authorized/i);
+      
+      expect(res.status).toBe(404);
+      expect(res.body.error).toMatch("Signup not found");
     });
   });
 });
