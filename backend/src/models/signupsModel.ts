@@ -158,18 +158,20 @@ class SignupsModel {
     supabase: SupabaseClient<Database>,
     user_id: string,
     event_id: string
-  ): Promise<boolean> {
-    const { error } = await supabase
+  ): Promise<void> {
+    const { count, error } = await supabase
       .from("signups")
-      .delete()
+      .delete({ count: "exact" })  // Retorna count de rows deletados
       .eq("user_id", user_id)
       .eq("event_id", event_id);
-
+  
     if (error) {
       throw new Error(`Failed to delete signup: ${error.message}`);
     }
-
-    return true;
+  
+    if (count === 0) {
+      throw new Error("Signup not found");
+    }
   }
 }
 
