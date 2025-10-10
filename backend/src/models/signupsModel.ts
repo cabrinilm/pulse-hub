@@ -10,6 +10,7 @@ interface Signup extends SignupInput {
   signup_date: string;
   payment_status: "pending" | "completed" | "failed";
   presence_status: "pending" | "confirmed" | "rejected";
+  events?: { id: string; title: string; description: string; event_date: string; location: string; is_public: boolean; };
 }
 
 class SignupsModel {
@@ -91,13 +92,43 @@ class SignupsModel {
       )
       .eq("user_id", user_id)
       .order("signup_date", { ascending: false });
-
+  
     if (error) {
       throw new Error(`Failed to list signups: ${error.message}`);
     }
-
-    return data as Signup[];
+  
+    return data as Signup[] || []; // Retorne [] se null
   }
+  
+
+  async getEventSignupStats(
+    supabase: SupabaseClient<Database>,
+    event_id: string
+  ): Promise<{ signup_count: number; confirmed_count: number; rejected_count: number }> {
+    const { data, error } = await supabase
+      .from("signups")
+      .select("presence_status")
+      .eq("event_id", event_id);
+  
+    if (error || !data) {
+      throw new Error(`Failed to fetch signups: ${error?.message || "No data"}`);
+    }
+  
+    // Group e count no código TS
+    const stats = data.reduce((acc: Record<string, number>, row) => {
+      const status = row.presence_status;
+      acc[status] = (acc[status] || 0) + 1;
+      return acc;
+    }, {});
+  
+    const signup_count = data.length; // Total signups
+    const confirmed_count = stats['confirmed'] || 0;
+    const rejected_count = stats['rejected'] || 0;
+  
+    return { signup_count, confirmed_count, rejected_count };
+  }
+
+
 
   async updateSignup(
     supabase: SupabaseClient<Database>,

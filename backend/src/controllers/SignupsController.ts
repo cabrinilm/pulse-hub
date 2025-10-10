@@ -71,6 +71,30 @@ class SignupsController {
     }
   }
 
+  async listEventSignups(req: Request, res: Response): Promise<void> {
+    try {
+      const supabase = req.supabase;
+      const { event_id } = req.params;
+
+      if (!supabase) {
+        res.status(500).json({ error: "Supabase client not found in request" });
+        return;
+      }
+
+      if (!event_id) {
+        res.status(400).json({ error: "Event ID is required" });
+        return;
+      }
+
+      const stats = await signupsModel.getEventSignupStats(supabase, event_id);
+      res.status(200).json(stats); // Ex.: { signup_count: 30, confirmed_count: 15, rejected_count: 5 }
+    } catch (error) {
+      res.status(500).json({
+        error: error instanceof Error ? error.message : "Unknown error",
+      });
+    }
+  }
+
 
   async updateSignup(req: Request, res: Response): Promise<void> {
     try {
