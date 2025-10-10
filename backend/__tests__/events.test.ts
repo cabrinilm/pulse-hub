@@ -210,7 +210,7 @@ describe("Events routes", () => {
 
     it("should get a public event by ID for authenticated user", async () => {
       const res = await makeRequest("get", `/api/events/${publicEventId}`);
-
+      
       expect(res.status).toBe(200);
       expect(res.body).toHaveProperty("id", publicEventId);
       expect(res.body).toHaveProperty("is_public", true);

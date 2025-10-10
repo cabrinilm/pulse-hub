@@ -22,30 +22,54 @@ class SignupsModel {
     event_id: string
   ): Promise<Signup> {
     const { data: authUser } = await supabase.auth.getUser();
-console.log("Auth user from model:", authUser?.user?.id);
-   const { data, error } = await supabase    
-      .from("signups")
-      .insert([{ user_id, event_id }])
-      .select()
+    console.log("Auth user from model:", authUser?.user?.id);
+  
+    // Fetch e log do evento para depuração (manter)
+    const { data: event, error: eventError } = await supabase
+      .from("events")
+      .select("id, is_public, creator_id")
+      .eq("id", event_id)
       .single();
-
-    if (error) {
-      if (error.code === "23505") {
+    if (eventError) {
+      console.error("Error fetching event:", eventError);
+      throw new Error("Failed to fetch event");
+    }
+    console.log("Event details:", {
+      id: event.id,
+      is_public: event.is_public,
+      creator_id: event.creator_id
+    });
+    console.log("Is user_id equal to auth.uid()?", user_id === authUser?.user?.id);
+  
+    // Insert sem .select()
+    const { error: insertError } = await supabase
+      .from("signups")
+      .insert([{ user_id, event_id }]);
+  
+    if (insertError) {
+      if (insertError.code === "23505") {
         throw new Error("Signup for this event already exists");
       }
-      if (error.message.includes("violates row-level security")) {
+      if (insertError.message.includes("violates row-level security")) {
         throw new Error("Not authorized for this private event");
       }
-      throw new Error(`Failed to create signup: ${error.message}`);
+      throw new Error(`Failed to create signup: ${insertError.message}`);
     }
-
-    if (!data) {
-      throw new Error("No data returned from signup creation");
+  
+    // Select separado após insert (agora o row é visível)
+    const { data, error: selectError } = await supabase
+      .from("signups")
+      .select("*")
+      .eq("user_id", user_id)
+      .eq("event_id", event_id)
+      .single();
+  
+    if (selectError || !data) {
+      throw new Error(`Failed to retrieve created signup: ${selectError?.message || "No data"}`);
     }
-
+  
     return data as Signup;
   }
-
 
   async listSignups(
     supabase: SupabaseClient<Database>,

@@ -99,6 +99,7 @@ class EventsController {
       }
 
       const event = await eventsModel.getEventById(supabase, user_id, event_id);
+     
 
       if (!event) {
         res.status(404).json({ error: "Event not found" });
