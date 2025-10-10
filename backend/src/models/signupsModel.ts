@@ -129,7 +129,6 @@ class SignupsModel {
   }
 
 
-
   async updateSignup(
     supabase: SupabaseClient<Database>,
     user_id: string,
@@ -143,18 +142,17 @@ class SignupsModel {
       .eq("event_id", event_id)
       .select()
       .single();
-
+  
     if (error) {
       throw new Error(`Failed to update signup: ${error.message}`);
     }
-
+  
     if (!data) {
-      throw new Error("Signup not found");
+      throw new Error("Signup not found or not authorized"); // Ajuste para capturar no controller como 403
     }
-
+  
     return data as Signup;
   }
-
 
   async deleteSignup(
     supabase: SupabaseClient<Database>,
