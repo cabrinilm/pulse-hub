@@ -10,21 +10,24 @@ interface Signup extends SignupInput {
   signup_date: string;
   payment_status: "pending" | "completed" | "failed";
   presence_status: "pending" | "confirmed" | "rejected";
-  events?: { id: string; title: string; description: string; event_date: string; location: string; is_public: boolean; };
+  events?: {
+    id: string;
+    title: string;
+    description: string;
+    event_date: string;
+    location: string;
+    is_public: boolean;
+  };
 }
 
 class SignupsModel {
-
+  // create
 
   async createSignup(
     supabase: SupabaseClient<Database>,
     user_id: string,
     event_id: string
   ): Promise<Signup> {
-    const { data: authUser } = await supabase.auth.getUser();
-    console.log("Auth user from model:", authUser?.user?.id);
-
-    // Fetch e log do evento para depuração
     const { data: event, error: eventError } = await supabase
       .from("events")
       .select("id, is_public, creator_id")
@@ -32,16 +35,9 @@ class SignupsModel {
       .single();
     if (eventError || !event) {
       console.error("Error fetching event:", eventError);
-      throw new Error("Event not found or not authorized"); // Ajuste para erro mais específico, evitando 500 genérico
+      throw new Error("Event not found or not authorized");
     }
-    console.log("Event details:", {
-      id: event.id,
-      is_public: event.is_public,
-      creator_id: event.creator_id
-    });
-    console.log("Is user_id equal to auth.uid()?", user_id === authUser?.user?.id);
 
-    // Insert sem .select()
     const { error: insertError } = await supabase
       .from("signups")
       .insert([{ user_id, event_id }]);
@@ -56,7 +52,6 @@ class SignupsModel {
       throw new Error(`Failed to create signup: ${insertError.message}`);
     }
 
-    // Select separado após insert (agora o row é visível)
     const { data, error: selectError } = await supabase
       .from("signups")
       .select("*")
@@ -65,11 +60,15 @@ class SignupsModel {
       .single();
 
     if (selectError || !data) {
-      throw new Error(`Failed to retrieve created signup: ${selectError?.message || "No data"}`);
+      throw new Error(
+        `Failed to retrieve created signup: ${selectError?.message || "No data"}`
+      );
     }
 
     return data as Signup;
   }
+
+  // list
 
   async listSignups(
     supabase: SupabaseClient<Database>,
@@ -92,42 +91,47 @@ class SignupsModel {
       )
       .eq("user_id", user_id)
       .order("signup_date", { ascending: false });
-  
+
     if (error) {
       throw new Error(`Failed to list signups: ${error.message}`);
     }
-  
-    return data as Signup[] || []; // Retorne [] se null
+
+    return (data as Signup[]) || [];
   }
-  
 
   async getEventSignupStats(
     supabase: SupabaseClient<Database>,
     event_id: string
-  ): Promise<{ signup_count: number; confirmed_count: number; rejected_count: number }> {
+  ): Promise<{
+    signup_count: number;
+    confirmed_count: number;
+    rejected_count: number;
+  }> {
     const { data, error } = await supabase
       .from("signups")
       .select("presence_status")
       .eq("event_id", event_id);
-  
+
     if (error || !data) {
-      throw new Error(`Failed to fetch signups: ${error?.message || "No data"}`);
+      throw new Error(
+        `Failed to fetch signups: ${error?.message || "No data"}`
+      );
     }
-  
-    // Group e count no código TS
+
     const stats = data.reduce((acc: Record<string, number>, row) => {
       const status = row.presence_status;
       acc[status] = (acc[status] || 0) + 1;
       return acc;
     }, {});
-  
-    const signup_count = data.length; // Total signups
-    const confirmed_count = stats['confirmed'] || 0;
-    const rejected_count = stats['rejected'] || 0;
-  
+
+    const signup_count = data.length;
+    const confirmed_count = stats["confirmed"] || 0;
+    const rejected_count = stats["rejected"] || 0;
+
     return { signup_count, confirmed_count, rejected_count };
   }
 
+  // update
 
   async updateSignup(
     supabase: SupabaseClient<Database>,
@@ -142,17 +146,19 @@ class SignupsModel {
       .eq("event_id", event_id)
       .select()
       .single();
-  
+
     if (error) {
       throw new Error(`Failed to update signup: ${error.message}`);
     }
-  
+
     if (!data) {
-      throw new Error("Signup not found or not authorized"); // Ajuste para capturar no controller como 403
+      throw new Error("Signup not found or not authorized");
     }
-  
+
     return data as Signup;
   }
+
+  // delete
 
   async deleteSignup(
     supabase: SupabaseClient<Database>,
@@ -161,14 +167,14 @@ class SignupsModel {
   ): Promise<void> {
     const { count, error } = await supabase
       .from("signups")
-      .delete({ count: "exact" })  // Retorna count de rows deletados
+      .delete({ count: "exact" })
       .eq("user_id", user_id)
       .eq("event_id", event_id);
-  
+
     if (error) {
       throw new Error(`Failed to delete signup: ${error.message}`);
     }
-  
+
     if (count === 0) {
       throw new Error("Signup not found");
     }
