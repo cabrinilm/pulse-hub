@@ -15,7 +15,6 @@ interface Signup extends SignupInput {
 class SignupsModel {
 
 
-  
   async createSignup(
     supabase: SupabaseClient<Database>,
     user_id: string,
@@ -23,16 +22,16 @@ class SignupsModel {
   ): Promise<Signup> {
     const { data: authUser } = await supabase.auth.getUser();
     console.log("Auth user from model:", authUser?.user?.id);
-  
-    // Fetch e log do evento para depuração (manter)
+
+    // Fetch e log do evento para depuração
     const { data: event, error: eventError } = await supabase
       .from("events")
       .select("id, is_public, creator_id")
       .eq("id", event_id)
       .single();
-    if (eventError) {
+    if (eventError || !event) {
       console.error("Error fetching event:", eventError);
-      throw new Error("Failed to fetch event");
+      throw new Error("Event not found or not authorized"); // Ajuste para erro mais específico, evitando 500 genérico
     }
     console.log("Event details:", {
       id: event.id,
@@ -40,12 +39,12 @@ class SignupsModel {
       creator_id: event.creator_id
     });
     console.log("Is user_id equal to auth.uid()?", user_id === authUser?.user?.id);
-  
+
     // Insert sem .select()
     const { error: insertError } = await supabase
       .from("signups")
       .insert([{ user_id, event_id }]);
-  
+
     if (insertError) {
       if (insertError.code === "23505") {
         throw new Error("Signup for this event already exists");
@@ -55,7 +54,7 @@ class SignupsModel {
       }
       throw new Error(`Failed to create signup: ${insertError.message}`);
     }
-  
+
     // Select separado após insert (agora o row é visível)
     const { data, error: selectError } = await supabase
       .from("signups")
@@ -63,11 +62,11 @@ class SignupsModel {
       .eq("user_id", user_id)
       .eq("event_id", event_id)
       .single();
-  
+
     if (selectError || !data) {
       throw new Error(`Failed to retrieve created signup: ${selectError?.message || "No data"}`);
     }
-  
+
     return data as Signup;
   }
 

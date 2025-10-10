@@ -89,9 +89,8 @@ describe("Signups API", () => {
   // POST /api/events/:event_id/signups
   // ======================================================
   describe("POST /api/events/:event_id/signups", () => {
-    it.only("should create a signup for a public event", async () => {
-       const privatedId = "97829645-29fe-4537-bb88-2b005c62a339";
-       const publicId = "825bf128-2816-4fe9-967c-a72155718c69";
+    it("should create a signup for a public event", async () => {
+   
       const res = await makeRequest("post", `/api/events/${publicEventId}/signups`, {
         presence_status: "pending",
       });
@@ -126,7 +125,7 @@ describe("Signups API", () => {
   // GET /api/events/:event_id/signups
   // ======================================================
   describe("GET /api/events/:event_id/signups", () => {
-    it("should list signups for a public event (visible to all users)", async () => {
+    it.only("should list signups for a public event (visible to all users)", async () => {
 
       await makeRequest("post", `/api/events/${publicEventId}/signups`, {
         presence_status: "pending",

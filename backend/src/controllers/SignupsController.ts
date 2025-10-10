@@ -29,21 +29,22 @@ class SignupsController {
       const signup = await signupsModel.createSignup(supabase, user_id, event_id);
       res.status(201).json(signup);
     } catch (error) {
-      if (error instanceof Error && error.message.includes("already exists")) {
-        res.status(409).json({ error: error.message });
-        return;
-      }
-
-      if (error instanceof Error && error.message.includes("Not authorized")) {
-        res.status(403).json({ error: "Not authorized for this private event" });
-        return;
+      if (error instanceof Error) {
+        if (error.message === "Event not found or not authorized" || error.message.includes("Not authorized")) {
+          res.status(403).json({ error: "Not authorized for this private event" });
+          return;
+        }
+        if (error.message.includes("already exists")) {
+          res.status(409).json({ error: error.message });
+          return;
+        }
       }
 
       res.status(500).json({
         error: error instanceof Error ? error.message : "Unknown error",
       });
     }
-  }
+}
 
  
   async listSignups(req: Request, res: Response): Promise<void> {
