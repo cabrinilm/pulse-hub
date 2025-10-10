@@ -54,6 +54,7 @@ app.delete("/api/events/:event_id", authMiddleware, eventsController.deleteEvent
 // Signups
 
 app.post( "/api/events/:event_id/signups", authMiddleware, signupsController.createSignup);
+app.post('/api/events/:event_id/add-user', authMiddleware, signupsController.addUserToEvent);
 app.get("/api/signups", authMiddleware, signupsController.listSignups);
 app.get("/api/events/:event_id/signups", authMiddleware, signupsController.listEventSignups)
 app.patch("/api/events/:event_id/signups", authMiddleware, signupsController.updateSignup);
