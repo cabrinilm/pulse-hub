@@ -55,6 +55,52 @@ class SignupsController {
       });
     }
   }
+
+  async addUserToEvent(req: Request, res: Response): Promise<void> {
+    try {
+      const supabase = req.supabase;
+      const creator_id = req.user?.id;
+      const { event_id } = req.params;
+      const { username } = req.body;  // Username enviado pelo creator
+  
+      if (!supabase) {
+        res.status(500).json({ error: "Supabase client not found in request" });
+        return;
+      }
+  
+      if (!creator_id) {
+        res.status(401).json({ error: "Unauthorized: No user ID found" });
+        return;
+      }
+  
+      if (!event_id) {
+        res.status(400).json({ error: "Event ID is required" });
+        return;
+      }
+  
+      if (!username) {
+        res.status(400).json({ error: "Username is required" });
+        return;
+      }
+  
+      const addedSignup = await signupsModel.addUserToEvent(supabase, creator_id, event_id, username);
+      res.status(201).json(addedSignup);
+    } catch (error) {
+      if (error instanceof Error && error.message === "User not found") {
+        res.status(404).json({ error: "User not found" });
+        return;
+      }
+      if (error instanceof Error && error.message.includes("already exists")) {
+        res.status(409).json({ error: "User already added to event" });
+        return;
+      }
+      if (error instanceof Error && error.message.includes("not authorized")) {
+        res.status(403).json({ error: "Not authorized to add user to this event" });
+        return;
+      }
+      res.status(500).json({ error: error instanceof Error ? error.message : "Unknown error" });
+    }
+  }
  
 // list 
 

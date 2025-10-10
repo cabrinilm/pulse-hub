@@ -67,6 +67,58 @@ class SignupsModel {
     return data as Signup;
   }
 
+  async addUserToEvent(
+    supabase: SupabaseClient<Database>,
+    creator_id: string,
+    event_id: string,
+    username: string
+  ): Promise<Signup> {
+    // Busca user_id por username em profiles
+    const { data: profile, error: profileError } = await supabase
+      .from("profiles")
+      .select("user_id")  // Use user_id se for o nome da coluna (ajuste se for id)
+      .eq("username", username)
+      .single();
+  
+    if (profileError || !profile) {
+      throw new Error("User not found");
+    }
+  
+    const user_id = profile.user_id;
+  
+    // Verifica se o evento é privado e o requester é creator (backup à RLS)
+    const { data: event, error: eventError } = await supabase
+      .from("events")
+      .select("is_public, creator_id")
+      .eq("id", event_id)
+      .single();
+  
+    if (eventError || !event) {
+      throw new Error("Event not found");
+    }
+  
+    if (event.is_public) {
+      throw new Error("This feature is only for private events");
+    }
+  
+    if (event.creator_id !== creator_id) {
+      throw new Error("Not authorized to add user to this event");
+    }
+  
+    
+    const { data: signup, error: insertError } = await supabase
+      .from("signups")
+      .insert([{ user_id, event_id, presence_status: "pending", payment_status: "pending" }])
+      .select()
+      .single();
+  
+    if (insertError) {
+      throw new Error(insertError.message);
+    }
+  
+    return signup as Signup;
+  }
+
   // list
 
   async listSignups(
