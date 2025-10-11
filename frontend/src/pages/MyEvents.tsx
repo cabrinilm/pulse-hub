@@ -30,7 +30,7 @@ const MyEvents = () => {
       <h1 className="text-2xl font-bold mb-4">My Events</h1>
       <div className="flex flex-col gap-4 md:grid md:grid-cols-2 lg:grid-cols-3">
         {events.map((event) => (
-          <Card key={event.id} title={event.title} description={event.description} date={event.event_date} location="" signup_count={0} />
+          <Card key={event.id} title={event.title}  date={event.event_date} location="" signup_count={0} />
         ))}
       </div>
       <Navbar />

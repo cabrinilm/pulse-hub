@@ -50,7 +50,6 @@ const Home = () => {
             <h2 className="text-lg font-semibold mb-2">Next Event</h2>
             <Card
               title={nextEvent.title}
-              description={nextEvent.description}
               date={nextEvent.event_date}
               location=""
               signup_count={0}
@@ -66,7 +65,6 @@ const Home = () => {
                 <Card
                   key={event.id}
                   title={event.title}
-                  description={event.description}
                   date={event.event_date}
                   location=""
                   signup_count={0}

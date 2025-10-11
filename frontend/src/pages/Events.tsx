@@ -55,7 +55,6 @@ const Events = () => {
           <Card
             key={event.id}
             title={event.title}
-            description={event.description}
             date={event.event_date}
             location=""
             signup_count={0}
