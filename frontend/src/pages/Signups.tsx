@@ -1,5 +1,6 @@
 // src/pages/Signups.tsx
 import { useEffect, useState, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
 import api from '../services/api';
 import Card from '../components/Card';
 import Navbar from '../components/Navbar';
@@ -20,6 +21,7 @@ const Signups = () => {
   const [signups, setSignups] = useState<Signup[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
   const signupsPerPage = 3;
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchSignups = async () => {
@@ -38,26 +40,16 @@ const Signups = () => {
   const indexOfFirstSignup = indexOfLastSignup - signupsPerPage;
   const currentSignups = signups.slice(indexOfFirstSignup, indexOfLastSignup);
 
-  // Navegação por swipe
-  const goNext = useCallback(() => {
-    setCurrentPage((p) => Math.min(p + 1, totalPages));
-  }, [totalPages]);
-
-  const goPrev = useCallback(() => {
-    setCurrentPage((p) => Math.max(p - 1, 1));
-  }, []);
+  // Swipe handlers
+  const goNext = useCallback(() => setCurrentPage(p => Math.min(p + 1, totalPages)), [totalPages]);
+  const goPrev = useCallback(() => setCurrentPage(p => Math.max(p - 1, 1)), []);
 
   const swipeHandlers = useSwipeable({
-    onSwipedLeft: () => {
-      if (totalPages > 1) goNext();
-    },
-    onSwipedRight: () => {
-      if (totalPages > 1) goPrev();
-    },
+    onSwipedLeft: () => totalPages > 1 && goNext(),
+    onSwipedRight: () => totalPages > 1 && goPrev(),
     trackTouch: true,
     trackMouse: true,
     delta: 50,
-    // preventDefaultTouchmoveEvent: true,
   });
 
   useEffect(() => {
@@ -77,16 +69,19 @@ const Signups = () => {
             date={signup.events.event_date}
             location={signup.events.location || ''}
             signup_count={0}
+            onClick={() => navigate(`/events/${signup.event_id}`)}
           />
         ))}
       </div>
 
       {/* Paginação por bolinhas */}
-      <PaginationDots
-        totalPages={totalPages}
-        currentPage={currentPage}
-        onPageChange={setCurrentPage}
-      />
+      <div className="fixed bottom-4 left-0 w-full flex justify-center md:static md:mt-6">
+        <PaginationDots
+          totalPages={totalPages}
+          currentPage={currentPage}
+          onPageChange={setCurrentPage}
+        />
+      </div>
 
       <Navbar />
     </div>
