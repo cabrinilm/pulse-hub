@@ -1,5 +1,6 @@
 // src/pages/Events.tsx
 import { useEffect, useState } from 'react';
+import { useSwipeable } from 'react-swipeable';
 import api from '../services/api';
 import Card from '../components/Card';
 import Navbar from '../components/Navbar';
@@ -33,12 +34,23 @@ const Events = () => {
   const indexOfFirstEvent = indexOfLastEvent - eventsPerPage;
   const currentEvents = events.slice(indexOfFirstEvent, indexOfLastEvent);
 
+  const swipeHandlers = useSwipeable({
+    onSwipedLeft: () => setCurrentPage((prev) => Math.min(prev + 1, totalPages)),
+    onSwipedRight: () => setCurrentPage((prev) => Math.max(prev - 1, 1)),
+    trackMouse: true,
+  });
+
+  // altura mínima para manter o menu de bolinhas fixo
+  const minHeightPerCard = 200; // ajuste conforme a altura do seu Card
+  const containerMinHeight = eventsPerPage * minHeightPerCard;
+
   return (
     <div className="p-4 md:p-8 pb-20 md:pb-8 md:ml-[18rem] mt-24">
-      <h1 className="text-2xl font-bold mb-4">Events</h1>
-
-      {/* Container dos eventos com altura mínima */}
-      <div className="flex flex-col gap-4 min-h-[calc(3*200px)]">
+      <div
+        {...swipeHandlers}
+        className="flex flex-col gap-6"
+        style={{ minHeight: containerMinHeight }}
+      >
         {currentEvents.map((event) => (
           <Card
             key={event.id}
@@ -51,7 +63,7 @@ const Events = () => {
         ))}
       </div>
 
-      {/* Menu de bolinhas sempre na mesma posição */}
+      {/* Menu de bolinhas */}
       {totalPages > 1 && (
         <div className="flex justify-center gap-2 mt-6">
           {Array.from({ length: totalPages }, (_, i) => (
