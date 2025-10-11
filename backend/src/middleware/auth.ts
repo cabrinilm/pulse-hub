@@ -1,4 +1,3 @@
-// middleware/auth.ts
 import type { Request, Response, NextFunction } from "express";
 import { createClient } from "@supabase/supabase-js";
 import { supabase } from "../services/supabaseClient.ts";

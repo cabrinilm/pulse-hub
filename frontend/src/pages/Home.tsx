@@ -1,3 +1,4 @@
+// src/pages/Home.tsx
 import { useEffect, useState } from 'react';
 import api from '../services/api';
 import Card from '../components/Card';
@@ -18,9 +19,16 @@ const Home = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const allEvents = await api.get<Event[]>('/events');
-        // Assuma ordenado por date; filtre next event (mais próximo)
-        const sortedEvents = allEvents.data.sort((a, b) => new Date(a.event_date).getTime() - new Date(b.event_date).getTime());
+        const res = await api.get('/events');  // Fetch do endpoint
+        console.log('Raw response:', res);  // Log para debug o response completo
+
+        const eventData = res.data?.data || res.data || [];  // Extraia .data ou fallback []
+        if (!Array.isArray(eventData)) {
+          console.error('Fetched data is not an array:', eventData);
+          return;
+        }
+
+        const sortedEvents = eventData.sort((a: Event, b: Event) => new Date(a.event_date).getTime() - new Date(b.event_date).getTime());
         setNextEvent(sortedEvents[0] || null);
         setEvents(sortedEvents.slice(1, 4));  // Ex.: 3 events próximos
       } catch (err) {
