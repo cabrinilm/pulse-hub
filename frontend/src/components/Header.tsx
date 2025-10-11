@@ -7,13 +7,25 @@ const Header = () => {
 
   return (
     <header className="fixed top-0 left-0 w-full bg-white shadow-md p-4 flex justify-between items-center z-10">
+      {/* Ícone de menu (à esquerda) */}
+      <Link to="/" className="text-gray-600 hover:text-blue-500">
+        <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+        </svg>
+      </Link>
+
+      {/* Nome do app (centralizado) */}
       <h1 className="text-xl font-bold">PulseHub</h1>
-      {user && (
-        <Link to="/profile/edit">
-          <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5.121 17.804A13.937 13.937 0 0112 16c2.5 0 4.847.655 6.879 1.804M15 10a3 3 0 11-6 0 3 3 0 016 0zm6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+
+      {/* Ícone de saída (visual apenas) */}
+      {user ? (
+        <div className="text-gray-600 hover:text-red-500 cursor-pointer">
+          <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h6a2 2 0 012 2v1" />
           </svg>
-        </Link>
+        </div>
+      ) : (
+        <div className="w-6" /> // mantém o alinhamento quando não há user
       )}
     </header>
   );
