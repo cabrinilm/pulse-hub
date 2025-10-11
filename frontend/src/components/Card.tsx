@@ -1,3 +1,4 @@
+import { Calendar, MapPin, Users } from 'lucide-react';
 import Button from "./Button";
 
 interface CardProps {
@@ -16,21 +17,39 @@ const Card = ({ title, date, location, signup_count, onClick }: CardProps) => {
 
   return (
     <div
-      className="bg-white rounded-xl shadow-md p-6 flex flex-col md:flex-row md:items-center gap-4 cursor-pointer hover:shadow-lg transition-shadow duration-200"
+      className="bg-white rounded-xl shadow-md p-4 md:p-6 flex flex-col md:flex-row md:items-center gap-4 cursor-pointer hover:shadow-lg transition-shadow duration-200 scale-[0.95] md:scale-100"
       onClick={onClick}
     >
       <div className="flex-1 flex flex-col gap-2">
-        <h3 className="text-xl font-semibold text-gray-800">{title}</h3>
+        <h3 className="text-lg md:text-xl font-semibold text-gray-800">{title}</h3>
+        
         <div className="flex flex-col sm:flex-row sm:justify-between text-sm text-gray-500 mt-2 gap-2">
-          <span>{`${dayOfWeek}, ${formattedDate} at ${formattedTime}`}</span>
-          <span>Location: {location || 'Online'}</span>
-          <span>Signed up: {signup_count}</span>
+          <span className="flex items-center gap-1">
+            <Calendar size={16} />
+            {`${dayOfWeek}, ${formattedDate} at ${formattedTime}`}
+          </span>
+
+          <span className="flex items-center gap-1">
+            <MapPin size={16} />
+            {location || 'Online'}
+          </span>
+
+          <span className="flex items-center gap-1">
+            <Users size={16} />
+            {`Signed up: ${signup_count}`}
+          </span>
         </div>
       </div>
-      <Button variant="primary" className="mt-4 md:mt-0 md:ml-4" onClick={onClick}>View Details</Button>
+
+      <Button
+        variant="primary"
+        className="mt-3 md:mt-0 md:ml-4 text-sm md:text-base py-1.5 md:py-2"
+        onClick={onClick}
+      >
+        View Details
+      </Button>
     </div>
   );
 };
 
 export default Card;
-
