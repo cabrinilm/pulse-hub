@@ -1,5 +1,5 @@
-import { Request, Response } from "express";
-import signupsModel from "../models/signupsModel";
+import type { Request, Response } from "express";
+import signupsModel from "../models/signupsModel.ts";
 
 class SignupsController {
 

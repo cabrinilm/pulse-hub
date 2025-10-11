@@ -2,9 +2,9 @@ import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
 import AuthController from "./controllers/AuthController.ts";
-import CommunityController from "./controllers/CommunityController.ts";
+// import CommunityController from "./controllers/CommunityController.ts";
 import profilesController from "./controllers/ProfileController.ts";
-import communityMemberController from "./controllers/CommunityMembersController.ts";
+// import communityMemberController from "./controllers/CommunityMembersController.ts";
 import { authMiddleware } from "./middleware/auth.ts";
 import eventsController from "./controllers/EventsController.ts";
 import signupsController from "./controllers/SignupsController.ts";
@@ -22,11 +22,6 @@ app.get("/api", (_req, res) => {
 // Auth routes
 app.post("/api/signup", AuthController.signup);
 
-// Profile routes
-app.post("/api/profile", authMiddleware, profilesController.createProfile);
-app.get("/api/profile", authMiddleware, profilesController.getProfile);
-app.patch("/api/profile", authMiddleware, profilesController.updateProfile);
-app.delete("/api/profile", authMiddleware, profilesController.deleteProfile);
 
 // // Community routes
 
@@ -42,6 +37,15 @@ app.delete("/api/profile", authMiddleware, profilesController.deleteProfile);
 // app.get('/api/communities/:communityId/members', authMiddleware, communityMemberController.getAllMembersCommunity);
 // app.delete('/api/communities/:communityId/members', authMiddleware, communityMemberController.memberLeavesCommunity);
 // app.delete('/api/communities/:communityId/:removedUserId', authMiddleware, communityMemberController.admRemoveMember);
+
+
+// Profile routes
+app.post("/api/profile", authMiddleware, profilesController.createProfile);
+app.get("/api/profile", authMiddleware, profilesController.getProfile);
+app.patch("/api/profile", authMiddleware, profilesController.updateProfile);
+app.delete("/api/profile", authMiddleware, profilesController.deleteProfile);
+
+
 
 // Events
 

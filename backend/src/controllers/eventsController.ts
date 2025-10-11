@@ -1,5 +1,5 @@
 import type { Request, Response } from "express";
-import eventsModel from "../models/eventsModel";
+import eventsModel from "../models/eventsModel.ts";
 
 
 

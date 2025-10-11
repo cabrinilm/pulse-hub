@@ -1,7 +1,6 @@
-// src/models/profilesModel.ts
 
 import type { SupabaseClient } from "@supabase/supabase-js";
-import type { Database } from "../types/supabase";
+import type { Database } from "../types/supabase.ts";
 
 interface ProfileInput {
   username: string;

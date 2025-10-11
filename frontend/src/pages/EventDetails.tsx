@@ -1,8 +1,10 @@
-// src/pages/EventDetails.tsx
 import { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
 import api from '../services/api';
+import Input from '../components/Input';
+import Button from '../components/Button';
+import Navbar from '../components/Navbar';
 
 interface Event {
   id: string;
@@ -12,7 +14,6 @@ interface Event {
   location: string | null;
   is_public: boolean;
   creator_id: string;
-  // Other fields if needed
 }
 
 interface Stats {
@@ -64,32 +65,26 @@ const EventDetails = () => {
   if (!event) return <p className="p-4 text-center">Loading...</p>;
 
   return (
-    <div className="p-4 md:p-8 max-w-4xl mx-auto">
-      <h1 className="text-2xl md:text-3xl font-bold mb-4">{event.title}</h1>
-      <p className="mb-2">Description: {event.description || 'No description'}</p>
-      <p className="mb-2">Date: {event.event_date}</p>
-      <p className="mb-2">Location: {event.location || 'No location defined'}</p>
-      <p className="mb-2">Signed up: {stats.signup_count}</p>
-      <p className="mb-2">Confirmed: {stats.confirmed_count}</p>
-      <p className="mb-4">Rejected: {stats.rejected_count}</p>
+    <div className="p-4 md:p-8 max-w-4xl mx-auto flex flex-col gap-4">
+      <h1 className="text-2xl md:text-3xl font-bold">{event.title}</h1>
+      <p className="text-gray-600">Description: {event.description || 'No description'}</p>
+      <p className="text-gray-600">Date: {event.event_date}</p>
+      <p className="text-gray-600">Location: {event.location || 'No location'}</p>
+      <p className="text-gray-600">Signed up: {stats.signup_count}</p>
+      <p className="text-gray-600">Confirmed: {stats.confirmed_count}</p>
+      <p className="text-gray-600">Rejected: {stats.rejected_count}</p>
 
       {isCreator && !event.is_public && (
-        <div className="mt-6 p-4 border rounded-md bg-gray-100 md:w-1/2">
-          <h3 className="text-lg font-semibold mb-2">Add User (Private Event)</h3>
-          <input
-            type="text"
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
-            placeholder="User's username"
-            className="p-2 border rounded-md w-full mb-2"
-          />
-          <button onClick={handleAddUser} className="bg-blue-500 text-white p-2 rounded-md hover:bg-blue-600 w-full md:w-auto">
-            Add
-          </button>
-          {error && <p className="text-red-500 mt-2">{error}</p>}
-          {success && <p className="text-green-500 mt-2">{success}</p>}
+        <div className="flex flex-col gap-2 md:w-1/2">
+          <h3 className="text-lg font-semibold">Add User (Private Event)</h3>
+          <Input type="text" value={username} onChange={(e) => setUsername(e.target.value)} placeholder="User's username" />
+          <Button onClick={handleAddUser}>Add</Button>
+          {error && <p className="text-red-500">{error}</p>}
+          {success && <p className="text-green-500">{success}</p>}
         </div>
       )}
+
+      <Navbar />
     </div>
   );
 };
