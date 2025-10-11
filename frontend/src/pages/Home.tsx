@@ -19,18 +19,21 @@ const Home = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const res = await api.get('/events');  // Fetch do endpoint
-        console.log('Raw response:', res);  // Log para debug o response completo
+        const res = await api.get('/events');
+        console.log('Raw response:', res);
 
-        const eventData = res.data?.data || res.data || [];  // Extraia .data ou fallback []
+        const eventData = res.data?.data || res.data || [];
         if (!Array.isArray(eventData)) {
           console.error('Fetched data is not an array:', eventData);
           return;
         }
 
-        const sortedEvents = eventData.sort((a: Event, b: Event) => new Date(a.event_date).getTime() - new Date(b.event_date).getTime());
+        const sortedEvents = eventData.sort(
+          (a: Event, b: Event) =>
+            new Date(a.event_date).getTime() - new Date(b.event_date).getTime()
+        );
         setNextEvent(sortedEvents[0] || null);
-        setEvents(sortedEvents.slice(1, 4));  // Ex.: 3 events próximos
+        setEvents(sortedEvents.slice(1, 3)); // apenas 2 eventos depois do nextEvent
       } catch (err) {
         console.error('Error fetching events:', err);
       }
@@ -39,25 +42,45 @@ const Home = () => {
   }, []);
 
   return (
-    <div className="p-4 md:p-8">
-      <h1 className="text-2xl font-bold mb-4">Home</h1>
-      {nextEvent && (
-        <div className="mb-6">
-          <h2 className="text-lg font-semibold mb-2">Next Event</h2>
-          <Card title={nextEvent.title} description={nextEvent.description} date={nextEvent.event_date} location="" signup_count={0} />
-        </div>
-      )}
-      <div>
-        <h2 className="text-lg font-semibold mb-2">Upcoming Events</h2>
-        <div className="flex flex-col gap-4 md:grid md:grid-cols-2 lg:grid-cols-3">
-          {events.map((event) => (
-            <Card key={event.id} title={event.title} description={event.description} date={event.event_date} location="" signup_count={0} />
-          ))}
-        </div>
+    <div className="p-4 md:p-8 pb-20 md:pb-8 md:ml-[18rem]">
+      {/* Aumentei mt-8 para mt-24 para mais espaço abaixo do header */}
+      <div className="mt-24">
+        {nextEvent && (
+          <div className="mb-6">
+            <h2 className="text-lg font-semibold mb-2">Next Event</h2>
+            <Card
+              title={nextEvent.title}
+              description={nextEvent.description}
+              date={nextEvent.event_date}
+              location=""
+              signup_count={0}
+            />
+          </div>
+        )}
+
+        {events.length > 0 && (
+          <div>
+            <h2 className="text-lg font-semibold mb-2">Upcoming Events</h2>
+            <div className="flex flex-col gap-4">
+              {events.map((event) => (
+                <Card
+                  key={event.id}
+                  title={event.title}
+                  description={event.description}
+                  date={event.event_date}
+                  location=""
+                  signup_count={0}
+                />
+              ))}
+            </div>
+          </div>
+        )}
       </div>
+
       <Navbar />
     </div>
   );
 };
 
 export default Home;
+
