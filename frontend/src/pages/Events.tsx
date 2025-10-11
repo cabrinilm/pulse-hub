@@ -1,9 +1,9 @@
 // src/pages/Events.tsx
 import { useEffect, useState, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
 import api from '../services/api';
 import Card from '../components/Card';
 import Navbar from '../components/Navbar';
-import { useNavigate } from 'react-router-dom';
 import PaginationDots from '../components/PaginationDots';
 import { useSwipeable } from 'react-swipeable';
 
@@ -39,38 +39,27 @@ const Events = () => {
   const indexOfFirstEvent = indexOfLastEvent - eventsPerPage;
   const currentEvents = events.slice(indexOfFirstEvent, indexOfLastEvent);
 
-  // Handlers para alterar página com limites
-  const goNext = useCallback(() => {
-    setCurrentPage((p) => Math.min(p + 1, totalPages));
-  }, [totalPages]);
+  // Swipe handlers
+  const goNext = useCallback(() => setCurrentPage(p => Math.min(p + 1, totalPages)), [totalPages]);
+  const goPrev = useCallback(() => setCurrentPage(p => Math.max(p - 1, 1)), []);
 
-  const goPrev = useCallback(() => {
-    setCurrentPage((p) => Math.max(p - 1, 1));
-  }, []);
-
-  // Swipe handlers (mobile touch & desktop mouse drag)
   const swipeHandlers = useSwipeable({
-    onSwipedLeft: () => {
-      if (totalPages > 1) goNext();
-    },
-    onSwipedRight: () => {
-      if (totalPages > 1) goPrev();
-    },
-    // configurações úteis:
+    onSwipedLeft: () => totalPages > 1 && goNext(),
+    onSwipedRight: () => totalPages > 1 && goPrev(),
     trackTouch: true,
-    trackMouse: true, // permite testar com o mouse no desktop
-    delta: 50, // distância mínima px para considerar swipe
-    // preventDefaultTouchmoveEvent: true,
+    trackMouse: true,
+    delta: 50,
   });
 
-  // Se a lista de events mudar e a página atual ficar fora do range, corrige:
   useEffect(() => {
     if (currentPage > totalPages) setCurrentPage(totalPages);
   }, [totalPages, currentPage]);
 
   return (
-    <div className="relative p-4 md:p-8 pb-24 md:pb-8 md:ml-[18rem] mt-16 md:mt-24">
-      {/* Envolvemos a área que responde ao swipe */}
+    <div className="p-4 md:p-8 pb-24 md:pb-8 md:ml-[18rem] mt-16 md:mt-24">
+      <h1 className="text-2xl font-bold mb-4 text-center md:text-left">Events</h1>
+
+      {/* Área de swipe */}
       <div {...swipeHandlers} className="flex flex-col gap-6">
         {currentEvents.map((event) => (
           <Card
@@ -79,17 +68,19 @@ const Events = () => {
             date={event.event_date}
             location={event.location || ''}
             signup_count={event.signup_count || 0}
-            onClick={() => navigate(`/events/${event.id}`)}
+            onClick={() => navigate(`/events/${event.id}`)} // clique vai para EventDetails
           />
         ))}
       </div>
 
-      {/* Componente de bolinhas de paginação (reutilizável) */}
-      <PaginationDots
-        totalPages={totalPages}
-        currentPage={currentPage}
-        onPageChange={setCurrentPage}
-      />
+      {/* Paginação por bolinhas */}
+      <div className="fixed bottom-4 left-0 w-full flex justify-center md:static md:mt-6">
+        <PaginationDots
+          totalPages={totalPages}
+          currentPage={currentPage}
+          onPageChange={setCurrentPage}
+        />
+      </div>
 
       <Navbar />
     </div>
@@ -97,3 +88,4 @@ const Events = () => {
 };
 
 export default Events;
+
