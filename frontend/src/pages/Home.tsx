@@ -1,5 +1,6 @@
 // src/pages/Home.tsx
 import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import api from '../services/api';
 import Card from '../components/Card';
 import Navbar from '../components/Navbar';
@@ -13,6 +14,7 @@ interface Event {
 }
 
 const Home = () => {
+  const navigate = useNavigate();
   const [nextEvent, setNextEvent] = useState<Event | null>(null);
   const [events, setEvents] = useState<Event[]>([]);
 
@@ -20,13 +22,8 @@ const Home = () => {
     const fetchData = async () => {
       try {
         const res = await api.get('/events');
-        console.log('Raw response:', res);
-
         const eventData = res.data?.data || res.data || [];
-        if (!Array.isArray(eventData)) {
-          console.error('Fetched data is not an array:', eventData);
-          return;
-        }
+        if (!Array.isArray(eventData)) return;
 
         const sortedEvents = eventData.sort(
           (a: Event, b: Event) =>
@@ -42,17 +39,17 @@ const Home = () => {
   }, []);
 
   return (
-    <div className="p-4 md:p-8 pb-20 md:pb-8 md:ml-[18rem]">
-      {/* Aumentei mt-8 para mt-24 para mais espaço abaixo do header */}
-      <div className="mt-16 md:mt-24">
+    <div className="p-4 md:p-8 pb-20 md:pb-8 md:ml-[18rem] mt-16 md:mt-24">
+      <div className="flex flex-col gap-6">
         {nextEvent && (
-          <div className="mb-6">
+          <div>
             <h2 className="text-lg font-semibold mb-2">Next Event</h2>
             <Card
               title={nextEvent.title}
               date={nextEvent.event_date}
               location=""
               signup_count={0}
+              onClick={() => navigate(`/events/${nextEvent.id}`)}
             />
           </div>
         )}
@@ -68,6 +65,7 @@ const Home = () => {
                   date={event.event_date}
                   location=""
                   signup_count={0}
+                  onClick={() => navigate(`/events/${event.id}`)}
                 />
               ))}
             </div>
@@ -81,4 +79,3 @@ const Home = () => {
 };
 
 export default Home;
-
