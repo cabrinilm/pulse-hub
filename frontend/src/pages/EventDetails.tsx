@@ -7,6 +7,7 @@ import Button from '../components/Button';
 import Navbar from '../components/Navbar';
 import { format } from 'date-fns';
 import { enGB } from 'date-fns/locale';
+import { Calendar, MapPin, Users } from 'lucide-react';
 
 interface Event {
   id: string;
@@ -33,7 +34,6 @@ interface Signup {
 const EventDetails = () => {
   const { id } = useParams<{ id: string }>();
   const { user } = useAuth();
-
   const [event, setEvent] = useState<Event | null>(null);
   const [stats, setStats] = useState<Stats>({ signup_count: 0, confirmed_count: 0, rejected_count: 0 });
   const [userSignup, setUserSignup] = useState<Signup | null>(null);
@@ -41,7 +41,6 @@ const EventDetails = () => {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
 
-  // Fetch event, stats and user signup
   const fetchEventAndSignup = async () => {
     if (!user) return;
     try {
@@ -114,37 +113,70 @@ const EventDetails = () => {
   const formattedDate = format(eventDate, 'EEEE, dd MMM yyyy, HH:mm', { locale: enGB });
 
   return (
-    <div className="p-4 md:p-8 max-w-4xl mx-auto flex flex-col gap-6">
-      <h1 className="text-2xl md:text-3xl font-bold">{event.title}</h1>
-      {event.description && <p className="text-gray-700">{event.description}</p>}
-      <p className="text-gray-600">Date: {formattedDate}</p>
-      <p className="text-gray-600">Location: {event.location || 'No location'}</p>
+    <div className="p-4 md:p-8 max-w-4xl mx-auto flex flex-col gap-6 mt-20 md:mt-32 md:ml-72">
+      {/* Header separado */}
+      <span className="text-sm text-blue-500 font-semibold uppercase tracking-wider mb-2">Event Details</span>
 
-      <div className="flex gap-4 text-gray-600">
-        <p>Signed up: {stats.signup_count}</p>
-        <p>Confirmed: {stats.confirmed_count}</p>
-        <p>Rejected: {stats.rejected_count}</p>
+      {/* Card do evento */}
+      <div className="bg-white rounded-xl shadow-md p-6 flex flex-col gap-4">
+        <h1 className="text-2xl md:text-3xl font-semibold text-gray-800">{event.title}</h1>
+        {event.description && <p className="text-gray-500">{event.description}</p>}
+
+        <div className="flex items-center gap-2 text-gray-600">
+          <Calendar size={16} />
+          <span>{formattedDate}</span>
+        </div>
+        <div className="flex items-center gap-2 text-gray-600">
+          <MapPin size={16} />
+          <span>{event.location || 'No location'}</span>
+        </div>
+        <div className="flex items-center gap-4 text-gray-600">
+          <div className="flex items-center gap-1">
+            <Users size={16} />
+            <span>Signed up: {stats.signup_count}</span>
+          </div>
+          <span>Confirmed: {stats.confirmed_count}</span>
+          <span>Rejected: {stats.rejected_count}</span>
+        </div>
       </div>
 
-      <div className="flex flex-col gap-2 mt-4">
+      {/* Ações do usuário */}
+      <div className="flex flex-col gap-4 bg-white rounded-xl shadow-md p-6">
+        <h3 className="text-lg font-semibold">Your Participation</h3>
         {!userSignup ? (
-          <Button onClick={handleSignup}>Sign up for this event</Button>
+          <Button onClick={handleSignup} className="w-full md:w-auto bg-blue-600 hover:bg-blue-700">
+            Sign up for this event
+          </Button>
         ) : (
-          <>
-            <p className="text-gray-700">Your status: {userSignup.presence_status}</p>
-
+          <div className="flex flex-col gap-4">
+            <p className="text-gray-700 font-medium">Your status: <span className="capitalize">{userSignup.presence_status}</span></p>
             {userSignup.presence_status === 'pending' && (
-              <div className="flex gap-2">
-                <Button variant="primary" onClick={() => handlePresenceUpdate('confirmed')}>Confirm</Button>
-                <Button variant="secondary" onClick={() => handlePresenceUpdate('rejected')}>Reject</Button>
+              <div className="flex flex-col sm:flex-row gap-2">
+                <Button
+                  onClick={() => handlePresenceUpdate('confirmed')}
+                  className="w-full sm:w-auto bg-green-500 hover:bg-green-600"
+                >
+                  Confirm
+                </Button>
+                <Button
+                  onClick={() => handlePresenceUpdate('rejected')}
+                  className="w-full sm:w-auto bg-red-500 hover:bg-red-600"
+                >
+                  Reject
+                </Button>
               </div>
             )}
-
-            <Button variant="secondary" onClick={handleCancelSignup}>Cancel Signup</Button>
-          </>
+            <Button
+              onClick={handleCancelSignup}
+              variant="secondary"
+              className="w-full sm:w-auto bg-gray-200 text-gray-800 hover:bg-gray-300"
+            >
+              Cancel Signup
+            </Button>
+          </div>
         )}
-        {error && <p className="text-red-500">{error}</p>}
-        {success && <p className="text-green-500">{success}</p>}
+        {error && <p className="text-red-500 text-sm">{error}</p>}
+        {success && <p className="text-green-500 text-sm">{success}</p>}
       </div>
 
       <Navbar />

@@ -56,11 +56,11 @@ const Events = () => {
   }, [totalPages, currentPage]);
 
   return (
-    <div className="p-4 md:p-8 pb-24 md:pb-8 md:ml-[18rem] mt-16 md:mt-24">
+    <div className="p-4 md:p-8 pb-24 md:pb-8 md:ml-[18rem] mt-14 md:mt-24">
       <h1 className="text-2xl font-bold mb-4 text-center md:text-left">Events</h1>
 
       {/* Área de swipe */}
-      <div {...swipeHandlers} className="flex flex-col gap-6">
+      <div {...swipeHandlers} className="flex flex-col gap-4">
         {currentEvents.map((event) => (
           <Card
             key={event.id}
@@ -68,7 +68,7 @@ const Events = () => {
             date={event.event_date}
             location={event.location || ''}
             signup_count={event.signup_count || 0}
-            onClick={() => navigate(`/events/${event.id}`)} // clique vai para EventDetails
+            onClick={() => navigate(`/events/${event.id}`)}
           />
         ))}
       </div>
@@ -88,4 +88,3 @@ const Events = () => {
 };
 
 export default Events;
-
