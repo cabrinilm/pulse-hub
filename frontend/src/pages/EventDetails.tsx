@@ -1,10 +1,12 @@
+// src/pages/EventDetails.tsx
 import { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
 import api from '../services/api';
-import Input from '../components/Input';
 import Button from '../components/Button';
 import Navbar from '../components/Navbar';
+import { format } from 'date-fns';
+import { enGB } from 'date-fns/locale';
 
 interface Event {
   id: string;
@@ -22,67 +24,128 @@ interface Stats {
   rejected_count: number;
 }
 
+interface Signup {
+  user_id: string;
+  event_id: string;
+  presence_status: 'pending' | 'confirmed' | 'rejected';
+}
+
 const EventDetails = () => {
   const { id } = useParams<{ id: string }>();
   const { user } = useAuth();
+
   const [event, setEvent] = useState<Event | null>(null);
   const [stats, setStats] = useState<Stats>({ signup_count: 0, confirmed_count: 0, rejected_count: 0 });
-  const [username, setUsername] = useState('');
+  const [userSignup, setUserSignup] = useState<Signup | null>(null);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
-  const [isCreator, setIsCreator] = useState(false);
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const eventRes = await api.get<Event>(`/events/${id}`);
-        setEvent(eventRes.data);
-        setIsCreator(eventRes.data.creator_id === user?.id);
-
-        const statsRes = await api.get<Stats>(`/events/${id}/signups`);
-        setStats(statsRes.data);
-      } catch (err: any) {
-        setError(err.message || 'Error loading event data');
-      }
-    };
-    fetchData();
-  }, [id, user]);
-
-  const handleAddUser = async () => {
-    setError('');
-    setSuccess('');
+  // Fetch event, stats and user signup
+  const fetchEventAndSignup = async () => {
+    if (!user) return;
     try {
-      await api.post(`/events/${id}/add-user`, { username });
-      setSuccess('User added successfully!');
-      // Refetch stats
-      const updatedStats = await api.get<Stats>(`/events/${id}/signups`);
-      setStats(updatedStats.data);
+      setLoading(true);
+      const eventRes = await api.get<Event>(`/events/${id}`);
+      setEvent(eventRes.data);
+
+      const statsRes = await api.get<Stats>(`/events/${id}/signups`);
+      setStats(statsRes.data);
+
+      const userSignupsRes = await api.get<Signup[]>('/signups');
+      const foundSignup = userSignupsRes.data.find(
+        (s: Signup) => s.event_id === id && s.user_id === user.id
+      );
+      setUserSignup(foundSignup || null);
     } catch (err: any) {
-      setError(err.message || 'Error adding user');
+      setError(err.message || 'Error loading event data');
+    } finally {
+      setLoading(false);
     }
   };
 
-  if (!event) return <p className="p-4 text-center">Loading...</p>;
+  useEffect(() => {
+    fetchEventAndSignup();
+  }, [id, user]);
+
+  const handleSignup = async () => {
+    if (!user) return;
+    setError('');
+    setSuccess('');
+    try {
+      await api.post(`/events/${id}/signups`);
+      setSuccess('You have successfully signed up!');
+      fetchEventAndSignup();
+    } catch (err: any) {
+      setError(err.message || 'Error signing up');
+    }
+  };
+
+  const handlePresenceUpdate = async (status: 'confirmed' | 'rejected') => {
+    if (!user) return;
+    setError('');
+    setSuccess('');
+    try {
+      await api.patch(`/events/${id}/signups`, { presence_status: status });
+      setSuccess(`Your presence has been ${status}!`);
+      fetchEventAndSignup();
+    } catch (err: any) {
+      setError(err.message || 'Error updating presence status');
+    }
+  };
+
+  const handleCancelSignup = async () => {
+    if (!user) return;
+    setError('');
+    setSuccess('');
+    try {
+      await api.delete(`/events/${id}/signups`);
+      setSuccess('Your signup has been cancelled.');
+      setUserSignup(null);
+      fetchEventAndSignup();
+    } catch (err: any) {
+      setError(err.message || 'Error cancelling signup');
+    }
+  };
+
+  if (loading || !event) return <p className="p-4 text-center">Loading...</p>;
+
+  const eventDate = new Date(event.event_date);
+  const formattedDate = format(eventDate, 'EEEE, dd MMM yyyy, HH:mm', { locale: enGB });
 
   return (
-    <div className="p-4 md:p-8 max-w-4xl mx-auto flex flex-col gap-4">
+    <div className="p-4 md:p-8 max-w-4xl mx-auto flex flex-col gap-6">
       <h1 className="text-2xl md:text-3xl font-bold">{event.title}</h1>
-      <p className="text-gray-600">Description: {event.description || 'No description'}</p>
-      <p className="text-gray-600">Date: {event.event_date}</p>
+      {event.description && <p className="text-gray-700">{event.description}</p>}
+      <p className="text-gray-600">Date: {formattedDate}</p>
       <p className="text-gray-600">Location: {event.location || 'No location'}</p>
-      <p className="text-gray-600">Signed up: {stats.signup_count}</p>
-      <p className="text-gray-600">Confirmed: {stats.confirmed_count}</p>
-      <p className="text-gray-600">Rejected: {stats.rejected_count}</p>
 
-      {isCreator && !event.is_public && (
-        <div className="flex flex-col gap-2 md:w-1/2">
-          <h3 className="text-lg font-semibold">Add User (Private Event)</h3>
-          <Input type="text" value={username} onChange={(e) => setUsername(e.target.value)} placeholder="User's username" />
-          <Button onClick={handleAddUser}>Add</Button>
-          {error && <p className="text-red-500">{error}</p>}
-          {success && <p className="text-green-500">{success}</p>}
-        </div>
-      )}
+      <div className="flex gap-4 text-gray-600">
+        <p>Signed up: {stats.signup_count}</p>
+        <p>Confirmed: {stats.confirmed_count}</p>
+        <p>Rejected: {stats.rejected_count}</p>
+      </div>
+
+      <div className="flex flex-col gap-2 mt-4">
+        {!userSignup ? (
+          <Button onClick={handleSignup}>Sign up for this event</Button>
+        ) : (
+          <>
+            <p className="text-gray-700">Your status: {userSignup.presence_status}</p>
+
+            {userSignup.presence_status === 'pending' && (
+              <div className="flex gap-2">
+                <Button variant="primary" onClick={() => handlePresenceUpdate('confirmed')}>Confirm</Button>
+                <Button variant="secondary" onClick={() => handlePresenceUpdate('rejected')}>Reject</Button>
+              </div>
+            )}
+
+            <Button variant="secondary" onClick={handleCancelSignup}>Cancel Signup</Button>
+          </>
+        )}
+        {error && <p className="text-red-500">{error}</p>}
+        {success && <p className="text-green-500">{success}</p>}
+      </div>
 
       <Navbar />
     </div>

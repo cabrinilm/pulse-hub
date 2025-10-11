@@ -27,7 +27,7 @@ const Card = ({ title, date, location, signup_count, onClick }: CardProps) => {
           <span>Signed up: {signup_count}</span>
         </div>
       </div>
-      <Button variant="primary" className="mt-4 md:mt-0 md:ml-4">View Details</Button>
+      <Button variant="primary" className="mt-4 md:mt-0 md:ml-4" onClick={onClick}>View Details</Button>
     </div>
   );
 };
