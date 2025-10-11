@@ -44,7 +44,7 @@ const Home = () => {
   return (
     <div className="p-4 md:p-8 pb-20 md:pb-8 md:ml-[18rem]">
       {/* Aumentei mt-8 para mt-24 para mais espaço abaixo do header */}
-      <div className="mt-24">
+      <div className="mt-16 md:mt-24">
         {nextEvent && (
           <div className="mb-6">
             <h2 className="text-lg font-semibold mb-2">Next Event</h2>
