@@ -3,7 +3,8 @@ import axios from 'axios';
 import { supabase } from './supabaseClient'; // caso você use para auth
 
 // URL do seu backend deployado (substitua pelo seu deploy real)
-const BACKEND_BASE_URL = 'https://meu-backend.vercel.app/api';
+const BACKEND_BASE_URL = 'https://pulse-hub-backend.vercel.app/api';
+
 
 const api = axios.create({
   baseURL: BACKEND_BASE_URL,
