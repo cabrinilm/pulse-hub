@@ -13,16 +13,20 @@ import ProfileEdit from './pages/ProfileEdit';
 import Login from './pages/Login';
 import Signup from './pages/Signup';
 import EditEvent from './pages/EditEvent';
-import CreateEvent from './pages/CreateEvent'; // nova página para criar eventos
+import CreateEvent from './pages/CreateEvent';
+import GoogleAuthCallback from './pages/GoogleAuthCallback';
 
 function App() {
   return (
     <AuthProvider>
       <Router>
         <Routes>
+          {/* Rotas públicas */}
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
+          <Route path="/auth/callback" element={<GoogleAuthCallback />} /> {/* 👈 nova rota */}
 
+          {/* Rotas privadas */}
           <Route path="/" element={<PrivateRoute><Layout><Home /></Layout></PrivateRoute>} />
           <Route path="/events" element={<PrivateRoute><Layout><Events /></Layout></PrivateRoute>} />
           <Route path="/signups" element={<PrivateRoute><Layout><Signups /></Layout></PrivateRoute>} />
