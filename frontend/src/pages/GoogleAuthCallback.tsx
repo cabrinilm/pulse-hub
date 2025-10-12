@@ -1,58 +1,43 @@
 // src/pages/GoogleAuthCallback.tsx
 import { useEffect, useState } from "react";
-import { useNavigate, useLocation } from "react-router-dom";
-import api from "../services/api";
+import { useNavigate } from "react-router-dom";
 
 const GoogleAuthCallback = () => {
   const navigate = useNavigate();
-  const location = useLocation();
   const [statusMessage, setStatusMessage] = useState("Connecting to Google Calendar...");
-  const [eventLink, setEventLink] = useState<string | null>(null);
 
   useEffect(() => {
-    // ✅ Pega o code da query string (Authorization Code Flow)
-    const params = new URLSearchParams(location.search);
-    const code = params.get("code");
+    const params = new URLSearchParams(window.location.search);
+    const message = params.get("message");
+    const error = params.get("error");
 
-    if (!code) {
-      setStatusMessage("Google authentication failed: no code returned.");
+    if (error) {
+      setStatusMessage(error);
+      setTimeout(() => navigate("/my-signups"), 3000); // volta após 3s
       return;
     }
 
-    // ✅ Pega o evento pendente do localStorage
-    const pendingEvent = localStorage.getItem("pending_event");
-    if (!pendingEvent) {
-      setStatusMessage("No event data found in localStorage.");
-      return;
-    }
-    const event = JSON.parse(pendingEvent);
+    if (message) {
+      setStatusMessage(message);
 
-    // ✅ Envia code + evento para o backend
-    api.post("/api/google-calendar/callback", { code, event })
-      .then(res => {
-        setStatusMessage("Event successfully added to Google Calendar!");
-        setEventLink(res.data.event.htmlLink);
-        localStorage.removeItem("pending_event");
-      })
-      .catch(err => {
-        console.error(err);
-        setStatusMessage("Failed to add event to Google Calendar.");
-      });
-  }, [location]);
+      // Animação simples antes de voltar
+      const timer = setTimeout(() => {
+        navigate("/my-signups");
+      }, 3000);
+
+      return () => clearTimeout(timer);
+    }
+
+    // Caso nenhum parâmetro
+    setStatusMessage("No data received from Google.");
+    setTimeout(() => navigate("/my-signups"), 3000);
+  }, [navigate]);
 
   return (
-    <div className="p-8 text-center">
-      <p>{statusMessage}</p>
-      {eventLink && (
-        <a
-          href={eventLink}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="text-blue-600 underline mt-2 block"
-        >
-          View event in Google Calendar
-        </a>
-      )}
+    <div className="p-8 text-center flex flex-col items-center justify-center min-h-screen bg-green-50 animate-fade-in">
+      <div className="bg-white p-6 rounded-lg shadow-lg border border-green-200">
+        <p className="text-lg font-semibold">{statusMessage}</p>
+      </div>
     </div>
   );
 };

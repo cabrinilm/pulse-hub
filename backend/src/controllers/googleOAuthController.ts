@@ -1,3 +1,4 @@
+// src/controllers/googleOAuthController.ts
 import type { Request, Response } from "express";
 import { google } from "googleapis";
 import { addEventToGoogleCalendar } from "../services/googleCalendarService.ts";
@@ -5,14 +6,10 @@ import { addEventToGoogleCalendar } from "../services/googleCalendarService.ts";
 export async function handleGoogleCallback(req: Request, res: Response) {
   try {
     const code = req.query.code as string;
-    const state = req.query.state as string; // evento vindo do frontend
+    const state = req.query.state as string;
 
-    if (!code) {
-      return res.status(400).send("Missing code from Google OAuth");
-    }
-    if (!state) {
-      return res.status(400).send("No event data in state");
-    }
+    if (!code) return res.status(400).send("Missing code from Google OAuth");
+    if (!state) return res.status(400).send("No event data in state");
 
     const event = JSON.parse(decodeURIComponent(state));
 
@@ -22,26 +19,25 @@ export async function handleGoogleCallback(req: Request, res: Response) {
       process.env.GOOGLE_REDIRECT_URI
     );
 
-    // Troca code por tokens
     const { tokens } = await oAuth2Client.getToken(code);
     const accessToken = tokens.access_token;
 
-    if (!accessToken) {
-      return res.status(400).send("Failed to get access token from Google");
-    }
+    if (!accessToken) return res.status(400).send("Failed to get access token from Google");
 
     const createdEvent = await addEventToGoogleCalendar(accessToken, event);
 
-    // Redireciona para o frontend mostrando sucesso
+    // Redireciona para frontend com mensagem e link
+    const frontendUrl = "http://localhost:5173/google-callback";
     return res.redirect(
-      `http://localhost:5173/google-callback?message=${encodeURIComponent(
+      `${frontendUrl}?message=${encodeURIComponent(
         "Event successfully added to Google Calendar!"
       )}&eventLink=${encodeURIComponent(createdEvent.htmlLink || "")}`
     );
   } catch (err: any) {
     console.error("Google OAuth Controller Error:", err.response?.data || err.message);
+    const frontendUrl = "http://localhost:5173/google-callback";
     return res.redirect(
-      `http://localhost:5173/google-callback?error=${encodeURIComponent(
+      `${frontendUrl}?error=${encodeURIComponent(
         "Failed to add event to Google Calendar: " + err.message
       )}`
     );
