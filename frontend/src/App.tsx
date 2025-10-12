@@ -1,7 +1,7 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { AuthProvider } from './contexts/AuthContext';
 import PrivateRoute from './components/PrivateRoute';
-import Layout from './components/Layout';  // Import do Layout wrapper
+import Layout from './components/Layout';
 
 import Home from './pages/Home';
 import Events from './pages/Events';
@@ -13,6 +13,7 @@ import ProfileEdit from './pages/ProfileEdit';
 import Login from './pages/Login';
 import Signup from './pages/Signup';
 import EditEvent from './pages/EditEvent';
+import CreateEvent from './pages/CreateEvent'; // nova página para criar eventos
 
 function App() {
   return (
@@ -21,13 +22,20 @@ function App() {
         <Routes>
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
+
           <Route path="/" element={<PrivateRoute><Layout><Home /></Layout></PrivateRoute>} />
           <Route path="/events" element={<PrivateRoute><Layout><Events /></Layout></PrivateRoute>} />
           <Route path="/signups" element={<PrivateRoute><Layout><Signups /></Layout></PrivateRoute>} />
           <Route path="/my-events" element={<PrivateRoute><Layout><MyEvents /></Layout></PrivateRoute>} />
           <Route path="/settings" element={<PrivateRoute><Layout><Settings /></Layout></PrivateRoute>} />
+
+          {/* Detalhes e edição de evento */}
           <Route path="/events/:id" element={<PrivateRoute><Layout><EventDetails /></Layout></PrivateRoute>} />
           <Route path="/events/edit/:id" element={<PrivateRoute><Layout><EditEvent /></Layout></PrivateRoute>} />
+
+          {/* Criar novo evento */}
+          <Route path="/events/create" element={<PrivateRoute><Layout><CreateEvent /></Layout></PrivateRoute>} />
+
           <Route path="/profile/edit" element={<PrivateRoute><Layout><ProfileEdit /></Layout></PrivateRoute>} />
         </Routes>
       </Router>
