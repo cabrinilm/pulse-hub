@@ -12,6 +12,7 @@ import EventDetails from './pages/EventDetails';
 import ProfileEdit from './pages/ProfileEdit';
 import Login from './pages/Login';
 import Signup from './pages/Signup';
+import EditEvent from './pages/EditEvent';
 
 function App() {
   return (
@@ -26,6 +27,7 @@ function App() {
           <Route path="/my-events" element={<PrivateRoute><Layout><MyEvents /></Layout></PrivateRoute>} />
           <Route path="/settings" element={<PrivateRoute><Layout><Settings /></Layout></PrivateRoute>} />
           <Route path="/events/:id" element={<PrivateRoute><Layout><EventDetails /></Layout></PrivateRoute>} />
+          <Route path="/events/edit/:id" element={<PrivateRoute><Layout><EditEvent /></Layout></PrivateRoute>} />
           <Route path="/profile/edit" element={<PrivateRoute><Layout><ProfileEdit /></Layout></PrivateRoute>} />
         </Routes>
       </Router>

@@ -1,5 +1,5 @@
 // src/pages/MyEvents.tsx
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../services/api';
 import Card from '../components/Card';
@@ -12,6 +12,8 @@ interface Event {
   title: string;
   description: string | null;
   event_date: string;
+  location?: string | null;
+  signup_count?: number;
 }
 
 const MyEvents = () => {
@@ -23,7 +25,7 @@ const MyEvents = () => {
   useEffect(() => {
     const fetchMyEvents = async () => {
       try {
-        const res = await api.get<Event[]>('/events?creator=true');
+        const res = await api.get<Event[]>('/events?creator=true'); // endpoint para meus eventos
         setEvents(res.data || []);
       } catch (err) {
         console.error('Error fetching my events:', err);
@@ -37,8 +39,9 @@ const MyEvents = () => {
   const indexOfFirstEvent = indexOfLastEvent - eventsPerPage;
   const currentEvents = events.slice(indexOfFirstEvent, indexOfLastEvent);
 
-  const goNext = useCallback(() => setCurrentPage(p => Math.min(p + 1, totalPages)), [totalPages]);
-  const goPrev = useCallback(() => setCurrentPage(p => Math.max(p - 1, 1)), []);
+  // Swipe handlers
+  const goNext = () => setCurrentPage(p => Math.min(p + 1, totalPages));
+  const goPrev = () => setCurrentPage(p => Math.max(p - 1, 1));
 
   const swipeHandlers = useSwipeable({
     onSwipedLeft: () => totalPages > 1 && goNext(),
@@ -48,24 +51,20 @@ const MyEvents = () => {
     delta: 50,
   });
 
-  useEffect(() => {
-    if (currentPage > totalPages) setCurrentPage(totalPages);
-  }, [totalPages, currentPage]);
-
   return (
     <div className="p-4 md:p-8 pb-24 md:pb-8 md:ml-[18rem] mt-14 md:mt-24">
       <h1 className="text-2xl font-bold mb-4 text-center md:text-left">My Events</h1>
 
-      {/* Área de swipe */}
       <div {...swipeHandlers} className="flex flex-col gap-4">
         {currentEvents.map((event) => (
           <Card
             key={event.id}
             title={event.title}
             date={event.event_date}
-            location={''}
-            signup_count={0}
-            onClick={() => navigate(`/events/edit/${event.id}`)} // botão vai para editar
+            location={event.location || ''}
+            signup_count={event.signup_count || 0}
+            editMode={true} // mostra botão de edição
+            onEdit={() => navigate(`/events/edit/${event.id}`)} // vai para EditEvent
           />
         ))}
       </div>
