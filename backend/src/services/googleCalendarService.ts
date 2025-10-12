@@ -3,39 +3,41 @@ import { google } from "googleapis";
 interface EventData {
   title: string;
   description?: string;
-  date: string; // ex: "2025-10-12"
+  date: string; // ex: "2025-10-12" ou ISO
   time?: string; // ex: "09:00"
   location?: string;
 }
 
 export async function addEventToGoogleCalendar(accessToken: string, event: EventData) {
   try {
-    // Valida campos essenciais
+    // 1️⃣ Validação mínima
     if (!event.title || !event.date) {
       throw new Error("Event must have a title and date");
     }
 
-    if (event.time && !/^\d{2}:\d{2}$/.test(event.time)) {
+    // 2️⃣ Validação de hora, se fornecida
+    if (event.time && !/^([01]\d|2[0-3]):([0-5]\d)$/.test(event.time)) {
       throw new Error("Event time must be in HH:mm format");
     }
 
-    // Cria cliente OAuth2
+    // 3️⃣ Cria cliente OAuth2
     const authClient = new google.auth.OAuth2();
     authClient.setCredentials({ access_token: accessToken });
 
     const calendar = google.calendar({ version: "v3", auth: authClient });
 
-    // Cria start e end
-    const startDateTime = new Date(`${event.date}T${event.time || "09:00"}`);
+    // 4️⃣ Cria start e end
+    const eventDate = event.date.split("T")[0]; // pega só a data yyyy-mm-dd
+    const startDateTime = new Date(`${eventDate}T${event.time || "09:00"}`);
     const endDateTime = new Date(startDateTime.getTime() + 60 * 60 * 1000); // +1 hora
 
-    // Monta objeto do evento
+    // 5️⃣ Monta objeto do evento para Google Calendar
     const calendarEvent = {
       summary: event.title,
       description: event.description || "",
       location: event.location || "",
-      start: { dateTime: startDateTime.toISOString(), timeZone: "Europe/Lisbon" },
-      end: { dateTime: endDateTime.toISOString(), timeZone: "Europe/Lisbon" },
+      start: { dateTime: startDateTime.toISOString(), timeZone: "Europe/London" },
+      end: { dateTime: endDateTime.toISOString(), timeZone: "Europe/London" },
     };
 
     // 🔹 Log detalhado para debug
@@ -43,7 +45,7 @@ export async function addEventToGoogleCalendar(accessToken: string, event: Event
     console.log(JSON.stringify(calendarEvent, null, 2));
     console.log("Access token length:", accessToken.length);
 
-    // Chama Google Calendar API
+    // 6️⃣ Cria o evento na Google Calendar API
     const response = await calendar.events.insert({
       calendarId: "primary",
       requestBody: calendarEvent,
