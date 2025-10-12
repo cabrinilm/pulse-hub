@@ -1,5 +1,5 @@
 import type { Request, Response } from "express";
-import { addEventToGoogleCalendar } from "../services/googleCalendarService";
+import { addEventToGoogleCalendar } from "../services/googleCalendarService.ts";
 
 export async function addEvent(req: Request, res: Response) {
   try {
