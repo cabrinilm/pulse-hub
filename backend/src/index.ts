@@ -1,4 +1,3 @@
-// src/index.ts
 import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
@@ -14,20 +13,15 @@ dotenv.config();
 
 const app = express();
 
-// Configuração CORS global
 app.use(cors({
-  origin: process.env.FRONTEND_URL || "https://pulse-hub-frontend.vercel.app",
+  origin: process.env.FRONTEND_URL, 
   methods: ["GET", "POST", "PATCH", "DELETE", "OPTIONS"],
   allowedHeaders: ["Content-Type", "Authorization"],
-  credentials: true, // se precisar enviar cookies ou credenciais
 }));
-
-// Permitir que preflight passe sem bloqueio
-app.options("*", cors());
 
 app.use(express.json());
 
-// Rota de teste
+
 app.get("/api", (_req, res) => {
   res.json({ message: "PulseHub Backend" });
 });
