@@ -9,8 +9,7 @@ import eventsController from "./controllers/eventsController.js";
 import signupsController from "./controllers/signupsController.js";
 import { authMiddleware } from "./middleware/auth.js";
 import { handleGoogleCallback } from "./controllers/googleOAuthController.js";
-// import CommunityController from "./controllers/CommunityController.js";
-// import communityMemberController from "./controllers/CommunityMembersController.js";
+
 
 dotenv.config();
 
@@ -49,19 +48,6 @@ app.delete("/api/events/:event_id/signups", authMiddleware, signupsController.de
 
 // Google Calendar route
 app.get("/api/google-calendar/callback", handleGoogleCallback);
-
-// Community routes (Possible extension)
-// app.post("/api/communities", authMiddleware, CommunityController.createCommunity);
-// app.get("/api/communities", authMiddleware, CommunityController.getCommunities);
-// app.get("/api/communities/:id", authMiddleware, CommunityController.getCommunityById);
-// app.patch("/api/communities/:id", authMiddleware, CommunityController.updateCommunity);
-// app.delete("/api/communities/:id", authMiddleware, CommunityController.deleteCommunity);
-
-// Community Members routes (Possible extension)
-// app.post("/api/communities/:communityId/members", authMiddleware, communityMemberController.joinCommunityById);
-// app.get("/api/communities/:communityId/members", authMiddleware, communityMemberController.getAllMembersCommunity);
-// app.delete("/api/communities/:communityId/members", authMiddleware, communityMemberController.memberLeavesCommunity);
-// app.delete("/api/communities/:communityId/:removedUserId", authMiddleware, communityMemberController.admRemoveMember);
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
