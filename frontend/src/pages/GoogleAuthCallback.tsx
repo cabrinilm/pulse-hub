@@ -1,57 +1,56 @@
-import { useEffect } from "react";
+// src/pages/GoogleAuthCallback.tsx
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import api from "../services/api"; // axios já configurado
+import api from "../services/api";
 
 const GoogleAuthCallback = () => {
   const navigate = useNavigate();
+  const [statusMessage, setStatusMessage] = useState("Connecting to Google Calendar...");
+  const [eventLink, setEventLink] = useState<string | null>(null);
 
   useEffect(() => {
-    // 1️⃣ Pega o hash da URL retornado pelo Google OAuth
-    const hash = window.location.hash; // ex: #access_token=...
+    const hash = window.location.hash;
     const params = new URLSearchParams(hash.replace("#", ""));
     const access_token = params.get("access_token");
 
     if (!access_token) {
-      alert("Google authentication failed");
+      setStatusMessage("Google authentication failed.");
       return;
     }
 
-    // 2️⃣ Recupera o evento pendente do localStorage
     const pendingEvent = localStorage.getItem("pending_event");
     if (!pendingEvent) {
-      alert("No pending event found");
+      setStatusMessage("No event found to add.");
       return;
     }
 
     const event = JSON.parse(pendingEvent);
 
-    // 3️⃣ Prepara o objeto a enviar para o backend
-    const eventToSend = {
-      title: event.title,
-      description: event.description || "",
-      location: event.location || "",
-      // Combina date e time para ISO 8601
-      start: new Date(`${event.date.split("T")[0]}T${event.time}`).toISOString(),
-      end: new Date(new Date(`${event.date.split("T")[0]}T${event.time}`).getTime() + 60 * 60 * 1000).toISOString() // +1 hora
-    };
-
-    // 4️⃣ Envia para o backend
-    api.post("/api/google-calendar/add-event", { access_token, event: eventToSend })
-      .then(() => {
-        alert("Event added to Google Calendar!");
-        localStorage.removeItem("pending_event"); // limpa o evento pendente
-        navigate("/mysignups"); // redireciona para a página desejada
+    api.post("/api/google-calendar/add-event", { access_token, event })
+      .then(res => {
+        setStatusMessage("Event successfully added to Google Calendar!");
+        setEventLink(res.data.event.htmlLink); // pega o link direto
+        localStorage.removeItem("pending_event");
       })
       .catch(err => {
         console.error(err);
-        alert("Failed to add event to Google Calendar");
+        setStatusMessage("Failed to add event to Google Calendar.");
       });
-
   }, [navigate]);
 
   return (
     <div className="p-8 text-center">
-      <p>Connecting to Google Calendar...</p>
+      <p>{statusMessage}</p>
+      {eventLink && (
+        <a
+          href={eventLink}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-blue-600 underline mt-2 block"
+        >
+          View event in Google Calendar
+        </a>
+      )}
     </div>
   );
 };

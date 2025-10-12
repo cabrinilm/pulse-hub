@@ -4,14 +4,19 @@ interface AddToCalendarButtonProps {
   event: {
     title: string;
     description?: string;
-    date: string; // YYYY-MM-DD
-    time?: string; // HH:mm
+    date: string;
+    time?: string;
     location?: string;
   };
   isVisible: boolean;
+  isLoading?: boolean; // opcional para mostrar que está processando
 }
 
-const AddToCalendarButton = ({ event, isVisible }: AddToCalendarButtonProps) => {
+const AddToCalendarButton = ({
+  event,
+  isVisible,
+  isLoading = false,
+}: AddToCalendarButtonProps) => {
   if (!isVisible) return null;
 
   const handleGoogleAuth = () => {
@@ -20,18 +25,13 @@ const AddToCalendarButton = ({ event, isVisible }: AddToCalendarButtonProps) => 
     const scope = "https://www.googleapis.com/auth/calendar.events";
     const responseType = "code";
 
-    // Normaliza o time: default 09:00
     const normalizedEvent = {
       ...event,
-      date: event.date.split("T")[0], // só YYYY-MM-DD
       time: event.time && event.time.trim() !== "" ? event.time : "09:00",
     };
 
-    // Salva no localStorage
     localStorage.setItem("pending_event", JSON.stringify(normalizedEvent));
-    console.log("Event ready for Google Calendar:", normalizedEvent);
 
-    // Redireciona para OAuth
     const authUrl = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${clientId}&redirect_uri=${redirectUri}&response_type=${responseType}&scope=${scope}&access_type=offline&prompt=consent`;
     window.location.href = authUrl;
   };
@@ -41,8 +41,9 @@ const AddToCalendarButton = ({ event, isVisible }: AddToCalendarButtonProps) => 
       variant="primary"
       className="mt-3 md:mt-0 md:ml-4 px-4 py-2 text-sm sm:text-base"
       onClick={handleGoogleAuth}
+      disabled={isLoading} // 🔹 aqui usamos a prop disabled
     >
-      Add to Google Calendar
+      {isLoading ? "Adding..." : "Add to Google Calendar"}
     </Button>
   );
 };

@@ -1,21 +1,18 @@
-// src/components/Button.tsx
 interface ButtonProps {
   children: React.ReactNode;
   variant?: "primary" | "secondary";
   className?: string;
   onClick?: () => void;
-  type?: "button" | "submit" | "reset"; // <- adicionamos aqui
+  disabled?: boolean; // 🔹 Adicione isto
 }
 
-const Button = ({ children, variant = "primary", className = "", onClick, type = "button" }: ButtonProps) => {
-  const baseStyles = "rounded px-4 py-2 font-medium transition-colors";
-  const variantStyles =
-    variant === "primary"
-      ? "bg-blue-600 text-white hover:bg-blue-700"
-      : "bg-gray-200 text-gray-800 hover:bg-gray-300";
-
+const Button = ({ children, variant = "primary", className = "", onClick, disabled = false }: ButtonProps) => {
   return (
-    <button type={type} onClick={onClick} className={`${baseStyles} ${variantStyles} ${className}`}>
+    <button
+      className={`btn-${variant} ${className}`}
+      onClick={onClick}
+      disabled={disabled} // 🔹 Agora funciona
+    >
       {children}
     </button>
   );
