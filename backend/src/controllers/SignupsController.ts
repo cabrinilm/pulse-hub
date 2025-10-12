@@ -1,7 +1,7 @@
 import type { Request, Response } from "express";
 import signupsModel from "../models/signupsModel";
 
-class SignupsController {
+class signupsController {
 
   // create
 
@@ -273,4 +273,4 @@ class SignupsController {
   }
 }
 
-export default new SignupsController();
+export default new signupsController();

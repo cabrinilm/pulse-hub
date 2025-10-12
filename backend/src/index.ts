@@ -3,9 +3,9 @@ import cors from "cors";
 import dotenv from "dotenv";
 
 import AuthController from "./controllers/AuthController.js";
-import profilesController from "./controllers/ProfileController.js";
-import eventsController from "./controllers/EventsController.js";
-import signupsController from "./controllers/SignupsController.js";
+import profilesController from "./controllers/profileController.js";
+import eventsController from "./controllers/eventsController.js";
+import signupsController from "./controllers/signupsController.js";
 import { authMiddleware } from "./middleware/auth.js";
 import { handleGoogleCallback } from "./controllers/googleOAuthController.js";
 // import CommunityController from "./controllers/CommunityController.js";
