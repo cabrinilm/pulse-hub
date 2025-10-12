@@ -1,4 +1,5 @@
-import express from "express";
+// src/index.ts
+import express, { Request, Response, NextFunction } from "express";
 import cors from "cors";
 import dotenv from "dotenv";
 
@@ -13,16 +14,27 @@ dotenv.config();
 
 const app = express();
 
-// CORS: permitindo tudo (somente para teste)
-app.use(cors({
-  origin: "*",
+// Configuração CORS
+const corsOptions = {
+  origin: "*", // Para testar, permite qualquer origem
   methods: ["GET", "POST", "PATCH", "DELETE", "OPTIONS"],
   allowedHeaders: ["Content-Type", "Authorization"],
-}));
+};
 
+// Preflight (OPTIONS) para todas as rotas
+app.options("*", cors(corsOptions));
+
+// Aplicar CORS em todas as rotas
+app.use(cors(corsOptions));
 app.use(express.json());
 
-// Rotas
+// Middleware para lidar com preflight em Vercel
+app.use((req: Request, _res: Response, next: NextFunction) => {
+  if (req.method === "OPTIONS") return next(); 
+  next();
+});
+
+// Rota de teste
 app.get("/api", (_req, res) => {
   res.json({ message: "PulseHub Backend" });
 });
@@ -54,6 +66,7 @@ app.delete("/api/events/:event_id/signups", authMiddleware, signupsController.de
 // Google Calendar route
 app.get("/api/google-calendar/callback", handleGoogleCallback);
 
+// Iniciar servidor
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`✅ Backend running on port ${PORT}`);
