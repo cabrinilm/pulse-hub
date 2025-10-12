@@ -1,4 +1,5 @@
-import React from "react";
+// src/components/AddToCalendarButton.tsx
+import Button from "./Button";
 
 interface AddToCalendarButtonProps {
   event: {
@@ -8,11 +9,17 @@ interface AddToCalendarButtonProps {
     time?: string;
     location?: string;
   };
+  isVisible: boolean;
 }
 
-const AddToCalendarButton = ({ event }: AddToCalendarButtonProps) => {
-  const handleClick = (e: React.MouseEvent<HTMLButtonElement>) => {
-    e.preventDefault();
+const AddToCalendarButton = ({ event, isVisible }: AddToCalendarButtonProps) => {
+  if (!isVisible) return null;
+
+  const handleGoogleAuth = () => {
+    const clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID;
+    const redirectUri = "http://localhost:3000/api/google-calendar/callback"; // rota do backend
+    const scope = "https://www.googleapis.com/auth/calendar.events";
+    const responseType = "code";
 
     // Normaliza o time
     const normalizedEvent = {
@@ -20,37 +27,21 @@ const AddToCalendarButton = ({ event }: AddToCalendarButtonProps) => {
       time: event.time && event.time.trim() !== "" ? event.time : "09:00",
     };
 
-    // Salva no localStorage
-    localStorage.setItem("pending_event", JSON.stringify(normalizedEvent));
-    console.log("Event saved for Google Calendar:", normalizedEvent);
+    const stateParam = encodeURIComponent(JSON.stringify(normalizedEvent));
 
-    // URL OAuth
-    const clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID;
-    const redirectUri = "http://localhost:5173/auth/callback";
-    const scope = "https://www.googleapis.com/auth/calendar.events";
-    const responseType = "token";
-    const authUrl = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${clientId}&redirect_uri=${redirectUri}&response_type=${responseType}&scope=${scope}&access_type=offline&prompt=consent`;
-    console.log("OAuth URL:", authUrl);
+    const authUrl = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${clientId}&redirect_uri=${redirectUri}&response_type=${responseType}&scope=${scope}&access_type=offline&prompt=consent&state=${stateParam}`;
 
-    // 🔹 Descomente esta linha para ativar o redirecionamento real
-    window.location.href = authUrl;
+    window.location.href = authUrl; // redireciona para Google OAuth
   };
 
   return (
-    <button
-      type="button"
-      style={{
-        padding: "0.5rem 1rem",
-        backgroundColor: "#1d4ed8",
-        color: "#fff",
-        borderRadius: "0.5rem",
-        border: "none",
-        cursor: "pointer",
-      }}
-      onClick={handleClick}
+    <Button
+      variant="primary"
+      className="mt-3 md:mt-0 md:ml-4 px-4 py-2 text-sm sm:text-base"
+      onClick={handleGoogleAuth}
     >
       Add to Google Calendar
-    </button>
+    </Button>
   );
 };
 
