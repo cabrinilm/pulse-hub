@@ -1,10 +1,11 @@
 // src/pages/EventDetails.tsx
 import { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useLocation } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
 import api from '../services/api';
 import Button from '../components/Button';
 import Navbar from '../components/Navbar';
+import BackArrow from '../components/BackArrow';
 import { format } from 'date-fns';
 import { enGB } from 'date-fns/locale';
 import { Calendar, MapPin, Users } from 'lucide-react';
@@ -34,12 +35,15 @@ interface Signup {
 const EventDetails = () => {
   const { id } = useParams<{ id: string }>();
   const { user } = useAuth();
+  const location = useLocation();
   const [event, setEvent] = useState<Event | null>(null);
   const [stats, setStats] = useState<Stats>({ signup_count: 0, confirmed_count: 0, rejected_count: 0 });
   const [userSignup, setUserSignup] = useState<Signup | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
+
+  const previousPage = location.state?.from || '/';
 
   const fetchEventAndSignup = async () => {
     if (!user) return;
@@ -113,13 +117,18 @@ const EventDetails = () => {
   const formattedDate = format(eventDate, 'EEEE, dd MMM yyyy, HH:mm', { locale: enGB });
 
   return (
-    <div className="p-4 md:p-8 max-w-4xl mx-auto flex flex-col gap-6 mt-20 md:mt-32 md:ml-72">
-      {/* Header separado */}
-      <span className="text-sm text-blue-500 font-semibold uppercase tracking-wider mb-2">Event Details</span>
+    <div className="p-4 md:p-8 max-w-4xl mx-auto mt-14 md:mt-24 md:ml-[18rem] relative">
+      {/* BackArrow visível apenas em mobile */}
+      <div className="md:hidden absolute top-4 left-4 z-10">
+        <BackArrow to={previousPage} animateOnClick />
+      </div>
+
+      {/* Título seguindo o mesmo padrão do Events.tsx */}
+      <h1 className="text-2xl font-bold mb-4 text-center md:text-left">Event Details</h1>
 
       {/* Card do evento */}
       <div className="bg-white rounded-xl shadow-md p-6 flex flex-col gap-4">
-        <h1 className="text-2xl md:text-3xl font-semibold text-gray-800">{event.title}</h1>
+        <h2 className="text-2xl md:text-3xl font-semibold text-gray-800">{event.title}</h2>
         {event.description && <p className="text-gray-500">{event.description}</p>}
 
         <div className="flex items-center gap-2 text-gray-600">
@@ -149,7 +158,9 @@ const EventDetails = () => {
           </Button>
         ) : (
           <div className="flex flex-col gap-4">
-            <p className="text-gray-700 font-medium">Your status: <span className="capitalize">{userSignup.presence_status}</span></p>
+            <p className="text-gray-700 font-medium">
+              Your status: <span className="capitalize">{userSignup.presence_status}</span>
+            </p>
             {userSignup.presence_status === 'pending' && (
               <div className="flex flex-col sm:flex-row gap-2">
                 <Button

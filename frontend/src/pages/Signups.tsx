@@ -1,11 +1,13 @@
+// src/pages/Signups.tsx
 import { useEffect, useState, useCallback } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import api from '../services/api';
 import Card from '../components/Card';
 import Navbar from '../components/Navbar';
 import PaginationDots from '../components/PaginationDots';
 import { useSwipeable } from 'react-swipeable';
 import AddToCalendarButton from '../components/AddToCalendarButton';
+import BackArrow from '../components/BackArrow';
 
 interface Signup {
   event_id: string;
@@ -24,6 +26,9 @@ const Signups = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const signupsPerPage = 3;
   const navigate = useNavigate();
+  const location = useLocation();
+
+  const previousPage = location.state?.from || '/';
 
   useEffect(() => {
     const fetchSignups = async () => {
@@ -42,7 +47,6 @@ const Signups = () => {
   const indexOfFirstSignup = indexOfLastSignup - signupsPerPage;
   const currentSignups = signups.slice(indexOfFirstSignup, indexOfLastSignup);
 
-  // Swipe handlers
   const goNext = useCallback(() => setCurrentPage(p => Math.min(p + 1, totalPages)), [totalPages]);
   const goPrev = useCallback(() => setCurrentPage(p => Math.max(p - 1, 1)), []);
 
@@ -59,7 +63,13 @@ const Signups = () => {
   }, [totalPages, currentPage]);
 
   return (
-    <div className="p-3 md:p-8 pb-24 md:pb-8 md:ml-[18rem] mt-14 md:mt-24">
+    <div className="p-3 md:p-8 pb-24 md:pb-8 md:ml-[18rem] mt-14 md:mt-24 relative">
+      {/* BackArrow visível apenas em mobile */}
+      <div className="md:hidden absolute top-4 left-4 z-10">
+        <BackArrow to={previousPage} animateOnClick />
+      </div>
+
+      {/* Título seguindo o mesmo padrão */}
       <h1 className="text-2xl font-bold mb-4 text-center md:text-left">My Signups</h1>
 
       {/* Área de swipe */}
@@ -71,10 +81,10 @@ const Signups = () => {
               date={signup.events.event_date}
               location={signup.events.location || ''}
               signup_count={0}
-              onClick={() => navigate(`/events/${signup.event_id}`)}
+              onClick={() => navigate(`/events/${signup.event_id}`, { state: { from: location.pathname } })}
             />
 
-            {/* 👇 novo botão "Add to Google Calendar" */}
+            {/* Botão "Add to Google Calendar" */}
             <AddToCalendarButton
               event={{
                 title: signup.events.title,
@@ -83,7 +93,7 @@ const Signups = () => {
                 time: signup.events.time || '',
                 location: signup.events.location || '',
               }}
-              isVisible={true} // user já está inscrito
+              isVisible={true}
             />
           </div>
         ))}
