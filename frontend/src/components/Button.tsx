@@ -3,15 +3,24 @@ interface ButtonProps {
   variant?: "primary" | "secondary";
   className?: string;
   onClick?: () => void;
-  disabled?: boolean; // 🔹 Adicione isto
+  disabled?: boolean;
+  type?: "button" | "submit" | "reset"; // ✅ Adicionado
 }
 
-const Button = ({ children, variant = "primary", className = "", onClick, disabled = false }: ButtonProps) => {
+const Button = ({
+  children,
+  variant = "primary",
+  className = "",
+  onClick,
+  disabled = false,
+  type = "button", // ✅ Valor padrão
+}: ButtonProps) => {
   return (
     <button
-      className={`btn-${variant} ${className}`}
+      type={type} // ✅ Agora o botão aceita "submit"
+      className={`btn-${variant} ${className} transition-all duration-200 active:scale-95`}
       onClick={onClick}
-      disabled={disabled} // 🔹 Agora funciona
+      disabled={disabled}
     >
       {children}
     </button>
