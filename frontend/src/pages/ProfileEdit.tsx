@@ -4,7 +4,6 @@ import Input from '../components/Input';
 import Button from '../components/Button';
 import Navbar from '../components/Navbar';
 import { useAuth } from '../hooks/useAuth';
-import { toast } from 'react-toastify';
 
 interface Profile {
   username: string;
@@ -12,11 +11,12 @@ interface Profile {
 }
 
 const ProfileEdit = () => {
-  const { user } = useAuth();
+  useAuth(); // apenas para garantir contexto, não usado diretamente
   const [profile, setProfile] = useState<Profile | null>(null);
   const [username, setUsername] = useState('');
   const [full_name, setFullName] = useState('');
   const [loading, setLoading] = useState(false);
+  const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -25,8 +25,8 @@ const ProfileEdit = () => {
         setProfile(res.data);
         setUsername(res.data.username || '');
         setFullName(res.data.full_name || '');
-      } catch (err) {
-        toast.error('Error loading profile');
+      } catch (err: any) {
+        setMessage({ type: 'error', text: 'Error loading profile' });
       }
     };
     fetchProfile();
@@ -34,12 +34,20 @@ const ProfileEdit = () => {
 
   const handleUpdate = async () => {
     setLoading(true);
+    setMessage(null);
     try {
       const updates = { username, full_name };
       await api.patch('/profile', updates);
-      toast.success('Profile updated successfully!');
-    } catch (err) {
-      toast.error('Error updating profile');
+      setMessage({ type: 'success', text: 'Profile updated successfully!' });
+      setProfile({ username, full_name });
+    } catch (err: any) {
+      // Verifica se o backend retornou erro de username duplicado
+      const errorMsg = err.response?.data?.error?.toLowerCase() || '';
+const isDuplicate = errorMsg.includes('username already exists');
+      setMessage({
+        type: 'error',
+        text: isDuplicate ? 'This username is already taken. Please choose another.' : 'Error updating profile',
+      });
     } finally {
       setLoading(false);
     }
@@ -50,6 +58,17 @@ const ProfileEdit = () => {
   return (
     <div className="p-4 md:p-8 max-w-md mx-auto">
       <h1 className="text-2xl font-bold mb-4">Edit Profile</h1>
+
+      {message && (
+        <div
+          className={`mb-4 p-3 rounded ${
+            message.type === 'success' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'
+          }`}
+        >
+          {message.text}
+        </div>
+      )}
+
       <div className="flex flex-col gap-4">
         <label>Username</label>
         <Input value={username} onChange={(e) => setUsername(e.target.value)} placeholder="Username" />
@@ -61,6 +80,7 @@ const ProfileEdit = () => {
           {loading ? 'Updating...' : 'Update Profile'}
         </Button>
       </div>
+
       <Navbar />
     </div>
   );

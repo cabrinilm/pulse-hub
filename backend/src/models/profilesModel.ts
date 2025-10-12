@@ -1,4 +1,3 @@
-
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { Database } from "../types/supabase.ts";
 
@@ -68,7 +67,7 @@ class ProfilesModel {
     return data as Profile | null;
   }
 
-  // atualiza profile
+  // update
   async updateProfile(
     supabase: SupabaseClient<Database>,
     user_id: string,
@@ -82,7 +81,10 @@ class ProfilesModel {
       .single();
 
     if (error) {
-      if (error.code === "23505") {
+      if (
+        error.message.includes("duplicate") ||
+        error.details?.includes("username")
+      ) {
         throw new Error("Username already exists");
       }
       throw new Error(`Failed to update profile: ${error.message}`);
