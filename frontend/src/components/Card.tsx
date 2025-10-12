@@ -7,12 +7,11 @@ interface CardProps {
   date: string;
   location: string | null;
   signup_count: number;
-  onClick?: () => void;   // View Details
-  editMode?: boolean;     // mostrar botão Edit Event
-  onEdit?: () => void;    // callback do botão Edit Event
+  buttonText?: string; // texto do botão opcional
+  onClick?: () => void; // ação do botão
 }
 
-const Card = ({ title, date, location, signup_count, onClick, editMode = false, onEdit }: CardProps) => {
+const Card = ({ title, date, location, signup_count, buttonText = "View Details", onClick }: CardProps) => {
   const eventDate = new Date(date);
   const dayOfWeek = eventDate.toLocaleDateString('en-GB', { weekday: 'long' });
   const formattedDate = eventDate.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
@@ -23,33 +22,29 @@ const Card = ({ title, date, location, signup_count, onClick, editMode = false, 
       <div className="flex-1 flex flex-col gap-1.5 sm:gap-2">
         <h3 className="text-xl sm:text-xl font-semibold text-gray-800">{title}</h3>
         <div className="flex flex-col sm:flex-row sm:justify-between text-sm text-gray-500 mt-1.5 sm:mt-2 gap-1 sm:gap-2">
-          <span className="flex items-center gap-1">
-            <Calendar size={15} className="text-blue-500" /> {dayOfWeek}, {formattedDate} at {formattedTime}
+          <span className="flex items-center gap-1 text-blue-600">
+            <Calendar size={15} /> {dayOfWeek}, {formattedDate} at {formattedTime}
           </span>
-          <span className="flex items-center gap-1">
-            <MapPin size={15} className="text-red-500" /> {location || 'Online'}
+          <span className="flex items-center gap-1 text-green-600">
+            <MapPin size={15} /> {location || 'Online'}
           </span>
-          <span className="flex items-center gap-1">
-            <Users size={15} className="text-green-500" /> Signed up: {signup_count}
+          <span className="flex items-center gap-1 text-purple-600">
+            <Users size={15} /> Signed up: {signup_count}
           </span>
         </div>
       </div>
-
-      {/* Botões */}
-      <div className="flex flex-col md:flex-row gap-2 mt-3 md:mt-0 md:ml-4">
-        {onClick && !editMode && (
-          <Button variant="primary" className="px-4 py-2 text-sm sm:text-base" onClick={onClick}>
-            View Details
-          </Button>
-        )}
-        {editMode && onEdit && (
-          <Button variant="primary" className="px-4 py-2 text-sm sm:text-base" onClick={onEdit}>
-            Edit Event
-          </Button>
-        )}
-      </div>
+      {onClick && (
+        <Button
+          variant="primary"
+          className="mt-3 md:mt-0 md:ml-4 px-4 py-2 text-sm sm:text-base"
+          onClick={onClick}
+        >
+          {buttonText}
+        </Button>
+      )}
     </div>
   );
 };
 
 export default Card;
+
