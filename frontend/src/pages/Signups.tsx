@@ -1,4 +1,3 @@
-// src/pages/Signups.tsx
 import { useEffect, useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../services/api';
@@ -6,6 +5,7 @@ import Card from '../components/Card';
 import Navbar from '../components/Navbar';
 import PaginationDots from '../components/PaginationDots';
 import { useSwipeable } from 'react-swipeable';
+import AddToCalendarButton from '../components/AddToCalendarButton';
 
 interface Signup {
   event_id: string;
@@ -14,6 +14,8 @@ interface Signup {
     title: string;
     event_date: string;
     location?: string | null;
+    description?: string | null;
+    time?: string | null;
   };
 }
 
@@ -63,14 +65,27 @@ const Signups = () => {
       {/* Área de swipe */}
       <div {...swipeHandlers} className="flex flex-col gap-6">
         {currentSignups.map((signup) => (
-          <Card
-            key={signup.event_id}
-            title={signup.events.title}
-            date={signup.events.event_date}
-            location={signup.events.location || ''}
-            signup_count={0}
-            onClick={() => navigate(`/events/${signup.event_id}`)}
-          />
+          <div key={signup.event_id}>
+            <Card
+              title={signup.events.title}
+              date={signup.events.event_date}
+              location={signup.events.location || ''}
+              signup_count={0}
+              onClick={() => navigate(`/events/${signup.event_id}`)}
+            />
+
+            {/* 👇 novo botão "Add to Google Calendar" */}
+            <AddToCalendarButton
+              event={{
+                title: signup.events.title,
+                description: signup.events.description || '',
+                date: signup.events.event_date,
+                time: signup.events.time || '',
+                location: signup.events.location || '',
+              }}
+              isVisible={true} // user já está inscrito
+            />
+          </div>
         ))}
       </div>
 
