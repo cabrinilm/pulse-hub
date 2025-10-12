@@ -8,6 +8,7 @@ import profilesController from "./controllers/ProfileController.ts";
 import { authMiddleware } from "./middleware/auth.ts";
 import eventsController from "./controllers/EventsController.ts";
 import signupsController from "./controllers/SignupsController.ts";
+import { addEvent } from "./controllers/googleCalendarController.ts";
 
 dotenv.config();
 const app = express();
@@ -63,6 +64,10 @@ app.get("/api/signups", authMiddleware, signupsController.listSignups);
 app.get("/api/events/:event_id/signups", authMiddleware, signupsController.listEventSignups)
 app.patch("/api/events/:event_id/signups", authMiddleware, signupsController.updateSignup);
 app.delete("/api/events/:event_id/signups", authMiddleware, signupsController.deleteSignup);
+
+
+// Google Calendar route
+app.post("/api/google-calendar/add-event", authMiddleware, addEvent);
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
