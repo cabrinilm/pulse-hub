@@ -9,14 +9,21 @@ import eventsController from "./controllers/eventsController";
 import signupsController from "./controllers/signupsController";
 import { authMiddleware } from "./middleware/auth";
 import { handleGoogleCallback } from "./controllers/googleOAuthController";
-// import CommunityController from "./controllers/CommunityController";
-// import communityMemberController from "./controllers/CommunityMembersController";
 
 dotenv.config();
 
 const app = express();
 
-app.use(cors());
+
+app.use(cors({
+  origin: 'https://pulse-hub-frontend.vercel.app', 
+  methods: ['GET', 'POST', 'PATCH', 'DELETE', 'OPTIONS'],
+  credentials: true, 
+}));
+
+
+app.options('*', cors());
+
 app.use(express.json());
 
 app.get("/api", (_req, res) => {
