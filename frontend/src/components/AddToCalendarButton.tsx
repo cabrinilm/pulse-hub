@@ -9,7 +9,7 @@ interface AddToCalendarButtonProps {
     location?: string;
   };
   isVisible: boolean;
-  isLoading?: boolean; // opcional para mostrar que está processando
+  isLoading?: boolean;
 }
 
 const AddToCalendarButton = ({
@@ -21,7 +21,7 @@ const AddToCalendarButton = ({
 
   const handleGoogleAuth = () => {
     const clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID;
-    const redirectUri = "http://localhost:3000/api/google-calendar/callback";
+    const redirectUri = "http://localhost:3000/api/google-calendar/callback"; // backend
     const scope = "https://www.googleapis.com/auth/calendar.events";
     const responseType = "code";
 
@@ -30,9 +30,10 @@ const AddToCalendarButton = ({
       time: event.time && event.time.trim() !== "" ? event.time : "09:00",
     };
 
-    localStorage.setItem("pending_event", JSON.stringify(normalizedEvent));
+    // Adiciona o evento no state do OAuth
+    const state = encodeURIComponent(JSON.stringify(normalizedEvent));
 
-    const authUrl = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${clientId}&redirect_uri=${redirectUri}&response_type=${responseType}&scope=${scope}&access_type=offline&prompt=consent`;
+    const authUrl = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${clientId}&redirect_uri=${redirectUri}&response_type=${responseType}&scope=${scope}&access_type=offline&prompt=consent&state=${state}`;
     window.location.href = authUrl;
   };
 
@@ -41,7 +42,7 @@ const AddToCalendarButton = ({
       variant="primary"
       className="mt-3 md:mt-0 md:ml-4 px-4 py-2 text-sm sm:text-base"
       onClick={handleGoogleAuth}
-      disabled={isLoading} // 🔹 aqui usamos a prop disabled
+      disabled={isLoading}
     >
       {isLoading ? "Adding..." : "Add to Google Calendar"}
     </Button>

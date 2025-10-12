@@ -1,42 +1,44 @@
 // src/pages/GoogleAuthCallback.tsx
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import api from "../services/api";
 
 const GoogleAuthCallback = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const [statusMessage, setStatusMessage] = useState("Connecting to Google Calendar...");
   const [eventLink, setEventLink] = useState<string | null>(null);
 
   useEffect(() => {
-    const hash = window.location.hash;
-    const params = new URLSearchParams(hash.replace("#", ""));
-    const access_token = params.get("access_token");
+    // ✅ Pega o code da query string (Authorization Code Flow)
+    const params = new URLSearchParams(location.search);
+    const code = params.get("code");
 
-    if (!access_token) {
-      setStatusMessage("Google authentication failed.");
+    if (!code) {
+      setStatusMessage("Google authentication failed: no code returned.");
       return;
     }
 
+    // ✅ Pega o evento pendente do localStorage
     const pendingEvent = localStorage.getItem("pending_event");
     if (!pendingEvent) {
-      setStatusMessage("No event found to add.");
+      setStatusMessage("No event data found in localStorage.");
       return;
     }
-
     const event = JSON.parse(pendingEvent);
 
-    api.post("/api/google-calendar/add-event", { access_token, event })
+    // ✅ Envia code + evento para o backend
+    api.post("/api/google-calendar/callback", { code, event })
       .then(res => {
         setStatusMessage("Event successfully added to Google Calendar!");
-        setEventLink(res.data.event.htmlLink); // pega o link direto
+        setEventLink(res.data.event.htmlLink);
         localStorage.removeItem("pending_event");
       })
       .catch(err => {
         console.error(err);
         setStatusMessage("Failed to add event to Google Calendar.");
       });
-  }, [navigate]);
+  }, [location]);
 
   return (
     <div className="p-8 text-center">
