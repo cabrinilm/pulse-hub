@@ -4,8 +4,9 @@ import { supabase } from "../services/supabaseClient";
 import type { Database } from "../types/supabase";
 
 
-
 export async function authMiddleware(req: Request, res: Response, next: NextFunction) {
+  if (req.method === "OPTIONS") return next(); 
+
   const token = req.headers.authorization?.split("Bearer ")[1];
   if (!token) {
     return res.status(401).json({ error: "No token provided" });
@@ -16,7 +17,6 @@ export async function authMiddleware(req: Request, res: Response, next: NextFunc
     return res.status(401).json({ error: "Invalid or expired token" });
   }
 
-
   const userSupabase = createClient<Database>(
     process.env.SUPABASE_URL!,
     process.env.SUPABASE_ANON_KEY!,
@@ -26,11 +26,8 @@ export async function authMiddleware(req: Request, res: Response, next: NextFunc
     }
   );
 
-
-  
   req.user = { id: user.id };
   req.supabase = userSupabase;
 
- 
   next();
 }

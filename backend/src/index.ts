@@ -14,16 +14,20 @@ dotenv.config();
 
 const app = express();
 
-// CORS configurado para permitir apenas seu frontend
+// Configuração CORS global
 app.use(cors({
   origin: process.env.FRONTEND_URL || "https://pulse-hub-frontend.vercel.app",
   methods: ["GET", "POST", "PATCH", "DELETE", "OPTIONS"],
   allowedHeaders: ["Content-Type", "Authorization"],
+  credentials: true, // se precisar enviar cookies ou credenciais
 }));
+
+// Permitir que preflight passe sem bloqueio
+app.options("*", cors());
 
 app.use(express.json());
 
-// Healthcheck
+// Rota de teste
 app.get("/api", (_req, res) => {
   res.json({ message: "PulseHub Backend" });
 });
@@ -52,10 +56,9 @@ app.get("/api/events/:event_id/signups", authMiddleware, signupsController.listE
 app.patch("/api/events/:event_id/signups", authMiddleware, signupsController.updateSignup);
 app.delete("/api/events/:event_id/signups", authMiddleware, signupsController.deleteSignup);
 
-// Google Calendar callback
+// Google Calendar route
 app.get("/api/google-calendar/callback", handleGoogleCallback);
 
-// Servidor
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`✅ Backend running on port ${PORT}`);
