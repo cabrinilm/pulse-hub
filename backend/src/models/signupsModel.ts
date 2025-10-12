@@ -1,3 +1,4 @@
+// src/models/signupsModel.ts
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { Database } from "../types/supabase";
 
@@ -22,7 +23,6 @@ interface Signup extends SignupInput {
 
 class SignupsModel {
   // create
-
   async createSignup(
     supabase: SupabaseClient<Database>,
     user_id: string,
@@ -73,54 +73,52 @@ class SignupsModel {
     event_id: string,
     username: string
   ): Promise<Signup> {
-    // Busca user_id por username em profiles
+   
     const { data: profile, error: profileError } = await supabase
       .from("profiles")
-      .select("user_id")  // Use user_id se for o nome da coluna (ajuste se for id)
+      .select("user_id")
       .eq("username", username)
       .single();
-  
+
     if (profileError || !profile) {
       throw new Error("User not found");
     }
-  
+
     const user_id = profile.user_id;
+
   
-    // Verifica se o evento é privado e o requester é creator (backup à RLS)
     const { data: event, error: eventError } = await supabase
       .from("events")
       .select("is_public, creator_id")
       .eq("id", event_id)
       .single();
-  
+
     if (eventError || !event) {
       throw new Error("Event not found");
     }
-  
+
     if (event.is_public) {
       throw new Error("This feature is only for private events");
     }
-  
+
     if (event.creator_id !== creator_id) {
       throw new Error("Not authorized to add user to this event");
     }
-  
-    
+
     const { data: signup, error: insertError } = await supabase
       .from("signups")
       .insert([{ user_id, event_id, presence_status: "pending", payment_status: "pending" }])
       .select()
       .single();
-  
+
     if (insertError) {
       throw new Error(insertError.message);
     }
-  
+
     return signup as Signup;
   }
 
   // list
-
   async listSignups(
     supabase: SupabaseClient<Database>,
     user_id: string
@@ -170,20 +168,21 @@ class SignupsModel {
     }
 
     const stats = data.reduce((acc: Record<string, number>, row) => {
-      const status = row.presence_status;
-      acc[status] = (acc[status] || 0) + 1;
+      const status = row.presence_status ?? 'unknown';  
+      if (status) {  
+        acc[status] = (acc[status] || 0) + 1;
+      }
       return acc;
-    }, {});
+    }, { pending: 0, confirmed: 0, rejected: 0 });  
 
-    const signup_count = data.length;
-    const confirmed_count = stats["confirmed"] || 0;
-    const rejected_count = stats["rejected"] || 0;
-
-    return { signup_count, confirmed_count, rejected_count };
+    return {
+      signup_count: data.length,
+      confirmed_count: stats.confirmed || 0,
+      rejected_count: stats.rejected || 0,
+    };
   }
 
   // update
-
   async updateSignup(
     supabase: SupabaseClient<Database>,
     user_id: string,
@@ -210,7 +209,6 @@ class SignupsModel {
   }
 
   // delete
-
   async deleteSignup(
     supabase: SupabaseClient<Database>,
     user_id: string,
