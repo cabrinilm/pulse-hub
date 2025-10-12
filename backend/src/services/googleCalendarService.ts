@@ -3,7 +3,7 @@ import { google } from "googleapis";
 interface EventData {
   title: string;
   description?: string;
-  date: string; // ex: "2025-10-12" ou ISO
+  date: string; // ex: "2025-09-01"
   time?: string; // ex: "09:00"
   location?: string;
 }
@@ -26,9 +26,12 @@ export async function addEventToGoogleCalendar(accessToken: string, event: Event
 
     const calendar = google.calendar({ version: "v3", auth: authClient });
 
-    // 4️⃣ Cria start e end
-    const eventDate = event.date.split("T")[0]; // pega só a data yyyy-mm-dd
-    const startDateTime = new Date(`${eventDate}T${event.time || "09:00"}`);
+    // 4️⃣ Cria start e end ajustando para timezone de Londres
+    const [year, month, day] = event.date.split("-").map(Number);
+    const [hour = 9, minute = 0] = (event.time || "09:00").split(":").map(Number);
+
+    // Date em Londres
+    const startDateTime = new Date(Date.UTC(year, month - 1, day, hour, minute));
     const endDateTime = new Date(startDateTime.getTime() + 60 * 60 * 1000); // +1 hora
 
     // 5️⃣ Monta objeto do evento para Google Calendar
@@ -36,8 +39,14 @@ export async function addEventToGoogleCalendar(accessToken: string, event: Event
       summary: event.title,
       description: event.description || "",
       location: event.location || "",
-      start: { dateTime: startDateTime.toISOString(), timeZone: "Europe/London" },
-      end: { dateTime: endDateTime.toISOString(), timeZone: "Europe/London" },
+      start: {
+        dateTime: startDateTime.toISOString(),
+        timeZone: "Europe/London",
+      },
+      end: {
+        dateTime: endDateTime.toISOString(),
+        timeZone: "Europe/London",
+      },
     };
 
     // 🔹 Log detalhado para debug
