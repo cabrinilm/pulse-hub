@@ -13,15 +13,16 @@ dotenv.config();
 
 const app = express();
 
+// CORS: permitindo tudo (somente para teste)
 app.use(cors({
-  origin: process.env.FRONTEND_URL, 
+  origin: "*",
   methods: ["GET", "POST", "PATCH", "DELETE", "OPTIONS"],
   allowedHeaders: ["Content-Type", "Authorization"],
 }));
 
 app.use(express.json());
 
-
+// Rotas
 app.get("/api", (_req, res) => {
   res.json({ message: "PulseHub Backend" });
 });
