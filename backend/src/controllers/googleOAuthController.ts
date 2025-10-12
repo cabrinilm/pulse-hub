@@ -1,7 +1,7 @@
 // src/controllers/googleOAuthController.ts
 import type { Request, Response } from "express";
 import { google } from "googleapis";
-import { addEventToGoogleCalendar } from "../services/googleCalendarService.ts";
+import { addEventToGoogleCalendar } from "../services/googleCalendarService";
 
 export async function handleGoogleCallback(req: Request, res: Response) {
   try {

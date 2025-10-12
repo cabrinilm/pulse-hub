@@ -1,6 +1,6 @@
 
 import type { Request, Response } from 'express';
-import profilesModel from '../models/profilesModel.ts';
+import profilesModel from '../models/profilesModel';
 
 
 class ProfilesController {

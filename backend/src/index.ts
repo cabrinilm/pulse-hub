@@ -1,14 +1,14 @@
 import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
-import AuthController from "./controllers/AuthController.ts";
+import AuthController from "./controllers/AuthController";
 // import CommunityController from "./controllers/CommunityController.ts";
-import profilesController from "./controllers/ProfileController.ts";
+import profilesController from "./controllers/ProfileController";
 // import communityMemberController from "./controllers/CommunityMembersController.ts";
-import { authMiddleware } from "./middleware/auth.ts";
-import eventsController from "./controllers/EventsController.ts";
-import signupsController from "./controllers/SignupsController.ts";
-import { handleGoogleCallback } from "./controllers/googleOAuthController.ts";
+import { authMiddleware } from "./middleware/auth";
+import eventsController from "./controllers/EventsController";
+import signupsController from "./controllers/SignupsController";
+import { handleGoogleCallback } from "./controllers/googleOAuthController";
 
 dotenv.config();
 const app = express();

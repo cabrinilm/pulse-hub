@@ -1,6 +1,6 @@
 
 import type { Request, Response } from "express";
-import { supabase } from '../services/supabaseClient.ts';
+import { supabase } from '../services/supabaseClient';
 
 class AuthController {
   async signup(req: Request, res: Response): Promise<void> {
