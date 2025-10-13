@@ -3,11 +3,11 @@
   "version": "1.0.0",
   "description": "PulseHub backend with Node.js, Express, and TypeScript",
   "type": "commonjs",
-  "main": "dist/index.js",
+  "main": "api/index.js",
   "scripts": {
     "dev": "ts-node src/index.ts",
-    "build": "tsc",
-    "start": "NODE_ENV=production node dist/index.js",
+    "build": "tsc --outDir api --module commonjs",
+    "start": "NODE_ENV=production node api/index.js",
     "lint": "eslint src --ext .ts",
     "test": "jest",
     "test:watch": "jest --watch"

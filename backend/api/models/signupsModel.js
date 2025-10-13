@@ -1,0 +1,146 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+class SignupsModel {
+    // create
+    async createSignup(supabase, user_id, event_id) {
+        const { data: event, error: eventError } = await supabase
+            .from("events")
+            .select("id, is_public, creator_id")
+            .eq("id", event_id)
+            .single();
+        if (eventError || !event) {
+            throw new Error("Event not found or not authorized");
+        }
+        const { error: insertError } = await supabase
+            .from("signups")
+            .insert([{ user_id, event_id }]);
+        if (insertError) {
+            if (insertError.code === "23505") {
+                throw new Error("Signup for this event already exists");
+            }
+            if (insertError.message.includes("violates row-level security")) {
+                throw new Error("Not authorized for this private event");
+            }
+            throw new Error(`Failed to create signup: ${insertError.message}`);
+        }
+        const { data, error: selectError } = await supabase
+            .from("signups")
+            .select("*")
+            .eq("user_id", user_id)
+            .eq("event_id", event_id)
+            .single();
+        if (selectError || !data) {
+            throw new Error(`Failed to retrieve created signup: ${selectError?.message || "No data"}`);
+        }
+        return data;
+    }
+    async addUserToEvent(supabase, creator_id, event_id, username) {
+        const { data: profile, error: profileError } = await supabase
+            .from("profiles")
+            .select("user_id")
+            .eq("username", username)
+            .single();
+        if (profileError || !profile) {
+            throw new Error("User not found");
+        }
+        const user_id = profile.user_id;
+        const { data: event, error: eventError } = await supabase
+            .from("events")
+            .select("is_public, creator_id")
+            .eq("id", event_id)
+            .single();
+        if (eventError || !event) {
+            throw new Error("Event not found");
+        }
+        if (event.is_public) {
+            throw new Error("This feature is only for private events");
+        }
+        if (event.creator_id !== creator_id) {
+            throw new Error("Not authorized to add user to this event");
+        }
+        const { data: signup, error: insertError } = await supabase
+            .from("signups")
+            .insert([{ user_id, event_id, presence_status: "pending", payment_status: "pending" }])
+            .select()
+            .single();
+        if (insertError) {
+            throw new Error(insertError.message);
+        }
+        return signup;
+    }
+    // list
+    async listSignups(supabase, user_id) {
+        const { data, error } = await supabase
+            .from("signups")
+            .select(`
+        *,
+        events (
+          id,
+          title,
+          description,
+          event_date,
+          location,
+          is_public
+        )
+      `)
+            .eq("user_id", user_id)
+            .order("signup_date", { ascending: false });
+        if (error) {
+            throw new Error(`Failed to list signups: ${error.message}`);
+        }
+        return data || [];
+    }
+    async getEventSignupStats(supabase, event_id) {
+        const { data, error } = await supabase
+            .from("signups")
+            .select("presence_status")
+            .eq("event_id", event_id);
+        if (error || !data) {
+            throw new Error(`Failed to fetch signups: ${error?.message || "No data"}`);
+        }
+        const stats = data.reduce((acc, row) => {
+            const status = row.presence_status ?? 'unknown';
+            if (status) {
+                acc[status] = (acc[status] || 0) + 1;
+            }
+            return acc;
+        }, { pending: 0, confirmed: 0, rejected: 0 });
+        return {
+            signup_count: data.length,
+            confirmed_count: stats.confirmed || 0,
+            rejected_count: stats.rejected || 0,
+        };
+    }
+    // update
+    async updateSignup(supabase, user_id, event_id, updates) {
+        const { data, error } = await supabase
+            .from("signups")
+            .update(updates)
+            .eq("user_id", user_id)
+            .eq("event_id", event_id)
+            .select()
+            .single();
+        if (error) {
+            throw new Error(`Failed to update signup: ${error.message}`);
+        }
+        if (!data) {
+            throw new Error("Signup not found or not authorized");
+        }
+        return data;
+    }
+    // delete
+    async deleteSignup(supabase, user_id, event_id) {
+        const { count, error } = await supabase
+            .from("signups")
+            .delete({ count: "exact" })
+            .eq("user_id", user_id)
+            .eq("event_id", event_id);
+        if (error) {
+            throw new Error(`Failed to delete signup: ${error.message}`);
+        }
+        if (count === 0) {
+            throw new Error("Signup not found");
+        }
+    }
+}
+exports.default = new SignupsModel();
