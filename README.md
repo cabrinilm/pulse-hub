@@ -1,17 +1,24 @@
 # Pulse Hub
 
-Pulse Hub is a full-stack application for managing events, profiles, and signups. The project is structured as a monorepo with a Node.js/Express/TypeScript backend and a React/Vite frontend. This guide provides step-by-step instructions to run the project locally.
+Pulse Hub is a full-stack application for managing events, profiles, and signups. The project is structured as a monorepo with a Node.js/Express/TypeScript backend and a React/Vite frontend using Tailwind CSS for styling. This guide provides step-by-step instructions to run the project locally.
 
 ## Overview
 
 - **Backend**: Handles authentication (Supabase + Google OAuth), events, profiles, and signups.
-- **Frontend**: React app built with Vite for UI/UX.
+- **Frontend**: React app built with Vite and Tailwind CSS for UI/UX.
 - **Database/Auth**: Supabase (PostgreSQL + Auth).
 - **Key Features**: User login, event creation/listing, profile management, Google OAuth for calendar sync.
 
 The local setup runs the backend on `http://localhost:3001` and frontend on `http://localhost:3000`.
 
+---
 
+## Hosted Online
+
+- **Frontend**: [https://pulse-hub-frontend.vercel.app](https://pulse-hub-frontend.vercel.app)  
+- **Backend**: [https://pulse-hub-backend.vercel.app](https://pulse-hub-backend.vercel.app)
+
+---
 
 ## Prerequisites
 
@@ -31,21 +38,45 @@ npm --version   # Should be >=9
 
 
 pulse-hub/
-├── backend/          # Node.js/Express/TypeScript API
-│   ├── src/          # Source code (controllers, models, services)
-│   ├── api/          # Compiled output (auto-generated on build)
+├── backend/              # Node.js/Express/TypeScript API
+│   ├── src/              # Source code (controllers, models, services)
+│   ├── api/              # Compiled output (auto-generated on build)
+│   ├── jest.config.ts    # Jest configuration for backend tests
 │   ├── package.json
 │   ├── tsconfig.json
-│   └── vercel.json   # Vercel config (CORS/routing)
-├── frontend/         # React/Vite app
-│   ├── src/          # Source code (components, hooks)
+│   └── vercel.json       # Vercel config (CORS/routing)
+├── frontend/             # React/Vite app with Tailwind CSS
+│   ├── src/              # Source code (components, hooks)
 │   ├── package.json
-│   └── vite.config.js
-├── .env.example      # Template for env vars
+│   ├── vite.config.js
+│   ├── tailwind.config.js  # Tailwind configuration
+│   └── postcss.config.js   # PostCSS config for Tailwind
+├── .env.example          # Template for env vars
 ├── .gitignore
 └── README.md
 
 ```
+## Installation & Running Locally
+
+# Clone the repository
+git clone https://github.com/yourusername/pulse-hub.git
+cd pulse-hub
+
+# Install backend dependencies
+cd backend
+npm install
+
+# Start backend server (default port: 3001)
+npm run dev
+
+# In a new terminal, install frontend dependencies
+cd ../frontend
+npm install
+
+# Start frontend server (default port: 3000)
+npm run dev
+
+
 
 ## Setup Environment Variables
 
@@ -116,7 +147,10 @@ VITE_API_URL=http://localhost:3001
 
 
 
+## Running Tests (Backend)
 
+cd backend
+npm test
 
 
 
