@@ -1,6 +1,7 @@
 // src/pages/EditEvent.tsx
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
+import { motion } from 'framer-motion';
 import api from '../services/api';
 import Button from '../components/Button';
 import Navbar from '../components/Navbar';
@@ -78,7 +79,7 @@ const EditEvent = () => {
   if (loading) return <p className="p-4 text-center text-white">Loading...</p>;
 
   return (
-    <div className="p-3 md:p-8 pb-24 md:pb-8 md:ml-[18rem] mt-14 md:mt-24 relative">
+    <div className="flex flex-col p-3 md:p-8 pb-24 md:pb-8 md:ml-[18rem] mt-10 md:mt-16 relative min-h-screen">
       {/* BackArrow Mobile */}
       <div className="md:hidden absolute top-4 left-4 z-10">
         <BackArrow to={previousPage} animateOnClick />
@@ -91,56 +92,75 @@ const EditEvent = () => {
       </div>
       <h1 className="md:hidden text-2xl font-bold mb-4 text-center text-white">Edit Event</h1>
 
-      <div className="max-w-2xl mx-auto flex flex-col gap-4">
-        {error && <p className="text-red-500">{error}</p>}
-        {success && <p className="text-green-500">{success}</p>}
+      <div className="flex flex-1 items-center justify-start md:justify-center px-4 sm:px-0">
+        <div className="relative z-10 w-full max-w-lg bg-white/30 backdrop-blur-md rounded-3xl shadow-2xl border border-white/20 p-8 flex flex-col gap-4">
+          <motion.h2
+            className="text-3xl font-bold text-white text-center mb-4"
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0, transition: { duration: 0.5 } }}
+          >
+            Edit Event
+          </motion.h2>
 
-        <label className="flex flex-col gap-1">
-          Title
-          <input
-            type="text"
-            name="title"
-            value={eventData.title}
-            onChange={handleChange}
-            className="border rounded p-2"
-          />
-        </label>
+          {error && (
+            <p className="text-red-400 text-sm mt-1 text-center">{error}</p>
+          )}
 
-        <label className="flex flex-col gap-1">
-          Description
-          <textarea
-            name="description"
-            value={eventData.description || ''}
-            onChange={handleChange}
-            className="border rounded p-2"
-          />
-        </label>
+          <div className="flex flex-col gap-4 w-full">
+            <input
+              type="text"
+              name="title"
+              value={eventData.title}
+              onChange={handleChange}
+              placeholder="Event Title"
+              className="p-3 border border-white/40 rounded-xl w-full bg-white/20 text-white placeholder-white/70 focus:ring-2 focus:ring-blue-400 focus:border-blue-400 transition-colors"
+            />
 
-        <label className="flex flex-col gap-1">
-          Date
-          <input
-            type="datetime-local"
-            name="event_date"
-            value={eventData.event_date}
-            onChange={handleChange}
-            className="border rounded p-2"
-          />
-        </label>
+            <textarea
+              name="description"
+              value={eventData.description || ''}
+              onChange={handleChange}
+              placeholder="Event Description"
+              rows={4}
+              className="p-3 border border-white/40 rounded-xl w-full bg-white/20 text-white placeholder-white/70 focus:ring-2 focus:ring-blue-400 focus:border-blue-400 transition-colors resize-none"
+            />
 
-        <label className="flex flex-col gap-1">
-          Location
-          <input
-            type="text"
-            name="location"
-            value={eventData.location || ''}
-            onChange={handleChange}
-            className="border rounded p-2"
-          />
-        </label>
+            <input
+              type="datetime-local"
+              name="event_date"
+              value={eventData.event_date}
+              onChange={handleChange}
+              className="p-3 border border-white/40 rounded-xl w-full bg-white/20 text-white focus:ring-2 focus:ring-blue-400 focus:border-blue-400 transition-colors"
+            />
 
-        <div className="flex gap-4 mt-4">
-          <Button variant="primary" onClick={handleUpdate}>Update Event</Button>
-          <Button variant="secondary" onClick={handleDelete} className="bg-red-500 hover:bg-red-600 text-white">Delete Event</Button>
+            <input
+              type="text"
+              name="location"
+              value={eventData.location || ''}
+              onChange={handleChange}
+              placeholder="Event Location"
+              className="p-3 border border-white/40 rounded-xl w-full bg-white/20 text-white placeholder-white/70 focus:ring-2 focus:ring-blue-400 focus:border-blue-400 transition-colors"
+            />
+
+            {success && (
+              <p className="text-green-400 text-sm mt-1 text-center">{success}</p>
+            )}
+
+            <div className="flex flex-col sm:flex-row gap-4">
+              <Button
+                onClick={handleUpdate}
+                className="bg-blue-400 hover:bg-blue-500 text-white px-4 py-3 rounded-xl w-full font-medium transition-all cursor-pointer"
+              >
+                Update Event
+              </Button>
+              <Button
+                onClick={handleDelete}
+                className="bg-red-400 hover:bg-red-500 text-white px-4 py-3 rounded-xl w-full font-medium transition-all cursor-pointer"
+              >
+                Delete Event
+              </Button>
+            </div>
+          </div>
         </div>
       </div>
 

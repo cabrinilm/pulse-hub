@@ -1,9 +1,11 @@
 import { useState, useEffect } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
+import { motion } from 'framer-motion';
 import api from '../services/api';
-import Input from '../components/Input';
 import Button from '../components/Button';
 import Navbar from '../components/Navbar';
 import { useAuth } from '../hooks/useAuth';
+import BackArrow from '../components/BackArrow';
 
 interface Profile {
   username: string;
@@ -12,11 +14,15 @@ interface Profile {
 
 const ProfileEdit = () => {
   useAuth(); // apenas para garantir contexto, não usado diretamente
+  const navigate = useNavigate();
+  const location = useLocation();
   const [profile, setProfile] = useState<Profile | null>(null);
   const [username, setUsername] = useState('');
   const [full_name, setFullName] = useState('');
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
+
+  const previousPage = location.state?.from || '/';
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -41,9 +47,9 @@ const ProfileEdit = () => {
       setMessage({ type: 'success', text: 'Profile updated successfully!' });
       setProfile({ username, full_name });
     } catch (err: any) {
-      // Verifica se o backend retornou erro de username duplicado
+  
       const errorMsg = err.response?.data?.error?.toLowerCase() || '';
-const isDuplicate = errorMsg.includes('username already exists');
+      const isDuplicate = errorMsg.includes('username already exists');
       setMessage({
         type: 'error',
         text: isDuplicate ? 'This username is already taken. Please choose another.' : 'Error updating profile',
@@ -53,32 +59,64 @@ const isDuplicate = errorMsg.includes('username already exists');
     }
   };
 
-  if (!profile) return <p className="p-4 text-center">Loading...</p>;
+  if (!profile) return <p className="p-4 text-center text-white">Loading...</p>;
 
   return (
-    <div className="p-4 md:p-8 max-w-md mx-auto">
-      <h1 className="text-2xl font-bold mb-4">Edit Profile</h1>
+    <div className="flex flex-col p-3 md:p-8 pb-24 md:pb-8 md:ml-[18rem] mt-14 md:mt-24 relative min-h-screen">
+      {/* BackArrow Mobile */}
+      <div className="md:hidden absolute top-4 left-4 z-10">
+        <BackArrow to={previousPage} animateOnClick />
+      </div>
 
-      {message && (
-        <div
-          className={`mb-4 p-3 rounded ${
-            message.type === 'success' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'
-          }`}
-        >
-          {message.text}
+      {/* Header */}
+      <div className="hidden md:flex items-center gap-4 mb-6">
+        <BackArrow to={previousPage} animateOnClick />
+        <h1 className="text-3xl font-bold text-white">Edit Profile</h1>
+      </div>
+      <h1 className="md:hidden text-2xl font-bold mb-4 text-center text-white">Edit Profile</h1>
+
+      <div className="flex flex-1 items-center justify-center px-4 sm:px-0">
+        <div className="relative z-10 w-full max-w-lg bg-white/30 backdrop-blur-md rounded-3xl shadow-2xl border border-white/20 p-8 flex flex-col gap-4">
+          <motion.h2
+            className="text-3xl font-bold text-white text-center mb-4"
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0, transition: { duration: 0.5 } }}
+          >
+            Edit Profile
+          </motion.h2>
+
+          {message && (
+            <p className={`text-sm text-center ${message.type === 'success' ? 'text-green-400' : 'text-red-400'}`}>
+              {message.text}
+            </p>
+          )}
+
+          <div className="flex flex-col gap-4 w-full">
+            <input
+              type="text"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              placeholder="Username"
+              className="p-3 border border-white/40 rounded-xl w-full bg-white/20 text-white placeholder-white/70 focus:ring-2 focus:ring-blue-400 focus:border-blue-400 transition-colors"
+            />
+
+            <input
+              type="text"
+              value={full_name}
+              onChange={(e) => setFullName(e.target.value)}
+              placeholder="Full Name"
+              className="p-3 border border-white/40 rounded-xl w-full bg-white/20 text-white placeholder-white/70 focus:ring-2 focus:ring-blue-400 focus:border-blue-400 transition-colors"
+            />
+
+            <Button
+              onClick={handleUpdate}
+              disabled={loading}
+              className="bg-blue-400 hover:bg-blue-500 text-white px-4 py-3 rounded-xl w-full font-medium transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {loading ? 'Updating...' : 'Update Profile'}
+            </Button>
+          </div>
         </div>
-      )}
-
-      <div className="flex flex-col gap-4">
-        <label>Username</label>
-        <Input value={username} onChange={(e) => setUsername(e.target.value)} placeholder="Username" />
-
-        <label>Full Name</label>
-        <Input value={full_name} onChange={(e) => setFullName(e.target.value)} placeholder="Full Name" />
-
-        <Button onClick={handleUpdate} disabled={loading}>
-          {loading ? 'Updating...' : 'Update Profile'}
-        </Button>
       </div>
 
       <Navbar />
