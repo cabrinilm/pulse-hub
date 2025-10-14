@@ -1,28 +1,27 @@
-// src/components/LoginHeader.tsx
-import { Link } from 'react-router-dom';
+interface LoginHeaderProps {
+  onToggleSignup?: (value: boolean) => void;
+}
 
-const LoginHeader = () => {
+const LoginHeader = ({ onToggleSignup }: LoginHeaderProps) => {
   return (
     <header className="w-full py-4 px-6 flex items-center justify-between z-10 relative">
-    
-      <Link to="/" className="text-white text-2xl font-bold">
+      <a href="/" className="text-white text-2xl font-bold">
         Pulse<span className="font-light">Hub</span>
-      </Link>
+      </a>
 
-    
       <nav className="flex items-center gap-6">
-        <Link
-          to="/login"
+        <button
+          onClick={() => onToggleSignup?.(false)}
           className="text-white/80 hover:text-white font-medium transition-colors"
         >
           Login
-        </Link>
-        <Link
-          to="/signup"
+        </button>
+        <button
+          onClick={() => onToggleSignup?.(true)}
           className="text-green-400 hover:text-green-300 font-medium transition-colors"
         >
           Sign Up
-        </Link>
+        </button>
       </nav>
     </header>
   );

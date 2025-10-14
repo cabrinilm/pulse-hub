@@ -57,7 +57,7 @@ const Login = () => {
   return (
     <div className="relative min-h-screen flex flex-col">
       <AnimatedBackground />
-      <LoginHeader />
+      <LoginHeader onToggleSignup={(value) => setIsSignup(value)} />
 
       <div className="flex flex-1 items-center justify-center px-4 sm:px-0">
         {!isSuccess && (
@@ -131,7 +131,9 @@ const Login = () => {
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
             >
-              {isSignup ? 'Already have an account? Login' : 'Create a new account'}
+              {isSignup
+                ? 'Already have an account? Login'
+                : 'Create a new account'}
             </motion.button>
           </div>
         )}
