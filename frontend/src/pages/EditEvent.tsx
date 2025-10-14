@@ -35,7 +35,7 @@ const EditEvent = () => {
     const fetchEvent = async () => {
       try {
         const res = await api.get<Event>(`/events/${id}`);
-        // Ajuste da data para o input type="datetime-local"
+       
         const date = new Date(res.data.event_date);
         const iso = date.toISOString().slice(0, 16);
         setEventData({ ...res.data, event_date: iso });

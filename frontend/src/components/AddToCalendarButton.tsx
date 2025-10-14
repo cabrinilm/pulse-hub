@@ -11,7 +11,7 @@ interface AddToCalendarButtonProps {
   };
   isVisible: boolean;
   isLoading?: boolean;
-  className?: string; // adiciona className opcional
+  className?: string; 
 }
 
 const AddToCalendarButton = ({ event, isVisible, isLoading = false }: AddToCalendarButtonProps) => {

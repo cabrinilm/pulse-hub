@@ -18,7 +18,7 @@ const CreateEvent = () => {
 
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
-  const [date, setDate] = useState(''); // formato yyyy-MM-ddTHH:mm
+  const [date, setDate] = useState(''); // yyyy-MM-ddTHH:mm
   const [locationInput, setLocationInput] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);

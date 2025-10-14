@@ -8,7 +8,7 @@ interface ButtonProps {
   onClick?: () => void;
   disabled?: boolean;
   type?: "button" | "submit" | "reset";
-  style?: React.CSSProperties; // se precisar
+  style?: React.CSSProperties; 
 }
 
 const Button = ({

@@ -13,14 +13,14 @@ const GoogleAuthCallback = () => {
 
     if (error) {
       setStatusMessage(error);
-      setTimeout(() => navigate("/my-signups"), 3000); // volta após 3s
+      setTimeout(() => navigate("/my-signups"), 3000); 
       return;
     }
 
     if (message) {
       setStatusMessage(message);
 
-      // Animação simples antes de voltar
+     
       const timer = setTimeout(() => {
         navigate("/my-signups");
       }, 3000);
@@ -28,7 +28,7 @@ const GoogleAuthCallback = () => {
       return () => clearTimeout(timer);
     }
 
-    // Caso nenhum parâmetro
+  
     setStatusMessage("No data received from Google.");
     setTimeout(() => navigate("/my-signups"), 3000);
   }, [navigate]);

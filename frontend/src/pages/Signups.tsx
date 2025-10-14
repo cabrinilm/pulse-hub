@@ -93,7 +93,7 @@ const Signups = () => {
               onClick={() => navigate(`/events/${signup.event_id}`, { state: { from: location.pathname } })}
             />
 
-            {/* Add to Calendar Button fora do card */}
+         
             <div className="flex justify-end mt-2 md:mt-0">
               <button
                 onClick={() =>
