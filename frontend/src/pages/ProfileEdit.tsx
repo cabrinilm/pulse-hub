@@ -1,11 +1,12 @@
 import { useState, useEffect } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import api from '../services/api';
 import Button from '../components/Button';
 import Navbar from '../components/Navbar';
-import { useAuth } from '../hooks/useAuth';
+// import { useAuth } from '../hooks/useAuth';
 import BackArrow from '../components/BackArrow';
+import LoadingOverlay from '../components/LoadingOverlay';
 
 interface Profile {
   username: string;
@@ -13,12 +14,12 @@ interface Profile {
 }
 
 const ProfileEdit = () => {
-  useAuth(); // apenas para garantir contexto, não usado diretamente
-  const navigate = useNavigate();
+  // useAuth(); // apenas para garantir contexto, não usado diretamente
   const location = useLocation();
   const [profile, setProfile] = useState<Profile | null>(null);
   const [username, setUsername] = useState('');
   const [full_name, setFullName] = useState('');
+  const [isLoading, setIsLoading] = useState(true);
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
 
@@ -27,12 +28,15 @@ const ProfileEdit = () => {
   useEffect(() => {
     const fetchProfile = async () => {
       try {
+        setIsLoading(true);
         const res = await api.get<Profile>('/profile');
         setProfile(res.data);
         setUsername(res.data.username || '');
         setFullName(res.data.full_name || '');
       } catch (err: any) {
         setMessage({ type: 'error', text: 'Error loading profile' });
+      } finally {
+        setIsLoading(false);
       }
     };
     fetchProfile();
@@ -59,7 +63,7 @@ const ProfileEdit = () => {
     }
   };
 
-  if (!profile) return <p className="p-4 text-center text-white">Loading...</p>;
+  if (isLoading) return <LoadingOverlay />;
 
   return (
     <div className="flex flex-col p-3 md:p-8 pb-24 md:pb-8 md:ml-[18rem] mt-14 md:mt-24 relative min-h-screen">

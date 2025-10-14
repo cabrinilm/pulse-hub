@@ -59,7 +59,6 @@ const EditEvent = () => {
     try {
       await api.patch(`/events/${id}`, eventData);
       setSuccess('Event updated successfully!');
-      // Redireciona para MyEvents
       navigate('/my-events');
     } catch (err: any) {
       setError(err.message || 'Error updating event');
