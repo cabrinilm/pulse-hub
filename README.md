@@ -56,24 +56,24 @@ pulse-hub/
 └── README.md
 
 ```
-## Installation & Running Locally
+# Installation & Running Locally
 
-# Clone the repository
-git clone https://github.com/yourusername/pulse-hub.git
-cd pulse-hub
+### Clone the repository
+-git clone https://github.com/yourusername/pulse-hub.git
+-cd pulse-hub
 
-# Install backend dependencies
-cd backend
-npm install
+### Install backend dependencies
+-cd backend
+-npm install
 
-# Start backend server (default port: 3001)
+### Start backend server (default port: 3001)
 npm run dev
 
-# In a new terminal, install frontend dependencies
-cd ../frontend
-npm install
+### In a new terminal, install frontend dependencies
+-cd ../frontend
+-npm install
 
-# Start frontend server (default port: 3000)
+### Start frontend server (default port: 3000)
 npm run dev
 
 
@@ -149,8 +149,8 @@ VITE_API_URL=http://localhost:3001
 
 ## Running Tests (Backend)
 
-cd backend
-npm test
+-cd backend
+-npm test
 
 
 
