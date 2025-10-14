@@ -2,9 +2,10 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
-import LoginHeader from '../components/LoginHeader';
+import AnimatedBackground from '../components/AnimatedBackground';
 import Button from '../components/Button';
 import { motion, AnimatePresence } from 'framer-motion';
+import LoginHeader from '../components/LoginHeader';
 
 const Login = () => {
   const [email, setEmail] = useState('');
@@ -47,26 +48,29 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#F9FAFB] to-[#E0F2FE] flex flex-col">
-      {/* Header próprio para login/signup */}
+    <div className="relative min-h-screen flex flex-col">
+      {/* Background */}
+      <AnimatedBackground />
+
+      {/* Header */}
       <LoginHeader />
 
-      {/* Box central */}
-      <div className="flex flex-col items-center justify-center flex-1 px-4 md:px-8 mt-12">
-        <motion.div
-          className="w-full max-w-md bg-white dark:bg-neutral-dark rounded-2xl shadow-xl p-8 border border-slate-200 dark:border-neutral-dark"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0, transition: { duration: 0.5 } }}
-        >
-          <motion.h1 className="text-3xl font-bold mb-6 text-[#1E293B] dark:text-neutral-light">
+      {/* Box centralizado */}
+      <div className="flex flex-1 items-center justify-center">
+        <div className="w-full max-w-md mx-4 sm:mx-0 bg-white/30 backdrop-blur-md rounded-3xl shadow-2xl border border-white/20 p-8 flex flex-col gap-4">
+          <motion.h2
+            className="text-3xl font-bold text-white text-center mb-4"
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0, transition: { duration: 0.5 } }}
+          >
             {isSignup ? 'Sign Up' : 'Login'}
-          </motion.h1>
+          </motion.h2>
 
           <AnimatePresence mode="wait">
             <motion.form
               key={isSignup ? 'signup' : 'login'}
               onSubmit={handleSubmit}
-              className="flex flex-col gap-4"
+              className="flex flex-col gap-4 w-full"
               variants={formVariants}
               initial="hidden"
               animate="visible"
@@ -78,7 +82,9 @@ const Login = () => {
                   value={username}
                   onChange={(e) => setUsername(e.target.value)}
                   placeholder="Username"
-                  className="p-3 border border-slate-300 dark:border-neutral-light rounded-md w-full focus:ring-2 focus:ring-[#2563EB] focus:border-[#2563EB] transition-colors placeholder-slate-400 dark:placeholder-neutral-light"
+                  className="p-3 border border-white/40 rounded-xl w-full bg-white/20 text-white placeholder-white/70 focus:ring-2 focus:ring-blue-400 focus:border-blue-400 transition-colors"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1, transition: { delay: 0.1 } }}
                 />
               )}
 
@@ -87,7 +93,9 @@ const Login = () => {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="Email"
-                className="p-3 border border-slate-300 dark:border-neutral-light rounded-md w-full focus:ring-2 focus:ring-[#2563EB] focus:border-[#2563EB] transition-colors placeholder-slate-400 dark:placeholder-neutral-light"
+                className="p-3 border border-white/40 rounded-xl w-full bg-white/20 text-white placeholder-white/70 focus:ring-2 focus:ring-blue-400 focus:border-blue-400 transition-colors"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1, transition: { delay: 0.2 } }}
               />
 
               <motion.input
@@ -95,14 +103,19 @@ const Login = () => {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="Password"
-                className="p-3 border border-slate-300 dark:border-neutral-light rounded-md w-full focus:ring-2 focus:ring-[#2563EB] focus:border-[#2563EB] transition-colors placeholder-slate-400 dark:placeholder-neutral-light"
+                className="p-3 border border-white/40 rounded-xl w-full bg-white/20 text-white placeholder-white/70 focus:ring-2 focus:ring-blue-400 focus:border-blue-400 transition-colors"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1, transition: { delay: 0.3 } }}
               />
 
               {error && (
-                <p className="text-[#EF4444] text-sm mt-1 font-medium">{error}</p>
+                <p className="text-red-400 text-sm mt-1 text-center">{error}</p>
               )}
 
-              <Button type="submit" variant="primary">
+              <Button
+                type="submit"
+                className="bg-blue-400 hover:bg-blue-500 text-white px-4 py-3 rounded-xl w-full font-medium transition-all cursor-pointer"
+              >
                 {isSignup ? 'Sign Up' : 'Login'}
               </Button>
             </motion.form>
@@ -110,13 +123,13 @@ const Login = () => {
 
           <motion.button
             onClick={() => setIsSignup(!isSignup)}
-            className="mt-4 text-[#2563EB] hover:text-[#1D4ED8] hover:underline font-medium transition-colors"
+            className="mt-4 text-white/80 hover:text-white hover:underline font-medium transition-colors self-center"
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
           >
             {isSignup ? 'Already have an account? Login' : 'Create a new account'}
           </motion.button>
-        </motion.div>
+        </div>
       </div>
     </div>
   );
