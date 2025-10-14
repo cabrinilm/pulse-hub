@@ -1,4 +1,3 @@
-// src/pages/Events.tsx
 import { useEffect, useState, useCallback } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import api from '../services/api';
@@ -24,7 +23,6 @@ const Events = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  // Rota anterior ou fallback
   const previousPage = location.state?.from || '/';
 
   useEffect(() => {
@@ -44,9 +42,11 @@ const Events = () => {
   const indexOfFirstEvent = indexOfLastEvent - eventsPerPage;
   const currentEvents = events.slice(indexOfFirstEvent, indexOfLastEvent);
 
-  // Swipe handlers
-  const goNext = useCallback(() => setCurrentPage(p => Math.min(p + 1, totalPages)), [totalPages]);
-  const goPrev = useCallback(() => setCurrentPage(p => Math.max(p - 1, 1)), []);
+  const goNext = useCallback(
+    () => setCurrentPage((p) => Math.min(p + 1, totalPages)),
+    [totalPages]
+  );
+  const goPrev = useCallback(() => setCurrentPage((p) => Math.max(p - 1, 1)), []);
 
   const swipeHandlers = useSwipeable({
     onSwipedLeft: () => totalPages > 1 && goNext(),
@@ -61,16 +61,20 @@ const Events = () => {
   }, [totalPages, currentPage]);
 
   return (
-    <div className="p-4 md:p-8 pb-24 md:pb-8 md:ml-[18rem] mt-14 md:mt-24 relative">
-      {/* BackArrow visível apenas em mobile */}
+    <div className="min-h-screen p-4 md:p-8 pb-24 md:pb-8 md:ml-[18rem] mt-14 md:mt-24 relative text-white">
+      {/* BackArrow — Mobile */}
       <div className="md:hidden absolute top-4 left-4 z-10">
-        <BackArrow
-          to={previousPage}
-          animateOnClick
-        />
+        <BackArrow to={previousPage} animateOnClick />
       </div>
 
-      <h1 className="text-2xl font-bold mb-4 text-center md:text-left">Events</h1>
+      {/* Header — Desktop */}
+      <div className="hidden md:flex items-center gap-4 mb-6">
+        <BackArrow to={previousPage} animateOnClick />
+        <h1 className="text-3xl font-bold">Events</h1>
+      </div>
+
+      {/* Header — Mobile */}
+      <h1 className="md:hidden text-2xl font-bold mb-4 text-center">Events</h1>
 
       <div {...swipeHandlers} className="flex flex-col gap-4">
         {currentEvents.map((event) => (
@@ -80,10 +84,13 @@ const Events = () => {
             date={event.event_date}
             location={event.location || ''}
             signup_count={event.signup_count || 0}
-            onClick={() => navigate(`/events/${event.id}`, { state: { from: location.pathname } })}
+            onClick={() =>
+              navigate(`/events/${event.id}`, { state: { from: location.pathname } })
+            }
           />
         ))}
       </div>
+
 
       <div className="fixed bottom-4 left-0 w-full flex justify-center md:static md:mt-6">
         <PaginationDots

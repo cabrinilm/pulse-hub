@@ -6,8 +6,9 @@ import Card from '../components/Card';
 import Navbar from '../components/Navbar';
 import PaginationDots from '../components/PaginationDots';
 import { useSwipeable } from 'react-swipeable';
-import AddToCalendarButton from '../components/AddToCalendarButton';
+import { CalendarPlus } from 'lucide-react';
 import BackArrow from '../components/BackArrow';
+import AddToCalendarButton from '../components/AddToCalendarButton';
 
 interface Signup {
   event_id: string;
@@ -64,18 +65,26 @@ const Signups = () => {
 
   return (
     <div className="p-3 md:p-8 pb-24 md:pb-8 md:ml-[18rem] mt-14 md:mt-24 relative">
-      {/* BackArrow visível apenas em mobile */}
+
+      {/* BackArrow Mobile */}
       <div className="md:hidden absolute top-4 left-4 z-10">
         <BackArrow to={previousPage} animateOnClick />
       </div>
 
-      {/* Título seguindo o mesmo padrão */}
-      <h1 className="text-2xl font-bold mb-4 text-center md:text-left">My Signups</h1>
+      {/* Header */}
+      <div className="hidden md:flex items-center gap-4 mb-6">
+        <BackArrow to={previousPage} animateOnClick />
+        <h1 className="text-3xl font-bold text-white">My Signups</h1>
+      </div>
+      <h1 className="md:hidden text-2xl font-bold mb-4 text-center text-white">My Signups</h1>
 
-      {/* Área de swipe */}
       <div {...swipeHandlers} className="flex flex-col gap-6">
-        {currentSignups.map((signup) => (
-          <div key={signup.event_id}>
+        {currentSignups.length === 0 ? (
+          <p className="text-white/80 text-center">
+            You have no signups yet. <span className="underline cursor-pointer" onClick={() => navigate('/events')}>Browse Events</span>
+          </p>
+        ) : currentSignups.map((signup) => (
+          <div key={signup.event_id} className="relative">
             <Card
               title={signup.events.title}
               date={signup.events.event_date}
@@ -84,22 +93,32 @@ const Signups = () => {
               onClick={() => navigate(`/events/${signup.event_id}`, { state: { from: location.pathname } })}
             />
 
-            {/* Botão "Add to Google Calendar" */}
-            <AddToCalendarButton
-              event={{
-                title: signup.events.title,
-                description: signup.events.description || '',
-                date: signup.events.event_date,
-                time: signup.events.time || '',
-                location: signup.events.location || '',
-              }}
-              isVisible={true}
-            />
+            {/* Add to Calendar Button fora do card */}
+            <div className="flex justify-end mt-2 md:mt-0">
+              <button
+                onClick={() =>
+                  AddToCalendarButton({
+                    event: {
+                      title: signup.events.title,
+                      description: signup.events.description || '',
+                      date: signup.events.event_date,
+                      time: signup.events.time || '',
+                      location: signup.events.location || '',
+                    },
+                    isVisible: true,
+                    isLoading: false,
+                  })
+                }
+                className="flex items-center gap-2 text-white bg-teal-500 hover:bg-teal-600 px-3 py-1 rounded-md transition-colors duration-200"
+              >
+                <CalendarPlus size={18} />
+                <span className="hidden md:inline">Add to Calendar</span>
+              </button>
+            </div>
           </div>
         ))}
       </div>
 
-      {/* Paginação por bolinhas */}
       <div className="fixed bottom-4 left-0 w-full flex justify-center md:static md:mt-6">
         <PaginationDots
           totalPages={totalPages}

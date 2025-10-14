@@ -1,11 +1,10 @@
-// src/components/BackArrow.tsx
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
 
 interface BackArrowProps {
   to: string;
-  animateOnClick?: boolean; // ativa animação quando clicado
+  animateOnClick?: boolean;
 }
 
 const BackArrow: React.FC<BackArrowProps> = ({ to, animateOnClick = false }) => {
@@ -15,9 +14,7 @@ const BackArrow: React.FC<BackArrowProps> = ({ to, animateOnClick = false }) => 
   const handleBack = () => {
     if (animateOnClick) {
       setIsClicked(true);
-      setTimeout(() => {
-        navigate(to);
-      }, 150); // tempo da animação
+      setTimeout(() => navigate(to), 150);
     } else {
       navigate(to);
     }
@@ -26,11 +23,11 @@ const BackArrow: React.FC<BackArrowProps> = ({ to, animateOnClick = false }) => 
   return (
     <button
       onClick={handleBack}
-      className={`p-2 rounded-full bg-white shadow-md hover:bg-gray-100 transition-transform duration-150 ${
-        isClicked ? 'scale-90' : 'scale-100'
-      }`}
+      className={`p-2 rounded-full bg-black/30 backdrop-blur-md shadow-lg
+        hover:bg-black/40 transition-all duration-200
+        ${isClicked ? 'scale-90' : 'scale-100'}`}
     >
-      <ArrowLeft size={24} />
+      <ArrowLeft size={24} className="text-white" />
     </button>
   );
 };

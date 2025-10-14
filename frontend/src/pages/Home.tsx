@@ -38,12 +38,7 @@ const Home = () => {
   }, []);
 
   return (
-    <div
-      className="min-h-screen p-4 md:p-8 pb-20 md:pb-8 md:ml-[18rem] mt-16 md:mt-24"
-      style={{
-        background: 'linear-gradient(135deg, #1D4ED8 0%, #10B981 100%)',
-      }}
-    >
+    <div className="min-h-screen p-4 md:p-8 pb-20 md:pb-8 md:ml-[18rem] mt-16 md:mt-24">
       <div className="flex flex-col gap-6">
         {nextEvent && (
           <div>

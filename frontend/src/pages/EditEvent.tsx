@@ -1,8 +1,10 @@
 // src/pages/EditEvent.tsx
 import { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import api from '../services/api';
 import Button from '../components/Button';
+import Navbar from '../components/Navbar';
+import BackArrow from '../components/BackArrow';
 
 interface Event {
   title: string;
@@ -14,6 +16,9 @@ interface Event {
 const EditEvent = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const location = useLocation();
+
+  const previousPage = location.state?.from || '/';
 
   const [eventData, setEventData] = useState<Event>({
     title: '',
@@ -70,62 +75,76 @@ const EditEvent = () => {
     }
   };
 
-  if (loading) return <p className="p-4 text-center">Loading...</p>;
+  if (loading) return <p className="p-4 text-center text-white">Loading...</p>;
 
   return (
-    <div className="p-4 md:p-8 max-w-2xl mx-auto flex flex-col gap-4">
-      <h1 className="text-2xl font-bold">Edit Event</h1>
-
-      {error && <p className="text-red-500">{error}</p>}
-      {success && <p className="text-green-500">{success}</p>}
-
-      <label className="flex flex-col gap-1">
-        Title
-        <input
-          type="text"
-          name="title"
-          value={eventData.title}
-          onChange={handleChange}
-          className="border rounded p-2"
-        />
-      </label>
-
-      <label className="flex flex-col gap-1">
-        Description
-        <textarea
-          name="description"
-          value={eventData.description || ''}
-          onChange={handleChange}
-          className="border rounded p-2"
-        />
-      </label>
-
-      <label className="flex flex-col gap-1">
-        Date
-        <input
-          type="datetime-local"
-          name="event_date"
-          value={eventData.event_date}
-          onChange={handleChange}
-          className="border rounded p-2"
-        />
-      </label>
-
-      <label className="flex flex-col gap-1">
-        Location
-        <input
-          type="text"
-          name="location"
-          value={eventData.location || ''}
-          onChange={handleChange}
-          className="border rounded p-2"
-        />
-      </label>
-
-      <div className="flex gap-4 mt-4">
-        <Button variant="primary" onClick={handleUpdate}>Update Event</Button>
-        <Button variant="secondary" onClick={handleDelete} className="bg-red-500 hover:bg-red-600 text-white">Delete Event</Button>
+    <div className="p-3 md:p-8 pb-24 md:pb-8 md:ml-[18rem] mt-14 md:mt-24 relative">
+      {/* BackArrow Mobile */}
+      <div className="md:hidden absolute top-4 left-4 z-10">
+        <BackArrow to={previousPage} animateOnClick />
       </div>
+
+      {/* Header */}
+      <div className="hidden md:flex items-center gap-4 mb-6">
+        <BackArrow to={previousPage} animateOnClick />
+        <h1 className="text-3xl font-bold text-white">Edit Event</h1>
+      </div>
+      <h1 className="md:hidden text-2xl font-bold mb-4 text-center text-white">Edit Event</h1>
+
+      <div className="max-w-2xl mx-auto flex flex-col gap-4">
+        {error && <p className="text-red-500">{error}</p>}
+        {success && <p className="text-green-500">{success}</p>}
+
+        <label className="flex flex-col gap-1">
+          Title
+          <input
+            type="text"
+            name="title"
+            value={eventData.title}
+            onChange={handleChange}
+            className="border rounded p-2"
+          />
+        </label>
+
+        <label className="flex flex-col gap-1">
+          Description
+          <textarea
+            name="description"
+            value={eventData.description || ''}
+            onChange={handleChange}
+            className="border rounded p-2"
+          />
+        </label>
+
+        <label className="flex flex-col gap-1">
+          Date
+          <input
+            type="datetime-local"
+            name="event_date"
+            value={eventData.event_date}
+            onChange={handleChange}
+            className="border rounded p-2"
+          />
+        </label>
+
+        <label className="flex flex-col gap-1">
+          Location
+          <input
+            type="text"
+            name="location"
+            value={eventData.location || ''}
+            onChange={handleChange}
+            className="border rounded p-2"
+          />
+        </label>
+
+        <div className="flex gap-4 mt-4">
+          <Button variant="primary" onClick={handleUpdate}>Update Event</Button>
+          <Button variant="secondary" onClick={handleDelete} className="bg-red-500 hover:bg-red-600 text-white">Delete Event</Button>
+        </div>
+      </div>
+
+      <Navbar />
     </div>
   );
 };

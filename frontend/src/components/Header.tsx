@@ -7,17 +7,16 @@ const Header = () => {
   const handleLogout = async () => {
     try {
       await signOut();
-      // redirecionamento feito no componente que chama signOut, se necessário
     } catch (err) {
-      console.error('Erro ao encerrar sessão:', err);
+      console.error('Error signing out:', err);
     }
   };
 
   return (
-    <header className="fixed top-0 left-0 w-full bg-white shadow-md p-4 flex justify-between items-center z-10">
-      {/* Ícone de perfil */}
+    <header className="fixed top-0 left-0 w-full bg-transparent shadow-none p-4 flex justify-between items-center z-10">
+
       {user ? (
-        <Link to="/profile/edit" className="text-gray-600 hover:text-blue-500">
+        <Link to="/profile/edit" className="text-white hover:text-gray-200 transition-colors">
           <svg
             xmlns="http://www.w3.org/2000/svg"
             className="h-6 w-6"
@@ -35,17 +34,17 @@ const Header = () => {
           </svg>
         </Link>
       ) : (
-        <div className="w-6" /> // mantém alinhamento quando não há user
+        <div className="w-6" />
       )}
 
-      {/* Nome do app */}
-      <h1 className="text-xl font-bold">PulseHub</h1>
 
-      {/* Botão de logout */}
+      <h1 className="text-white text-xl sm:text-2xl font-bold">PulseHub</h1>
+
+
       {user ? (
         <button
           onClick={handleLogout}
-          className="text-gray-600 hover:text-red-500 cursor-pointer"
+          className="text-white hover:text-gray-200 transition-colors cursor-pointer"
           aria-label="Logout"
         >
           <svg
