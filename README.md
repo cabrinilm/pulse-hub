@@ -25,11 +25,10 @@ The local setup runs the backend on `http://localhost:3001` and frontend on `htt
 - **Optional**: Vercel CLI (`npm i -g vercel`) for local emulation; Jest for running tests.
 
 Verify Node/npm:
-
+```bash
 node --version  # Should be >=18
 npm --version   # Should be >=9
 
-## Project Structure
 
 pulse-hub/
 ├── backend/          # Node.js/Express/TypeScript API
@@ -46,6 +45,7 @@ pulse-hub/
 ├── .gitignore
 └── README.md
 
+```
 
 ## Setup Environment Variables
 
