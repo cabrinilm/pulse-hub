@@ -10,7 +10,6 @@ interface Event {
   title: string;
   description: string | null;
   event_date: string;
-  // Outros campos
 }
 
 const Home = () => {
@@ -30,7 +29,7 @@ const Home = () => {
             new Date(a.event_date).getTime() - new Date(b.event_date).getTime()
         );
         setNextEvent(sortedEvents[0] || null);
-        setEvents(sortedEvents.slice(1, 3)); // apenas 2 eventos depois do nextEvent
+        setEvents(sortedEvents.slice(1, 3));
       } catch (err) {
         console.error('Error fetching events:', err);
       }
@@ -39,11 +38,16 @@ const Home = () => {
   }, []);
 
   return (
-    <div className="p-4 md:p-8 pb-20 md:pb-8 md:ml-[18rem] mt-16 md:mt-24">
+    <div
+      className="min-h-screen p-4 md:p-8 pb-20 md:pb-8 md:ml-[18rem] mt-16 md:mt-24"
+      style={{
+        background: 'linear-gradient(135deg, #1D4ED8 0%, #10B981 100%)',
+      }}
+    >
       <div className="flex flex-col gap-6">
         {nextEvent && (
           <div>
-            <h2 className="text-lg font-semibold mb-2">Next Event</h2>
+            <h2 className="text-lg font-semibold mb-2 text-white">Next Event</h2>
             <Card
               title={nextEvent.title}
               date={nextEvent.event_date}
@@ -56,7 +60,7 @@ const Home = () => {
 
         {events.length > 0 && (
           <div>
-            <h2 className="text-lg font-semibold mb-2">Upcoming Events</h2>
+            <h2 className="text-lg font-semibold mb-2 text-white">Upcoming Events</h2>
             <div className="flex flex-col gap-4">
               {events.map((event) => (
                 <Card
