@@ -4,7 +4,7 @@ import { motion } from 'framer-motion';
 import api from '../services/api';
 import Button from '../components/Button';
 import Navbar from '../components/Navbar';
-// import { useAuth } from '../hooks/useAuth';
+import { useAuth } from '../hooks/useAuth';
 import BackArrow from '../components/BackArrow';
 import LoadingOverlay from '../components/LoadingOverlay';
 
@@ -14,9 +14,8 @@ interface Profile {
 }
 
 const ProfileEdit = () => {
-  // useAuth(); // apenas para garantir contexto, não usado diretamente
+  useAuth();
   const location = useLocation();
-  const [profile, setProfile] = useState<Profile | null>(null);
   const [username, setUsername] = useState('');
   const [full_name, setFullName] = useState('');
   const [isLoading, setIsLoading] = useState(true);
@@ -30,7 +29,6 @@ const ProfileEdit = () => {
       try {
         setIsLoading(true);
         const res = await api.get<Profile>('/profile');
-        setProfile(res.data);
         setUsername(res.data.username || '');
         setFullName(res.data.full_name || '');
       } catch (err: any) {
@@ -49,7 +47,6 @@ const ProfileEdit = () => {
       const updates = { username, full_name };
       await api.patch('/profile', updates);
       setMessage({ type: 'success', text: 'Profile updated successfully!' });
-      setProfile({ username, full_name });
     } catch (err: any) {
   
       const errorMsg = err.response?.data?.error?.toLowerCase() || '';
