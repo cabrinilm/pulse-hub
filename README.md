@@ -54,7 +54,7 @@ Copy `.env.example` to `.env` in both `backend/` and `frontend/` (create separat
 ### Backend `.env` (in `backend/`)
 
 Required for Supabase, Google OAuth, and local redirects:
-
+```bash
 SUPABASE_URL=your_supabase_project_url
 SUPABASE_ANON_KEY=your_supabase_anon_key
 GOOGLE_CLIENT_ID=your_google_client_id
@@ -63,15 +63,18 @@ GOOGLE_REDIRECT_URI=http://localhost:3001/api/google-calendar/callback
 FRONTEND_URL=http://localhost:3000
 
 
+```
+
+
 
 ### Frontend `.env` (in `frontend/` – prefixed with `VITE_` for Vite)
-
+```bash
 VITE_SUPABASE_URL=your_supabase_project_url
 VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
 VITE_GOOGLE_CLIENT_ID=your_google_client_id
 VITE_API_URL=http://localhost:3001
 
-
+```
 
 **Notes**:
 - Use `http://localhost:3001` for backend API in local dev.
