@@ -162,9 +162,11 @@ VITE_API_URL=http://localhost:3001
 
 
 ## Running Tests (Backend)
+```bash
+cd backend
+npm test
 
--cd backend
--npm test
+```
 
 
 
