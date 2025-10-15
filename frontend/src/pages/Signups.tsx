@@ -93,27 +93,22 @@ const Signups = () => {
               onClick={() => navigate(`/events/${signup.event_id}`, { state: { from: location.pathname } })}
             />
 
-         
             <div className="flex justify-end mt-2 md:mt-0">
-              <button
-                onClick={() =>
-                  AddToCalendarButton({
-                    event: {
-                      title: signup.events.title,
-                      description: signup.events.description || '',
-                      date: signup.events.event_date,
-                      time: signup.events.time || '',
-                      location: signup.events.location || '',
-                    },
-                    isVisible: true,
-                    isLoading: false,
-                  })
-                }
+              <AddToCalendarButton
+                event={{
+                  title: signup.events.title,
+                  description: signup.events.description || '',
+                  date: signup.events.event_date,
+                  time: signup.events.time || '',
+                  location: signup.events.location || '',
+                }}
+                isVisible={true}
+                isLoading={false}
                 className="flex items-center gap-2 text-white bg-teal-500 hover:bg-teal-600 px-3 py-1 rounded-md transition-colors duration-200"
               >
                 <CalendarPlus size={18} />
-                <span className="hidden md:inline">Add to Calendar</span>
-              </button>
+                Add to Calendar
+              </AddToCalendarButton>
             </div>
           </div>
         ))}

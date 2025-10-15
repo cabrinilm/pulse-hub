@@ -1,5 +1,6 @@
 // src/components/AddToCalendarButton.tsx
 import Button from "./Button";
+import type { ReactNode } from "react";
 
 interface AddToCalendarButtonProps {
   event: {
@@ -11,15 +12,22 @@ interface AddToCalendarButtonProps {
   };
   isVisible: boolean;
   isLoading?: boolean;
-  className?: string; 
+  className?: string;
+  children?: ReactNode;
 }
 
-const AddToCalendarButton = ({ event, isVisible, isLoading = false }: AddToCalendarButtonProps) => {
+const AddToCalendarButton = ({ 
+  event, 
+  isVisible, 
+  isLoading = false, 
+  children,
+  className 
+}: AddToCalendarButtonProps) => {
   if (!isVisible) return null;
 
   const handleGoogleAuth = () => {
     const clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID;
-    const redirectUri = "http://localhost:3000/api/google-calendar/callback";
+    const redirectUri = `${window.location.origin}/api/google-calendar/callback`;  // Dinâmico: usa o domínio atual
     const scope = "https://www.googleapis.com/auth/calendar.events";
     const responseType = "code";
 
@@ -33,11 +41,11 @@ const AddToCalendarButton = ({ event, isVisible, isLoading = false }: AddToCalen
   return (
     <Button
       variant="primary"
-      className="mt-3 md:mt-0 md:ml-4 px-4 py-2 text-sm sm:text-base"
+      className={`mt-3 md:mt-0 md:ml-4 px-4 py-2 text-sm sm:text-base ${className || ''}`}
       onClick={handleGoogleAuth}
       disabled={isLoading}
     >
-      {isLoading ? "Adding..." : "Add to Google Calendar"}
+      {children || (isLoading ? "Adding..." : "Add to Google Calendar")}
     </Button>
   );
 };
