@@ -22,7 +22,7 @@ function App() {
         <Routes>
           
           <Route path="/login" element={<Login />} />
-          <Route path="/auth/callback" element={<GoogleAuthCallback />} /> {/* 👈 nova rota */}
+          <Route path="/auth/callback" element={<GoogleAuthCallback />} /> 
 
      
           <Route path="/" element={<PrivateRoute><Layout><Home /></Layout></PrivateRoute>} />

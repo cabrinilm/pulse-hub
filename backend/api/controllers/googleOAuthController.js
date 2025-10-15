@@ -22,18 +22,19 @@ async function handleGoogleCallback(req, res) {
     const createdEvent = await (0,
     googleCalendarService_1.addEventToGoogleCalendar)(accessToken, event);
 
-    const frontendUrl = "http://localhost:5173/google-callback";
+    const frontendUrl = process.env.FRONTEND_URL || "http://localhost:5173";
     return res.redirect(
-      `${frontendUrl}?message=${encodeURIComponent("Event successfully added to Google Calendar!")}&eventLink=${encodeURIComponent(createdEvent.htmlLink || "")}`
+      `${frontendUrl}/google-callback?message=${encodeURIComponent("Event successfully added to Google Calendar!")}&eventLink=${encodeURIComponent(createdEvent.htmlLink || "")}`
     );
   } catch (err) {
     console.error(
       "Google OAuth Controller Error:",
       err.response?.data || err.message
     );
-    const frontendUrl = "http://localhost:5173/google-callback";
+  
+    const frontendUrl = process.env.FRONTEND_URL || "http://localhost:5173";
     return res.redirect(
-      `${frontendUrl}?error=${encodeURIComponent("Failed to add event to Google Calendar: " + err.message)}`
+      `${frontendUrl}/google-callback?error=${encodeURIComponent("Failed to add event to Google Calendar: " + err.message)}`
     );
   }
 }
