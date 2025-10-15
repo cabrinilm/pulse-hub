@@ -1,4 +1,3 @@
-// src/components/AuthButton.tsx
 import React from "react";
 
 interface AuthButtonProps {

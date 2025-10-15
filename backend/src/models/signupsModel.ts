@@ -1,4 +1,3 @@
-// src/models/signupsModel.ts
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { Database } from "../types/supabase";
 

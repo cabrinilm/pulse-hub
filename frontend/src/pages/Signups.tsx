@@ -1,4 +1,3 @@
-// src/pages/Signups.tsx
 import { useEffect, useState, useCallback } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import api from '../services/api';

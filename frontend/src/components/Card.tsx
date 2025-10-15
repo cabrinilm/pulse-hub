@@ -1,4 +1,3 @@
-// src/components/Card.tsx
 import { Calendar, MapPin, Users } from "lucide-react";
 import AuthButton from "./AuthButton";
 

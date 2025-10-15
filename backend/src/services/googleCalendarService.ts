@@ -1,4 +1,3 @@
-// src/services/googleCalendarService.ts
 import { google } from "googleapis";
 
 interface EventData {

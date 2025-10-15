@@ -1,4 +1,3 @@
-// src/controllers/googleOAuthController.ts
 import type { Request, Response } from "express";
 import { google } from "googleapis";
 import { addEventToGoogleCalendar } from "../services/googleCalendarService";

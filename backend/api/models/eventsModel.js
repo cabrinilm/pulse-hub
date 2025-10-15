@@ -1,5 +1,4 @@
 "use strict";
-// src/models/eventsModel.ts
 Object.defineProperty(exports, "__esModule", { value: true });
 class EventsModel {
     async createEvent(supabase, creator_id, event) {

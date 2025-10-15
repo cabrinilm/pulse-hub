@@ -1,4 +1,3 @@
-// src/components/AddToCalendarButton.tsx
 import Button from "./Button";
 import { CalendarPlus } from 'lucide-react';
 import type { ReactNode } from "react";

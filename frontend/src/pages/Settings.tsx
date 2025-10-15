@@ -1,4 +1,3 @@
-// src/pages/Settings.tsx
 import { useNavigate, useLocation } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import AuthButton from '../components/AuthButton';

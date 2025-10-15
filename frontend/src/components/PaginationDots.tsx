@@ -1,4 +1,3 @@
-// src/components/PaginationDots.tsx
 interface PaginationDotsProps {
     totalPages: number;
     currentPage: number;

@@ -1,4 +1,3 @@
-
 import type { Request, Response } from 'express';
 import profilesModel from '../models/profilesModel';
 
