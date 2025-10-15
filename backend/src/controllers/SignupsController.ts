@@ -61,7 +61,7 @@ class signupsController {
       const supabase = req.supabase;
       const creator_id = req.user?.id;
       const { event_id } = req.params;
-      const { username } = req.body;  // Username enviado pelo creator
+      const { username } = req.body;  
   
       if (!supabase) {
         res.status(500).json({ error: "Supabase client not found in request" });

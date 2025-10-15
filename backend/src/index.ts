@@ -14,27 +14,22 @@ dotenv.config();
 
 const app = express();
 
-// Configuração CORS
 const corsOptions = {
-  origin: "*", // Para testar, permite qualquer origem
+  origin: "*",
   methods: ["GET", "POST", "PATCH", "DELETE", "OPTIONS"],
   allowedHeaders: ["Content-Type", "Authorization"],
 };
 
-// Preflight (OPTIONS) para todas as rotas
 app.options("*", cors(corsOptions));
 
-// Aplicar CORS em todas as rotas
 app.use(cors(corsOptions));
 app.use(express.json());
 
-// Middleware para lidar com preflight em Vercel
 app.use((req: Request, _res: Response, next: NextFunction) => {
-  if (req.method === "OPTIONS") return next(); 
+  if (req.method === "OPTIONS") return next();
   next();
 });
 
-// Rota de teste
 app.get("/api", (_req, res) => {
   res.json({ message: "PulseHub Backend" });
 });
@@ -52,21 +47,48 @@ app.delete("/api/profile", authMiddleware, profilesController.deleteProfile);
 app.post("/api/events", authMiddleware, eventsController.createEvent);
 app.get("/api/events", authMiddleware, eventsController.listEvents);
 app.get("/api/events/:event_id", authMiddleware, eventsController.getEventById);
-app.patch("/api/events/:event_id", authMiddleware, eventsController.updateEvent);
-app.delete("/api/events/:event_id", authMiddleware, eventsController.deleteEvent);
+app.patch(
+  "/api/events/:event_id",
+  authMiddleware,
+  eventsController.updateEvent
+);
+app.delete(
+  "/api/events/:event_id",
+  authMiddleware,
+  eventsController.deleteEvent
+);
 
 // Signups routes
-app.post("/api/events/:event_id/signups", authMiddleware, signupsController.createSignup);
-app.post("/api/events/:event_id/add-user", authMiddleware, signupsController.addUserToEvent);
+app.post(
+  "/api/events/:event_id/signups",
+  authMiddleware,
+  signupsController.createSignup
+);
+app.post(
+  "/api/events/:event_id/add-user",
+  authMiddleware,
+  signupsController.addUserToEvent
+);
 app.get("/api/signups", authMiddleware, signupsController.listSignups);
-app.get("/api/events/:event_id/signups", authMiddleware, signupsController.listEventSignups);
-app.patch("/api/events/:event_id/signups", authMiddleware, signupsController.updateSignup);
-app.delete("/api/events/:event_id/signups", authMiddleware, signupsController.deleteSignup);
+app.get(
+  "/api/events/:event_id/signups",
+  authMiddleware,
+  signupsController.listEventSignups
+);
+app.patch(
+  "/api/events/:event_id/signups",
+  authMiddleware,
+  signupsController.updateSignup
+);
+app.delete(
+  "/api/events/:event_id/signups",
+  authMiddleware,
+  signupsController.deleteSignup
+);
 
 // Google Calendar route
 app.get("/api/google-calendar/callback", handleGoogleCallback);
 
-// Iniciar servidor
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`✅ Backend running on port ${PORT}`);

@@ -1,7 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 class ProfilesModel {
-    // cria profile
+    // profile
     async createProfile(supabase, user_id, profile) {
         const { username, full_name, avatar } = profile;
         const { data, error } = await supabase
@@ -27,7 +27,7 @@ class ProfilesModel {
         }
         return data;
     }
-    // retorna profile pelo user_id
+    // get 
     async getProfile(supabase, user_id) {
         const { data, error } = await supabase
             .from("profiles")
@@ -59,7 +59,7 @@ class ProfilesModel {
         }
         return data;
     }
-    // deleta profile
+    // delete
     async deleteProfile(supabase, user_id) {
         const { error } = await supabase
             .from("profiles")

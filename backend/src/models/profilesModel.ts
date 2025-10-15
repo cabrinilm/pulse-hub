@@ -14,7 +14,7 @@ interface Profile extends ProfileInput {
 }
 
 class ProfilesModel {
-  // cria profile
+  //  profile
   async createProfile(
     supabase: SupabaseClient<Database>,
     user_id: string,
@@ -49,7 +49,7 @@ class ProfilesModel {
     return data as Profile;
   }
 
-  // retorna profile pelo user_id
+  // get 
   async getProfile(
     supabase: SupabaseClient<Database>,
     user_id: string
@@ -97,7 +97,7 @@ class ProfilesModel {
     return data as Profile;
   }
 
-  // deleta profile
+  // deleta 
   async deleteProfile(
     supabase: SupabaseClient<Database>,
     user_id: string
