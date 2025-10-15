@@ -27,8 +27,8 @@ const AddToCalendarButton = ({
 
   const handleGoogleAuth = () => {
    const clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID;
-  const backendUrl = import.meta.env.VITE_API_URL;
-  const redirectUri = `${backendUrl}/api/google-calendar/callback`;  
+   const backendUrl = import.meta.env.VITE_API_URL.replace(/\/$/, ""); 
+   const redirectUri = `${backendUrl}/api/google-calendar/callback`;
   const scope = "https://www.googleapis.com/auth/calendar.events";
   const responseType = "code";
 
