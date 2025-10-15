@@ -27,18 +27,16 @@ const AddToCalendarButton = ({
 
   const handleGoogleAuth = () => {
     const clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID;
-    const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3000/api';  
-    const redirectUri = `${apiUrl}/google-calendar/callback`;  
-    const scope = "https://www.googleapis.com/auth/calendar.events";
-    const responseType = "code";
+  const backendUrl = import.meta.env.VITE_BACKEND_URL || 'http://localhost:3000'; 
+  const redirectUri = `${backendUrl}/api/google-calendar/callback`;  
+  const scope = "https://www.googleapis.com/auth/calendar.events";
+  const responseType = "code";
 
-    const normalizedEvent = { ...event, time: event.time || "09:00" };
-    const state = encodeURIComponent(JSON.stringify(normalizedEvent));
+  const normalizedEvent = { ...event, time: event.time || "09:00" };
+  const state = encodeURIComponent(JSON.stringify(normalizedEvent));
 
-    const authUrl = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${clientId}&redirect_uri=${redirectUri}&response_type=${responseType}&scope=${scope}&access_type=offline&prompt=consent&state=${state}`;
-    
-  
-    window.location.href = authUrl;
+  const authUrl = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${clientId}&redirect_uri=${redirectUri}&response_type=${responseType}&scope=${scope}&access_type=offline&prompt=consent&state=${state}`;
+  window.location.href = authUrl;
   };
 
   const defaultContent = (
