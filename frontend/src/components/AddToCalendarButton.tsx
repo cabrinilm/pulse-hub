@@ -1,5 +1,6 @@
 // src/components/AddToCalendarButton.tsx
 import Button from "./Button";
+import { CalendarPlus } from 'lucide-react';
 import type { ReactNode } from "react";
 
 interface AddToCalendarButtonProps {
@@ -27,7 +28,7 @@ const AddToCalendarButton = ({
 
   const handleGoogleAuth = () => {
     const clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID;
-    const redirectUri = `${window.location.origin}/api/google-calendar/callback`;  // Dinâmico: usa o domínio atual
+    const redirectUri = `${window.location.origin}/api/google-calendar/callback`; 
     const scope = "https://www.googleapis.com/auth/calendar.events";
     const responseType = "code";
 
@@ -38,14 +39,22 @@ const AddToCalendarButton = ({
     window.location.href = authUrl;
   };
 
+ 
+  const defaultContent = (
+    <>
+      <CalendarPlus size={18} />
+      <span className="hidden md:inline">Add to Calendar</span>
+    </>
+  );
+
   return (
     <Button
       variant="primary"
-      className={`mt-3 md:mt-0 md:ml-4 px-4 py-2 text-sm sm:text-base ${className || ''}`}
+      className={`flex items-center gap-2 text-white bg-teal-500 hover:bg-teal-600 px-3 py-1 rounded-md transition-colors duration-200 ${className || ''}`}
       onClick={handleGoogleAuth}
       disabled={isLoading}
     >
-      {children || (isLoading ? "Adding..." : "Add to Google Calendar")}
+      {children || defaultContent || (isLoading ? "Adding..." : "Add to Google Calendar")}
     </Button>
   );
 };
