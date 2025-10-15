@@ -17,24 +17,24 @@ const googleOAuthController_1 = require("./controllers/googleOAuthController");
 dotenv_1.default.config();
 const app = (0, express_1.default)();
 exports.app = app;
-// Configuração CORS
+
 const corsOptions = {
-    origin: "*", // Para testar, permite qualquer origem
+    origin: "*", 
     methods: ["GET", "POST", "PATCH", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
 };
-// Preflight (OPTIONS) para todas as rotas
+
 app.options("*", (0, cors_1.default)(corsOptions));
-// Aplicar CORS em todas as rotas
+
 app.use((0, cors_1.default)(corsOptions));
 app.use(express_1.default.json());
-// Middleware para lidar com preflight em Vercel
+
 app.use((req, _res, next) => {
     if (req.method === "OPTIONS")
         return next();
     next();
 });
-// Rota de teste
+
 app.get("/api", (_req, res) => {
     res.json({ message: "PulseHub Backend" });
 });
@@ -60,7 +60,7 @@ app.patch("/api/events/:event_id/signups", auth_1.authMiddleware, signupsControl
 app.delete("/api/events/:event_id/signups", auth_1.authMiddleware, signupsController_1.default.deleteSignup);
 // Google Calendar route
 app.get("/api/google-calendar/callback", googleOAuthController_1.handleGoogleCallback);
-// Iniciar servidor
+
 // const PORT = process.env.PORT || 3000;
 // app.listen(PORT, () => {
 //     console.log(`✅ Backend running on port ${PORT}`);
