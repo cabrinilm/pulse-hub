@@ -52,7 +52,7 @@ const EventDetails = () => {
   const fetchEventAndSignup = async () => {
     if (!user) return;
     try {
-      setLoading(true); // loading apenas na requisição inicial
+      setLoading(true); 
       const eventRes = await api.get<Event>(`/events/${id}`);
       setEvent(eventRes.data);
 

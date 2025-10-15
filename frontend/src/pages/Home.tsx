@@ -10,6 +10,7 @@ interface Event {
   title: string;
   description: string | null;
   event_date: string;
+  location: string;
 }
 
 const Home = () => {
@@ -46,7 +47,7 @@ const Home = () => {
             <Card
               title={nextEvent.title}
               date={nextEvent.event_date}
-              location=""
+              location={nextEvent.location}
               signup_count={0}
               onClick={() => navigate(`/events/${nextEvent.id}`)}
             />
@@ -62,7 +63,7 @@ const Home = () => {
                   key={event.id}
                   title={event.title}
                   date={event.event_date}
-                  location=""
+                  location={event.location}
                   signup_count={0}
                   onClick={() => navigate(`/events/${event.id}`)}
                 />

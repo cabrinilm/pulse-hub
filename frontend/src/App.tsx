@@ -20,22 +20,21 @@ function App() {
     <AuthProvider>
       <Router>
         <Routes>
-          {/* Rotas públicas */}
+          
           <Route path="/login" element={<Login />} />
           <Route path="/auth/callback" element={<GoogleAuthCallback />} /> {/* 👈 nova rota */}
 
-          {/* Rotas privadas */}
+     
           <Route path="/" element={<PrivateRoute><Layout><Home /></Layout></PrivateRoute>} />
           <Route path="/events" element={<PrivateRoute><Layout><Events /></Layout></PrivateRoute>} />
           <Route path="/signups" element={<PrivateRoute><Layout><Signups /></Layout></PrivateRoute>} />
           <Route path="/my-events" element={<PrivateRoute><Layout><MyEvents /></Layout></PrivateRoute>} />
           <Route path="/settings" element={<PrivateRoute><Layout><Settings /></Layout></PrivateRoute>} />
 
-          {/* Detalhes e edição de evento */}
           <Route path="/events/:id" element={<PrivateRoute><Layout><EventDetails /></Layout></PrivateRoute>} />
           <Route path="/events/edit/:id" element={<PrivateRoute><Layout><EditEvent /></Layout></PrivateRoute>} />
 
-          {/* Criar novo evento */}
+    
           <Route path="/events/create" element={<PrivateRoute><Layout><CreateEvent /></Layout></PrivateRoute>} />
 
           <Route path="/profile/edit" element={<PrivateRoute><Layout><ProfileEdit /></Layout></PrivateRoute>} />
