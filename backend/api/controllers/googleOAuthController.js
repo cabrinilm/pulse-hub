@@ -38,3 +38,5 @@ async function handleGoogleCallback(req, res) {
     );
   }
 }
+
+module.exports = { handleGoogleCallback };
