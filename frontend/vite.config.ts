@@ -6,9 +6,9 @@ export default defineConfig({
   server: {
     proxy: {
       '/api': {
-        target: 'http://localhost:3000',  // Port do backend
+        target: 'http://localhost:3000',  
         changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/api/, '/api')  // Mantém /api
+        rewrite: (path) => path.replace(/^\/api/, '/api')  
       },
     },
   },
