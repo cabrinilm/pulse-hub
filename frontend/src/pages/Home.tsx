@@ -9,7 +9,8 @@ interface Event {
   title: string;
   description: string | null;
   event_date: string;
-  location: string;
+  location: string | null;
+  signup_count?: number; 
 }
 
 const Home = () => {
@@ -20,20 +21,33 @@ const Home = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const res = await api.get('/events');
-        const eventData = res.data?.data || res.data || [];
-        if (!Array.isArray(eventData)) return;
+        const res = await api.get<Event[]>('/events');
+        const eventData = res.data;
 
-        const sortedEvents = eventData.sort(
-          (a: Event, b: Event) =>
-            new Date(a.event_date).getTime() - new Date(b.event_date).getTime()
+        
+        const eventsWithSignups = await Promise.all(
+          eventData.map(async (event) => {
+            try {
+              const statsRes = await api.get(`/events/${event.id}/signups`);
+              return { ...event, signup_count: statsRes.data.signup_count };
+            } catch {
+              return { ...event, signup_count: 0 };
+            }
+          })
         );
+
+      
+        const sortedEvents = eventsWithSignups.sort(
+          (a, b) => new Date(a.event_date).getTime() - new Date(b.event_date).getTime()
+        );
+
         setNextEvent(sortedEvents[0] || null);
         setEvents(sortedEvents.slice(1, 3));
       } catch (err) {
         console.error('Error fetching events:', err);
       }
     };
+
     fetchData();
   }, []);
 
@@ -47,7 +61,7 @@ const Home = () => {
               title={nextEvent.title}
               date={nextEvent.event_date}
               location={nextEvent.location}
-              signup_count={0}
+              signup_count={nextEvent.signup_count || 0}
               onClick={() => navigate(`/events/${nextEvent.id}`)}
             />
           </div>
@@ -63,7 +77,7 @@ const Home = () => {
                   title={event.title}
                   date={event.event_date}
                   location={event.location}
-                  signup_count={0}
+                  signup_count={event.signup_count || 0}
                   onClick={() => navigate(`/events/${event.id}`)}
                 />
               ))}
