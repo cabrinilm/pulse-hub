@@ -9,7 +9,7 @@ Pulse Hub is a full-stack application for managing events, profiles, and signups
 - **Database/Auth**: Supabase (PostgreSQL + Auth).
 - **Key Features**: User login, event creation/listing, profile management, Google OAuth for calendar sync.
 
-The local setup runs the backend on `http://localhost:3001` and frontend on `http://localhost:3000`.
+The local setup runs the backend on `http://localhost:3000` and frontend on `http://localhost:5173`.
 
 ---
 
@@ -73,9 +73,9 @@ npm install
 
 ```
 
-### Start backend server (default port: 3001)
+### Start backend server (default port: 3000)
 ```bash
-npm run dev
+npm run build && npm start
 
 ```
 
@@ -105,7 +105,7 @@ SUPABASE_ANON_KEY=your_supabase_anon_key
 GOOGLE_CLIENT_ID=your_google_client_id
 GOOGLE_CLIENT_SECRET=your_google_client_secret
 GOOGLE_REDIRECT_URI=http://localhost:3001/api/google-calendar/callback
-FRONTEND_URL=http://localhost:3000
+FRONTEND_URL=http://localhost:5173
 
 
 ```
@@ -117,7 +117,7 @@ FRONTEND_URL=http://localhost:3000
 VITE_SUPABASE_URL=your_supabase_project_url
 VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
 VITE_GOOGLE_CLIENT_ID=your_google_client_id
-VITE_API_URL=http://localhost:3001
+VITE_API_URL=http://localhost:3000
 
 ```
 
