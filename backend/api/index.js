@@ -60,7 +60,7 @@ app.get("/api/events/:event_id/signups", auth_1.authMiddleware, signupsControlle
 app.patch("/api/events/:event_id/signups", auth_1.authMiddleware, signupsController_1.default.updateSignup);
 app.delete("/api/events/:event_id/signups", auth_1.authMiddleware, signupsController_1.default.deleteSignup);
 // Google Calendar route
-app.get("/api/google-calendar/callback", handleGoogleCallback);
+// app.get("/api/google-calendar/callback", handleGoogleCallback);
 
 
 // const PORT = process.env.PORT || 3000;
