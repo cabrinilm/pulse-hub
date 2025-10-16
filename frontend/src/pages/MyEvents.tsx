@@ -36,7 +36,19 @@ const MyEvents = () => {
         setLoading(true);
         const res = await api.get<Event[]>('/events');
         const myEvents = res.data.filter(event => event.creator_id === user.id);
-        setEvents(myEvents);
+
+        const eventsWithCount = await Promise.all(
+          myEvents.map(async (event) => {
+            try {
+              const statsRes = await api.get(`/events/${event.id}/signups`);
+              return { ...event, signup_count: statsRes.data.signup_count };
+            } catch {
+              return { ...event, signup_count: 0 };
+            }
+          })
+        );
+
+        setEvents(eventsWithCount);
       } catch (err) {
         console.error('Error fetching my events:', err);
       } finally {
@@ -56,18 +68,15 @@ const MyEvents = () => {
 
   return (
     <div className="p-4 md:p-8 md:ml-[18rem] mt-14 md:mt-24 relative">
-      {/* BackArrow Mobile */}
       <div className="md:hidden absolute top-4 left-4 z-10">
         <BackArrow to={previousPage} animateOnClick />
       </div>
 
-      {/* Header — Desktop */}
       <div className="hidden md:flex items-center gap-4 mb-6">
         <BackArrow to={previousPage} animateOnClick />
         <h1 className="text-3xl font-bold text-white">My Events</h1>
       </div>
 
-      {/* Header — Mobile */}
       <h1 className="md:hidden text-2xl font-bold mb-4 text-center text-white">My Events</h1>
 
       <div className="flex flex-col gap-4">
@@ -88,7 +97,6 @@ const MyEvents = () => {
         )}
       </div>
 
-     
       <div className="mt-6 flex justify-center md:justify-start">
         <Button
           onClick={() => navigate('/events/create', { state: { from: location.pathname } })}

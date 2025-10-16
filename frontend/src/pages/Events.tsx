@@ -1,11 +1,11 @@
-import { useEffect, useState, useCallback } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
-import api from '../services/api';
-import Card from '../components/Card';
-import Navbar from '../components/Navbar';
-import PaginationDots from '../components/PaginationDots';
-import { useSwipeable } from 'react-swipeable';
-import BackArrow from '../components/BackArrow';
+import { useEffect, useState, useCallback } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
+import api from "../services/api";
+import Card from "../components/Card";
+import Navbar from "../components/Navbar";
+import PaginationDots from "../components/PaginationDots";
+import { useSwipeable } from "react-swipeable";
+import BackArrow from "../components/BackArrow";
 
 interface Event {
   id: string;
@@ -23,17 +23,31 @@ const Events = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const previousPage = location.state?.from || '/';
+  const previousPage = location.state?.from || "/";
 
   useEffect(() => {
     const fetchEvents = async () => {
       try {
-        const res = await api.get<Event[]>('/events');
-        setEvents(res.data || []);
+        const res = await api.get<Event[]>("/events");
+        const eventData = res.data || [];
+
+        const eventsWithSignups = await Promise.all(
+          eventData.map(async (event) => {
+            try {
+              const statsRes = await api.get(`/events/${event.id}/signups`);
+              return { ...event, signup_count: statsRes.data.signup_count };
+            } catch {
+              return { ...event, signup_count: 0 };
+            }
+          })
+        );
+
+        setEvents(eventsWithSignups);
       } catch (err) {
-        console.error('Error fetching events:', err);
+        console.error("Error fetching events:", err);
       }
     };
+
     fetchEvents();
   }, []);
 
@@ -46,7 +60,10 @@ const Events = () => {
     () => setCurrentPage((p) => Math.min(p + 1, totalPages)),
     [totalPages]
   );
-  const goPrev = useCallback(() => setCurrentPage((p) => Math.max(p - 1, 1)), []);
+  const goPrev = useCallback(
+    () => setCurrentPage((p) => Math.max(p - 1, 1)),
+    []
+  );
 
   const swipeHandlers = useSwipeable({
     onSwipedLeft: () => totalPages > 1 && goNext(),
@@ -82,15 +99,16 @@ const Events = () => {
             key={event.id}
             title={event.title}
             date={event.event_date}
-            location={event.location || ''}
+            location={event.location || ""}
             signup_count={event.signup_count || 0}
             onClick={() =>
-              navigate(`/events/${event.id}`, { state: { from: location.pathname } })
+              navigate(`/events/${event.id}`, {
+                state: { from: location.pathname },
+              })
             }
           />
         ))}
       </div>
-
 
       <div className="fixed bottom-4 left-0 w-full flex justify-center md:static md:mt-6">
         <PaginationDots
@@ -106,4 +124,3 @@ const Events = () => {
 };
 
 export default Events;
-

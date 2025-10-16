@@ -19,6 +19,7 @@ interface Signup {
     description?: string | null;
     time?: string | null;
   };
+  signup_count?: number;
 }
 
 const Signups = () => {
@@ -34,11 +35,25 @@ const Signups = () => {
     const fetchSignups = async () => {
       try {
         const res = await api.get<Signup[]>('/signups');
-        setSignups(res.data || []);
+        const signupsData = res.data || [];
+
+        const signupsWithCount = await Promise.all(
+          signupsData.map(async (signup) => {
+            try {
+              const statsRes = await api.get(`/events/${signup.event_id}/signups`);
+              return { ...signup, signup_count: statsRes.data.signup_count };
+            } catch {
+              return { ...signup, signup_count: 0 };
+            }
+          })
+        );
+
+        setSignups(signupsWithCount);
       } catch (err) {
         console.error('Error fetching signups:', err);
       }
     };
+
     fetchSignups();
   }, []);
 
@@ -64,13 +79,10 @@ const Signups = () => {
 
   return (
     <div className="p-3 md:p-8 pb-24 md:pb-8 md:ml-[18rem] mt-14 md:mt-24 relative">
-
-      {/* BackArrow Mobile */}
       <div className="md:hidden absolute top-4 left-4 z-10">
         <BackArrow to={previousPage} animateOnClick />
       </div>
 
-      {/* Header */}
       <div className="hidden md:flex items-center gap-4 mb-6">
         <BackArrow to={previousPage} animateOnClick />
         <h1 className="text-3xl font-bold text-white">My Signups</h1>
@@ -88,7 +100,7 @@ const Signups = () => {
               title={signup.events.title}
               date={signup.events.event_date}
               location={signup.events.location || ''}
-              signup_count={0}
+              signup_count={signup.signup_count || 0}
               onClick={() => navigate(`/events/${signup.event_id}`, { state: { from: location.pathname } })}
             />
 
