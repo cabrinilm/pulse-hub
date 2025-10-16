@@ -12,7 +12,7 @@ const AuthController_1 = __importDefault(require("./controllers/AuthController")
 const profileController_1 = __importDefault(require("./controllers/profileController"));
 const eventsController_1 = __importDefault(require("./controllers/eventsController"));
 const signupsController_1 = __importDefault(require("./controllers/signupsController"));
-const { handleGoogleCallback } = require("./controllers/googleOAuthController");
+// const { handleGoogleCallback } = require("./controllers/googleOAuthController");
 const auth_1 = require("./middleware/auth");
 // const googleOAuthController_1 = require("./controllers/googleOAuthController");
 dotenv_1.default.config();
