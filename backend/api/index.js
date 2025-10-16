@@ -12,7 +12,7 @@ const AuthController_1 = __importDefault(require("./controllers/AuthController")
 const profileController_1 = __importDefault(require("./controllers/profileController"));
 const eventsController_1 = __importDefault(require("./controllers/eventsController"));
 const signupsController_1 = __importDefault(require("./controllers/signupsController"));
-// const { handleGoogleCallback } = require("./controllers/googleOAuthController");
+const { handleGoogleCallback } = require("./controllers/googleOAuthController");
 const auth_1 = require("./middleware/auth");
 // const googleOAuthController_1 = require("./controllers/googleOAuthController");
 dotenv_1.default.config();
@@ -60,7 +60,7 @@ app.get("/api/events/:event_id/signups", auth_1.authMiddleware, signupsControlle
 app.patch("/api/events/:event_id/signups", auth_1.authMiddleware, signupsController_1.default.updateSignup);
 app.delete("/api/events/:event_id/signups", auth_1.authMiddleware, signupsController_1.default.deleteSignup);
 // Google Calendar route
-// app.get("/api/google-calendar/callback", handleGoogleCallback);
+app.get("/api/google-calendar/callback", handleGoogleCallback);
 
 
 // const PORT = process.env.PORT || 3000;

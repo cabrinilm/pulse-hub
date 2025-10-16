@@ -1,8 +1,7 @@
-// src/services/api.ts
 import axios from 'axios';
-import { supabase } from './supabaseClient'; // caso você use para auth
+import { supabase } from './supabaseClient'; 
 
-// URL do seu backend deployado (substitua pelo seu deploy real)
+
 const BACKEND_BASE_URL = 'https://pulse-hub-backend.vercel.app/api';
 
 
@@ -14,9 +13,9 @@ const api = axios.create({
   },
 });
 
-// Interceptor para adicionar token de autenticação (opcional)
+
 api.interceptors.request.use(async (config) => {
-  // Se você estiver usando autenticação via Supabase
+
   const { data: { session } } = await supabase.auth.getSession();
   const token = session?.access_token;
 
@@ -27,12 +26,12 @@ api.interceptors.request.use(async (config) => {
   return config;
 }, (error) => Promise.reject(error));
 
-// Interceptor para tratamento global de erros (ex.: logout em 401)
+
 api.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response?.status === 401) {
-      // Ex.: supabase.auth.signOut(); ou redirecionar para login
+     
     }
     return Promise.reject(error);
   }
