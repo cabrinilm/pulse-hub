@@ -24,7 +24,8 @@ const BackArrow: React.FC<BackArrowProps> = ({ to, animateOnClick = false }) => 
     <button
       onClick={handleBack}
       className={`p-2 rounded-full bg-black/30 backdrop-blur-md shadow-lg
-        hover:bg-black/40 transition-all duration-200
+        hover:bg-black/40 hover:scale-110 cursor-pointer
+        transition-all duration-200
         ${isClicked ? 'scale-90' : 'scale-100'}`}
     >
       <ArrowLeft size={24} className="text-white" />
@@ -33,6 +34,3 @@ const BackArrow: React.FC<BackArrowProps> = ({ to, animateOnClick = false }) => 
 };
 
 export default BackArrow;
-
-
-
