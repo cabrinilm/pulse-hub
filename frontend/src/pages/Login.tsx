@@ -7,6 +7,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import LoginHeader from '../components/LoginHeader';
 import Lottie from 'lottie-react';
 import unlockAnimation from '../lottie/Unlock_lottie.json';
+import emailVerificationAnimation from '../lottie/emailverification_lottie.json';
 
 const Login = () => {
   const [email, setEmail] = useState('');
@@ -16,6 +17,7 @@ const Login = () => {
   const [isForgotPassword, setIsForgotPassword] = useState(false); 
   const [error, setError] = useState('');
   const [isSuccess, setIsSuccess] = useState(false);
+  const [isEmailSent, setIsEmailSent] = useState(false);
 
   const { signIn, signUp, resetPassword } = useAuth(); 
   const navigate = useNavigate();
@@ -36,7 +38,8 @@ const Login = () => {
     try {
       if (isForgotPassword) {
         await resetPassword(email);
-        setIsSuccess(true);
+        setIsEmailSent(true);
+        setTimeout(() => navigate('/', { replace: true }), 3000);
         return;
       }
 
@@ -66,7 +69,7 @@ const Login = () => {
       <LoginHeader onToggleSignup={(value) => setIsSignup(value)} />
 
       <div className="flex flex-1 items-center justify-center px-4 sm:px-0">
-        {!isSuccess && (
+        {!isSuccess && !isEmailSent && (
           <div className="relative z-10 w-full max-w-md bg-white/30 backdrop-blur-md rounded-3xl shadow-2xl border border-white/20 p-8 flex flex-col gap-4">
             <motion.h2
               className="text-3xl font-bold text-white text-center mb-4"
@@ -135,12 +138,11 @@ const Login = () => {
               </motion.form>
             </AnimatePresence>
 
-       
+         
             {!isForgotPassword && !isSignup && (
               <motion.button
                 onClick={() => setIsForgotPassword(true)}
-                className="text-white/70 hover:text-white hover:underline text-sm self-center transition-colors"
-                whileHover={{ scale: 1.05 }}
+                className="text-white/70 hover:text-white hover:underline text-sm self-center transition-colors cursor-pointer"
               >
                 Forgot your password?
               </motion.button>
@@ -149,20 +151,16 @@ const Login = () => {
             {isForgotPassword && (
               <motion.button
                 onClick={() => setIsForgotPassword(false)}
-                className="text-white/70 hover:text-white hover:underline text-sm self-center transition-colors"
-                whileHover={{ scale: 1.05 }}
+                className="text-white/70 hover:text-white hover:underline text-sm self-center transition-colors cursor-pointer"
               >
                 Back to login
               </motion.button>
             )}
 
-           
             {!isForgotPassword && (
               <motion.button
                 onClick={() => setIsSignup(!isSignup)}
-                className="mt-2 text-white/80 hover:text-white hover:underline font-medium transition-colors self-center"
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
+                className="mt-2 text-white/80 hover:text-white hover:underline font-medium transition-colors self-center cursor-pointer"
               >
                 {isSignup
                   ? 'Already have an account? Login'
@@ -172,10 +170,14 @@ const Login = () => {
           </div>
         )}
 
-        {isSuccess && (
+  
+        {(isSuccess || isEmailSent) && (
           <div className="fixed inset-0 z-50 flex items-center justify-center bg-transparent">
             <div className="w-72 h-72">
-              <Lottie animationData={unlockAnimation} loop={false} />
+              <Lottie
+                animationData={isEmailSent ? emailVerificationAnimation : unlockAnimation}
+                loop={false}
+              />
             </div>
           </div>
         )}
