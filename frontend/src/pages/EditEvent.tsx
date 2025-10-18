@@ -77,7 +77,7 @@ const EditEvent = () => {
   if (loading) return <p className="p-4 text-center text-white">Loading...</p>;
 
   return (
-    <div className="flex flex-col p-3 md:p-8 pb-24 md:pb-8 md:ml-[18rem] mt-10 md:mt-16 relative min-h-screen">
+    <div className="flex flex-col p-3 md:p-8 pb-24 md:pb-8 md:ml-[18rem] mt-10 md:mt-6 relative min-h-screen">
       {/* BackArrow Mobile */}
       <div className="md:hidden absolute top-4 left-4 z-10">
         <BackArrow to={previousPage} animateOnClick />
