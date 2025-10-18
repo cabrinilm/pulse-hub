@@ -48,7 +48,6 @@ const ProfileEdit = () => {
       await api.patch('/profile', updates);
       setMessage({ type: 'success', text: 'Profile updated successfully!' });
     } catch (err: any) {
-  
       const errorMsg = err.response?.data?.error?.toLowerCase() || '';
       const isDuplicate = errorMsg.includes('username already exists');
       setMessage({
@@ -63,7 +62,7 @@ const ProfileEdit = () => {
   if (isLoading) return <LoadingOverlay />;
 
   return (
-    <div className="flex flex-col p-3 md:p-8 pb-24 md:pb-8 md:ml-[18rem] mt-14 md:mt-24 relative min-h-screen">
+    <div className="flex flex-col p-3 md:p-8 pb-24 md:pb-8 md:ml-[18rem] mt-14 md:mt-6 relative min-h-screen">
       {/* BackArrow Mobile */}
       <div className="md:hidden absolute top-4 left-4 z-10">
         <BackArrow to={previousPage} animateOnClick />

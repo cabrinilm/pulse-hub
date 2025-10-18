@@ -24,7 +24,6 @@ const Home = () => {
         const res = await api.get<Event[]>('/events');
         const eventData = res.data;
 
-        
         const eventsWithSignups = await Promise.all(
           eventData.map(async (event) => {
             try {
@@ -36,7 +35,6 @@ const Home = () => {
           })
         );
 
-      
         const sortedEvents = eventsWithSignups.sort(
           (a, b) => new Date(a.event_date).getTime() - new Date(b.event_date).getTime()
         );
@@ -52,11 +50,11 @@ const Home = () => {
   }, []);
 
   return (
-    <div className="min-h-screen p-4 md:p-8 pb-20 md:pb-8 md:ml-[18rem] mt-16 md:mt-24">
+    <div className="min-h-screen p-4 md:p-8 pb-20 md:pb-8 md:ml-[18rem] mt-14 md:mt-6">
       <div className="flex flex-col gap-6">
         {nextEvent && (
           <div>
-            <h2 className="text-lg font-semibold mb-2 text-white">Next Event</h2>
+            <h2 className="text-3xl md:text-3xl font-bold mb-2 text-white">Next Event</h2>
             <Card
               title={nextEvent.title}
               date={nextEvent.event_date}
@@ -69,7 +67,7 @@ const Home = () => {
 
         {events.length > 0 && (
           <div>
-            <h2 className="text-lg font-semibold mb-2 text-white">Upcoming Events</h2>
+            <h2 className="text-2xl md:text-2xl font-bold mb-2 text-white">Upcoming Events</h2>
             <div className="flex flex-col gap-4">
               {events.map((event) => (
                 <Card

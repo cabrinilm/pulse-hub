@@ -17,14 +17,14 @@ const Settings = () => {
   const appVersion = '1.0.0';
 
   return (
-    <div className="p-3 md:p-8 pb-24 md:pb-8 md:ml-[18rem] mt-14 md:mt-24 relative">
+    <div className="p-3 md:p-8 pb-24 md:pb-8 md:ml-[18rem] mt-14 md:mt-6 relative">
       {/* BackArrow Mobile */}
       <div className="md:hidden absolute top-4 left-4 z-10">
         <BackArrow to={previousPage} animateOnClick />
       </div>
 
       {/* Header */}
-      <div className="hidden md:flex items-center gap-4 mb-6">
+      <div className="hidden md:flex items-center gap-4 mb-4"> 
         <BackArrow to={previousPage} animateOnClick />
         <h1 className="text-3xl font-bold text-white">Settings</h1>
       </div>
