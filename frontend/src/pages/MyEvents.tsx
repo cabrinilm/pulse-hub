@@ -100,7 +100,7 @@ const MyEvents = () => {
 
       <h1 className="md:hidden text-2xl font-bold mb-4 text-center text-white">My Events</h1>
 
-      {/* Swipeable container para mobile */}
+
       <div {...handlers} className="flex flex-col gap-4 overflow-hidden">
         {paginatedEvents.length > 0 ? (
           paginatedEvents.map((event) => (
@@ -119,7 +119,7 @@ const MyEvents = () => {
         )}
       </div>
 
-      {/* Controles de paginação mobile */}
+    
       {totalPages > 1 && (
         <div className="flex justify-center gap-2 mt-4 md:hidden">
           {Array.from({ length: totalPages }, (_, idx) => (
