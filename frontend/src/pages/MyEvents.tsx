@@ -88,19 +88,22 @@ const MyEvents = () => {
   }
 
   return (
-    <div className="p-4 md:p-8 md:ml-[18rem] mt-14 md:mt-24 relative">
+    <div className="p-4 md:p-8 md:ml-[18rem] mt-14 md:mt-6 relative">
+      {/* BackArrow — Mobile */}
       <div className="md:hidden absolute top-4 left-4 z-10">
         <BackArrow to={previousPage} animateOnClick />
       </div>
 
+      {/* Header — Desktop */}
       <div className="hidden md:flex items-center gap-4 mb-6">
         <BackArrow to={previousPage} animateOnClick />
         <h1 className="text-3xl font-bold text-white">My Events</h1>
       </div>
 
+      {/* Header — Mobile */}
       <h1 className="md:hidden text-2xl font-bold mb-4 text-center text-white">My Events</h1>
 
-
+      {/* Events List */}
       <div {...handlers} className="flex flex-col gap-4 overflow-hidden">
         {paginatedEvents.length > 0 ? (
           paginatedEvents.map((event) => (
@@ -119,7 +122,7 @@ const MyEvents = () => {
         )}
       </div>
 
-    
+      {/* Pagination Dots — Mobile */}
       {totalPages > 1 && (
         <div className="flex justify-center gap-2 mt-4 md:hidden">
           {Array.from({ length: totalPages }, (_, idx) => (
@@ -133,6 +136,7 @@ const MyEvents = () => {
         </div>
       )}
 
+      {/* Create Event Button */}
       <div className="mt-6 flex justify-center md:justify-start">
         <Button
           onClick={() => navigate('/events/create', { state: { from: location.pathname } })}

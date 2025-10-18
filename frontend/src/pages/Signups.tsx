@@ -78,17 +78,22 @@ const Signups = () => {
   }, [totalPages, currentPage]);
 
   return (
-    <div className="p-3 md:p-8 pb-24 md:pb-8 md:ml-[18rem] mt-14 md:mt-24 relative">
+    <div className="p-3 md:p-8 pb-24 md:pb-8 md:ml-[18rem] mt-14 md:mt-6 relative">
+      {/* BackArrow — Mobile */}
       <div className="md:hidden absolute top-4 left-4 z-10">
         <BackArrow to={previousPage} animateOnClick />
       </div>
 
+      {/* Header — Desktop */}
       <div className="hidden md:flex items-center gap-4 mb-6">
         <BackArrow to={previousPage} animateOnClick />
         <h1 className="text-3xl font-bold text-white">My Signups</h1>
       </div>
+
+      {/* Header — Mobile */}
       <h1 className="md:hidden text-2xl font-bold mb-4 text-center text-white">My Signups</h1>
 
+      {/* Signups List */}
       <div {...swipeHandlers} className="flex flex-col gap-6">
         {currentSignups.length === 0 ? (
           <p className="text-white/80 text-center">
@@ -125,6 +130,7 @@ const Signups = () => {
         ))}
       </div>
 
+      {/* Pagination Dots */}
       <div className="fixed bottom-4 left-0 w-full flex justify-center md:static md:mt-6">
         <PaginationDots
           totalPages={totalPages}

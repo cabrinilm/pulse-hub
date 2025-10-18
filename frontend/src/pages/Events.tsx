@@ -78,7 +78,7 @@ const Events = () => {
   }, [totalPages, currentPage]);
 
   return (
-    <div className="min-h-screen p-4 md:p-8 pb-24 md:pb-8 md:ml-[18rem] mt-14 md:mt-24 relative text-white">
+    <div className="min-h-screen p-4 md:p-8 pb-24 md:pb-8 md:ml-[18rem] mt-14 md:mt-6 relative text-white">
       {/* BackArrow — Mobile */}
       <div className="md:hidden absolute top-4 left-4 z-10">
         <BackArrow to={previousPage} animateOnClick />
