@@ -9,6 +9,7 @@ import Button from '../components/Button';
 import BackArrow from '../components/BackArrow';
 import Lottie from 'lottie-react';
 import loadingAnimation from '../lottie/Trail_lottie.json';
+import { useSwipeable } from 'react-swipeable';
 
 interface Event {
   id: string;
@@ -24,9 +25,11 @@ const MyEvents = () => {
   const { user } = useAuth();
   const [events, setEvents] = useState<Event[]>([]);
   const [loading, setLoading] = useState(true);
+  const [currentPage, setCurrentPage] = useState(0);
+  const eventsPerPage = 2;
+
   const navigate = useNavigate();
   const location = useLocation();
-
   const previousPage = location.state?.from || '/';
 
   useEffect(() => {
@@ -55,8 +58,26 @@ const MyEvents = () => {
         setLoading(false);
       }
     };
+
     fetchMyEvents();
   }, [user]);
+
+  const totalPages = Math.ceil(events.length / eventsPerPage);
+
+  const handlers = useSwipeable({
+    onSwipedLeft: () => {
+      if (currentPage < totalPages - 1) setCurrentPage(currentPage + 1);
+    },
+    onSwipedRight: () => {
+      if (currentPage > 0) setCurrentPage(currentPage - 1);
+    },
+    trackMouse: true,
+  });
+
+  const paginatedEvents = events.slice(
+    currentPage * eventsPerPage,
+    currentPage * eventsPerPage + eventsPerPage
+  );
 
   if (loading) {
     return (
@@ -79,9 +100,10 @@ const MyEvents = () => {
 
       <h1 className="md:hidden text-2xl font-bold mb-4 text-center text-white">My Events</h1>
 
-      <div className="flex flex-col gap-4">
-        {events.length > 0 ? (
-          events.map((event) => (
+      {/* Swipeable container para mobile */}
+      <div {...handlers} className="flex flex-col gap-4 overflow-hidden">
+        {paginatedEvents.length > 0 ? (
+          paginatedEvents.map((event) => (
             <Card
               key={event.id}
               title={event.title}
@@ -96,6 +118,20 @@ const MyEvents = () => {
           <p className="text-white/80 text-center">You have not created any events yet.</p>
         )}
       </div>
+
+      {/* Controles de paginação mobile */}
+      {totalPages > 1 && (
+        <div className="flex justify-center gap-2 mt-4 md:hidden">
+          {Array.from({ length: totalPages }, (_, idx) => (
+            <div
+              key={idx}
+              className={`w-3 h-3 rounded-full transition-colors ${
+                idx === currentPage ? 'bg-white' : 'bg-white/40'
+              }`}
+            />
+          ))}
+        </div>
+      )}
 
       <div className="mt-6 flex justify-center md:justify-start">
         <Button
