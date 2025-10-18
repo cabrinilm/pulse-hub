@@ -13,10 +13,11 @@ const Login = () => {
   const [password, setPassword] = useState('');
   const [username, setUsername] = useState('');
   const [isSignup, setIsSignup] = useState(false);
+  const [isForgotPassword, setIsForgotPassword] = useState(false); 
   const [error, setError] = useState('');
   const [isSuccess, setIsSuccess] = useState(false);
 
-  const { signIn, signUp } = useAuth();
+  const { signIn, signUp, resetPassword } = useAuth(); 
   const navigate = useNavigate();
 
   const errorMessages: { [key: string]: string } = {
@@ -33,6 +34,12 @@ const Login = () => {
     setError('');
 
     try {
+      if (isForgotPassword) {
+        await resetPassword(email);
+        setIsSuccess(true);
+        return;
+      }
+
       if (isSignup) {
         await signUp(email, password, username);
       } else {
@@ -66,12 +73,16 @@ const Login = () => {
               initial={{ opacity: 0, y: -10 }}
               animate={{ opacity: 1, y: 0, transition: { duration: 0.5 } }}
             >
-              {isSignup ? 'Sign Up' : 'Login'}
+              {isForgotPassword
+                ? 'Reset Password'
+                : isSignup
+                ? 'Sign Up'
+                : 'Login'}
             </motion.h2>
 
             <AnimatePresence mode="wait">
               <motion.form
-                key={isSignup ? 'signup' : 'login'}
+                key={isForgotPassword ? 'forgot' : isSignup ? 'signup' : 'login'}
                 onSubmit={handleSubmit}
                 className="flex flex-col gap-4 w-full"
                 variants={formVariants}
@@ -86,8 +97,6 @@ const Login = () => {
                     onChange={(e) => setUsername(e.target.value)}
                     placeholder="Username"
                     className="p-3 border border-white/40 rounded-xl w-full bg-white/20 text-white placeholder-white/70 focus:ring-2 focus:ring-blue-400 focus:border-blue-400 transition-colors"
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1, transition: { delay: 0.1 } }}
                   />
                 )}
 
@@ -97,19 +106,17 @@ const Login = () => {
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="Email"
                   className="p-3 border border-white/40 rounded-xl w-full bg-white/20 text-white placeholder-white/70 focus:ring-2 focus:ring-blue-400 focus:border-blue-400 transition-colors"
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1, transition: { delay: 0.2 } }}
                 />
 
-                <motion.input
-                  type="password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  placeholder="Password"
-                  className="p-3 border border-white/40 rounded-xl w-full bg-white/20 text-white placeholder-white/70 focus:ring-2 focus:ring-blue-400 focus:border-blue-400 transition-colors"
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1, transition: { delay: 0.3 } }}
-                />
+                {!isForgotPassword && (
+                  <motion.input
+                    type="password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    placeholder="Password"
+                    className="p-3 border border-white/40 rounded-xl w-full bg-white/20 text-white placeholder-white/70 focus:ring-2 focus:ring-blue-400 focus:border-blue-400 transition-colors"
+                  />
+                )}
 
                 {error && (
                   <p className="text-red-400 text-sm mt-1 text-center">{error}</p>
@@ -119,21 +126,49 @@ const Login = () => {
                   type="submit"
                   className="bg-blue-400 hover:bg-blue-500 text-white px-4 py-3 rounded-xl w-full font-medium transition-all cursor-pointer"
                 >
-                  {isSignup ? 'Sign Up' : 'Login'}
+                  {isForgotPassword
+                    ? 'Send reset link'
+                    : isSignup
+                    ? 'Sign Up'
+                    : 'Login'}
                 </Button>
               </motion.form>
             </AnimatePresence>
 
-            <motion.button
-              onClick={() => setIsSignup(!isSignup)}
-              className="mt-4 text-white/80 hover:text-white hover:underline font-medium transition-colors self-center"
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-            >
-              {isSignup
-                ? 'Already have an account? Login'
-                : 'Create a new account'}
-            </motion.button>
+       
+            {!isForgotPassword && !isSignup && (
+              <motion.button
+                onClick={() => setIsForgotPassword(true)}
+                className="text-white/70 hover:text-white hover:underline text-sm self-center transition-colors"
+                whileHover={{ scale: 1.05 }}
+              >
+                Forgot your password?
+              </motion.button>
+            )}
+
+            {isForgotPassword && (
+              <motion.button
+                onClick={() => setIsForgotPassword(false)}
+                className="text-white/70 hover:text-white hover:underline text-sm self-center transition-colors"
+                whileHover={{ scale: 1.05 }}
+              >
+                Back to login
+              </motion.button>
+            )}
+
+           
+            {!isForgotPassword && (
+              <motion.button
+                onClick={() => setIsSignup(!isSignup)}
+                className="mt-2 text-white/80 hover:text-white hover:underline font-medium transition-colors self-center"
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+              >
+                {isSignup
+                  ? 'Already have an account? Login'
+                  : 'Create a new account'}
+              </motion.button>
+            )}
           </div>
         )}
 

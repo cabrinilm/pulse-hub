@@ -14,6 +14,7 @@ import Login from "./pages/Login";
 import EditEvent from "./pages/EditEvent";
 import CreateEvent from "./pages/CreateEvent";
 import GoogleAuthCallback from "./pages/GoogleAuthCallback";
+import ResetPassword from "./pages/ResetPassword";
 
 function App() {
   return (
@@ -21,6 +22,7 @@ function App() {
       <Router>
         <Routes>
           <Route path="/login" element={<Login />} />
+          <Route path="/reset-password" element={<ResetPassword />} />
           <Route path="/auth/callback" element={<GoogleAuthCallback />} />
 
           <Route
