@@ -1,28 +1,16 @@
-import { useState, useEffect } from 'react';
-import { useSearchParams, useNavigate } from 'react-router-dom';
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { supabase } from '../services/supabaseClient';
 import Button from '../components/Button';
 import { motion, AnimatePresence } from 'framer-motion';
 import AnimatedBackground from '../components/AnimatedBackground';
 
 const ResetPassword = () => {
-  const [searchParams] = useSearchParams();
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
-
-  const token = searchParams.get('token'); 
-  const type = searchParams.get('type');
-
-  useEffect(() => {
-   
-    if (!token || type !== 'recovery') {
-      setError('Invalid reset link. Please request a new one.');
-      setTimeout(() => navigate('/login', { replace: true }), 3000);
-    }
-  }, [token, type, navigate]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -35,8 +23,6 @@ const ResetPassword = () => {
 
     try {
       setLoading(true);
-
-  
       const { error: updateError } = await supabase.auth.updateUser({ password });
       if (updateError) throw updateError;
 
