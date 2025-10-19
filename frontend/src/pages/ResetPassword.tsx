@@ -3,7 +3,7 @@ import { useSearchParams, useNavigate } from 'react-router-dom';
 import { supabase } from '../services/supabaseClient';
 import Button from '../components/Button';
 import { motion, AnimatePresence } from 'framer-motion';
-import AnimatedBackground from '../components/AnimatedBackground'; 
+import AnimatedBackground from '../components/AnimatedBackground';
 
 const ResetPassword = () => {
   const [searchParams] = useSearchParams();
@@ -13,50 +13,37 @@ const ResetPassword = () => {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
+  const token = searchParams.get('token'); 
+  const type = searchParams.get('type');
+
   useEffect(() => {
-    const token = searchParams.get('token');
-    const type = searchParams.get('type');
-  
-    if (token && type === 'recovery') {
-     
-      const verify = async () => {
-        setLoading(true);
-        const { error: verifyError } = await supabase.auth.verifyOtp({
-          token_hash: token,
-          type: 'recovery' as const,
-        });
-        if (verifyError) {
-          setError(verifyError.message || 'Invalid or expired reset link');
-          setTimeout(() => navigate('/login', { replace: true }), 3000);
-        }
-        setLoading(false);
-      };
-      verify(); 
-    } else {
-     
+   
+    if (!token || type !== 'recovery') {
       setError('Invalid reset link. Please request a new one.');
-      setTimeout(() => navigate('/login', { replace: true }), 2000);
+      setTimeout(() => navigate('/login', { replace: true }), 3000);
     }
-  }, [searchParams, navigate]);
+  }, [token, type, navigate]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
 
     if (password.length < 6) {
-      setError('Password must be at least 6 characters');
+      setError('Password must be at least 6 characters.');
       return;
     }
 
     try {
       setLoading(true);
+
+  
       const { error: updateError } = await supabase.auth.updateUser({ password });
       if (updateError) throw updateError;
 
       setSuccess(true);
       setTimeout(() => navigate('/login', { replace: true }), 3000);
     } catch (err: any) {
-      setError(err.message || 'Failed to update password');
+      setError(err.message || 'Failed to update password.');
     } finally {
       setLoading(false);
     }
@@ -70,7 +57,7 @@ const ResetPassword = () => {
 
   return (
     <div className="relative min-h-screen flex flex-col">
-      <AnimatedBackground /> 
+      <AnimatedBackground />
       <div className="flex flex-1 items-center justify-center px-4 sm:px-0">
         <AnimatePresence mode="wait">
           {!success ? (
@@ -90,12 +77,19 @@ const ResetPassword = () => {
               </motion.h2>
 
               {error && (
-                <motion.p className="text-red-400 text-sm text-center" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+                <motion.p
+                  className="text-red-400 text-sm text-center"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                >
                   {error}
                 </motion.p>
               )}
 
-              <motion.form onSubmit={handleSubmit} className="flex flex-col gap-4">
+              <motion.form
+                onSubmit={handleSubmit}
+                className="flex flex-col gap-4"
+              >
                 <motion.input
                   type="password"
                   value={password}
@@ -124,7 +118,9 @@ const ResetPassword = () => {
               animate="visible"
               exit="exit"
             >
-              <p className="text-green-500 text-lg">Password updated! Redirecting to login...</p>
+              <p className="text-green-500 text-lg">
+                Password updated! Redirecting to login...
+              </p>
             </motion.div>
           )}
         </AnimatePresence>
