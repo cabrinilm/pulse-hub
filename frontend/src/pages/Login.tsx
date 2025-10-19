@@ -1,45 +1,45 @@
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../hooks/useAuth';
-import AnimatedBackground from '../components/AnimatedBackground';
-import Button from '../components/Button';
-import { motion, AnimatePresence } from 'framer-motion';
-import LoginHeader from '../components/LoginHeader';
-import Lottie from 'lottie-react';
-import unlockAnimation from '../lottie/Unlock_lottie.json';
-import emailVerificationAnimation from '../lottie/emailverification_lottie.json';
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "../hooks/useAuth";
+import AnimatedBackground from "../components/AnimatedBackground";
+import Button from "../components/Button";
+import { motion, AnimatePresence } from "framer-motion";
+import LoginHeader from "../components/LoginHeader";
+import Lottie from "lottie-react";
+import unlockAnimation from "../lottie/Unlock_lottie.json";
+import emailVerificationAnimation from "../lottie/emailverification_lottie.json";
 
 const Login = () => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [username, setUsername] = useState('');
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [username, setUsername] = useState("");
   const [isSignup, setIsSignup] = useState(false);
-  const [isForgotPassword, setIsForgotPassword] = useState(false); 
-  const [error, setError] = useState('');
+  const [isForgotPassword, setIsForgotPassword] = useState(false);
+  const [error, setError] = useState("");
   const [isSuccess, setIsSuccess] = useState(false);
   const [isEmailSent, setIsEmailSent] = useState(false);
 
-  const { signIn, signUp, resetPassword } = useAuth(); 
+  const { signIn, signUp, resetPassword } = useAuth();
   const navigate = useNavigate();
 
   const errorMessages: { [key: string]: string } = {
-    'missing email or phone': 'Missing email or password',
-    'Invalid login credentials': 'Invalid email or password',
-    'User already registered': 'User already registered',
-    'Email not confirmed': 'Please confirm your email before logging in',
-    'Too many requests': 'Too many attempts – try again in a few minutes',
-    default: 'Authentication error. Please try again.',
+    "missing email or phone": "Missing email or password",
+    "Invalid login credentials": "Invalid email or password",
+    "User already registered": "User already registered",
+    "Email not confirmed": "Please confirm your email before logging in",
+    "Too many requests": "Too many attempts – try again in a few minutes",
+    default: "Authentication error. Please try again.",
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError('');
+    setError("");
 
     try {
       if (isForgotPassword) {
         await resetPassword(email);
         setIsEmailSent(true);
-        setTimeout(() => navigate('/', { replace: true }), 3000);
+        setTimeout(() => navigate("/", { replace: true }), 3000);
         return;
       }
 
@@ -50,7 +50,7 @@ const Login = () => {
       }
 
       setIsSuccess(true);
-      setTimeout(() => navigate('/', { replace: true }), 3000);
+      setTimeout(() => navigate("/", { replace: true }), 3000);
     } catch (err: any) {
       const customError = errorMessages[err.message] || errorMessages.default;
       setError(customError);
@@ -77,15 +77,17 @@ const Login = () => {
               animate={{ opacity: 1, y: 0, transition: { duration: 0.5 } }}
             >
               {isForgotPassword
-                ? 'Reset Password'
+                ? "Reset Password"
                 : isSignup
-                ? 'Sign Up'
-                : 'Login'}
+                  ? "Sign Up"
+                  : "Login"}
             </motion.h2>
 
             <AnimatePresence mode="wait">
               <motion.form
-                key={isForgotPassword ? 'forgot' : isSignup ? 'signup' : 'login'}
+                key={
+                  isForgotPassword ? "forgot" : isSignup ? "signup" : "login"
+                }
                 onSubmit={handleSubmit}
                 className="flex flex-col gap-4 w-full"
                 variants={formVariants}
@@ -122,7 +124,9 @@ const Login = () => {
                 )}
 
                 {error && (
-                  <p className="text-red-400 text-sm mt-1 text-center">{error}</p>
+                  <p className="text-red-400 text-sm mt-1 text-center">
+                    {error}
+                  </p>
                 )}
 
                 <Button
@@ -130,15 +134,14 @@ const Login = () => {
                   className="bg-blue-400 hover:bg-blue-500 text-white px-4 py-3 rounded-xl w-full font-medium transition-all cursor-pointer"
                 >
                   {isForgotPassword
-                    ? 'Send reset link'
+                    ? "Send reset link"
                     : isSignup
-                    ? 'Sign Up'
-                    : 'Login'}
+                      ? "Sign Up"
+                      : "Login"}
                 </Button>
               </motion.form>
             </AnimatePresence>
 
-         
             {!isForgotPassword && !isSignup && (
               <motion.button
                 onClick={() => setIsForgotPassword(true)}
@@ -163,21 +166,32 @@ const Login = () => {
                 className="mt-2 text-white/80 hover:text-white hover:underline font-medium transition-colors self-center cursor-pointer"
               >
                 {isSignup
-                  ? 'Already have an account? Login'
-                  : 'Create a new account'}
+                  ? "Already have an account? Login"
+                  : "Create a new account"}
               </motion.button>
             )}
           </div>
         )}
 
-  
         {(isSuccess || isEmailSent) && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-transparent">
-            <div className="w-72 h-72">
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+            <div className="w-72 h-72 flex flex-col items-center">
               <Lottie
-                animationData={isEmailSent ? emailVerificationAnimation : unlockAnimation}
+                animationData={
+                  isEmailSent ? emailVerificationAnimation : unlockAnimation
+                }
                 loop={false}
               />
+              {isEmailSent && (
+                <p className="text-white text-center mt-2">
+                  Check your email for the reset link!
+                </p>
+              )}
+              {isSuccess && (
+                <p className="text-white text-center mt-2">
+                  Welcome! Redirecting...
+                </p>
+              )}
             </div>
           </div>
         )}
