@@ -1,42 +1,40 @@
 # Pulse Hub
 
-Pulse Hub is a full-stack application for managing events, profiles, and signups. The project is structured as a monorepo with a Node.js/Express/TypeScript backend and a React/Vite frontend using Tailwind CSS for styling. This guide provides step-by-step instructions to run the project locally.
+Full-stack event management platform where users can create, manage, and RSVP to events.
 
-## Overview
+## Live Demo
 
-- **Backend**: Handles authentication (Supabase + Google OAuth), events, profiles, and signups.
-- **Frontend**: React app built with Vite and Tailwind CSS for UI/UX.
-- **Database/Auth**: Supabase (PostgreSQL + Auth).
-- **Key Features**: User login, event creation/listing, profile management, Google OAuth for calendar sync.
+Frontend: https://pulse-hub-frontend.vercel.app  
+Backend: https://pulse-hub-backend.vercel.app
+
+## Tech Stack
+
+- Frontend: React, TypeScript, Vite, Tailwind CSS
+- Backend: Node.js, Express, TypeScript
+- Database/Auth: Supabase (PostgreSQL + Auth)
+- Integrations: Google OAuth / Google Calendar
+
+## Features
+
+- User authentication with Supabase and Google OAuth
+- Event creation and event listing
+- RSVP and signup management
+- Profile management
+- Google Calendar integration
+- Responsive UI
 
 The local setup runs the backend on `http://localhost:3000` and frontend on `http://localhost:5173`.
 
----
-
-## Hosted Online
-
-- **Frontend**: [https://pulse-hub-frontend.vercel.app](https://pulse-hub-frontend.vercel.app)  
-- **Backend**: [https://pulse-hub-backend.vercel.app](https://pulse-hub-backend.vercel.app)
-
----
-
 ## Prerequisites
 
-- **Node.js**: Version 18+ (recommended: 20.x). Download from [nodejs.org](https://nodejs.org).
-- **npm**: Version 9+ (comes with Node.js).
-- **Git**: For cloning the repo.
-- **Browser**: Modern browser (Chrome/Firefox) for testing.
-- **Accounts/Services**:
-  - [Supabase](https://supabase.com) account (free tier).
-  - [Google Cloud Console](https://console.cloud.google.com) for OAuth credentials.
-- **Optional**: Vercel CLI (`npm i -g vercel`) for local emulation; Jest for running tests.
+- Node.js (v18+)
+- npm
+- Supabase account
+- Google OAuth credentials
 
-Verify Node/npm:
-```bash
-node --version  # Should be >=18
-npm --version   # Should be >=9
+## Project Structure
 
-
+```text
 pulse-hub/
 ├── backend/              # Node.js/Express/TypeScript API
 │   ├── src/              # Source code (controllers, models, services)
@@ -54,51 +52,31 @@ pulse-hub/
 ├── .env.example          # Template for env vars
 ├── .gitignore
 └── README.md
-
 ```
-## Installation & Running Locally
 
-### Clone the repository
+## Installation
+
 ```bash
-git clone https://github.com/yourusername/pulse-hub.git
+git clone https://github.com/cabrinilm/pulse-hub.git
 cd pulse-hub
 
-
-```
-
-### Install backend dependencies
-```bash
+# Backend
 cd backend
 npm install
-
-```
-
-### Start backend server (default port: 3000)
-```bash
 npm run build && npm start
 
-```
-
-### In a new terminal, install frontend dependencies
-```bash
+# Frontend
 cd ../frontend
 npm install
-
-```
-
-### Start frontend server (default port: 3000)
-```bash
 npm run dev
-
 ```
 
-## Setup Environment Variables
+## Environment Variables
 
-Copy `.env.example` to `.env` in both `backend/` and `frontend/` (create separate files if needed). Fill in the values.
+Create `.env` files in both `backend/` and `frontend/` using `.env.example` as a reference.
 
-### Backend `.env` (in `backend/`)
+### Backend
 
-Required for Supabase, Google OAuth, and local redirects:
 ```bash
 SUPABASE_URL=your_supabase_project_url
 SUPABASE_ANON_KEY=your_supabase_anon_key
@@ -106,76 +84,25 @@ GOOGLE_CLIENT_ID=your_google_client_id
 GOOGLE_CLIENT_SECRET=your_google_client_secret
 GOOGLE_REDIRECT_URI=http://localhost:3001/api/google-calendar/callback
 FRONTEND_URL=http://localhost:5173
-
-
 ```
 
+### Frontend
 
-
-### Frontend `.env` (in `frontend/` – prefixed with `VITE_` for Vite)
 ```bash
 VITE_SUPABASE_URL=your_supabase_project_url
 VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
 VITE_GOOGLE_CLIENT_ID=your_google_client_id
 VITE_API_URL=http://localhost:3000
-
 ```
 
-**Notes**:
-- Use `http://localhost:3001` for backend API in local dev.
-- No Stripe or other services used.
+## External Services
 
+- Supabase (PostgreSQL + Authentication)
+- Google OAuth for calendar integration
 
-## External Services Setup
+## Running Tests Backend
 
-### Supabase (Database & Auth)
-
-1. **Sign Up**: Go to [supabase.com](https://supabase.com) and create a free account (email or GitHub).
-2. **Create Project**:
-   - Click "New Project".
-   - Choose an organization (default is fine).
-   - Name: `pulse-hub-local` (or similar).
-   - Region: Closest to you (e.g., US East).
-   - Password: Set a strong DB password (save it).
-   - Click "Create new project" (takes ~2 min).
-3. **Get Keys & URL**:
-   - Go to Settings > API.
-   - Copy `Project URL` (e.g., `https://abc123.supabase.co`) to `SUPABASE_URL`.
-   - Under "Project API keys", copy `anon public` to `SUPABASE_ANON_KEY`.
-4. **Enable Auth Providers**:
-   - Go to Authentication > Providers > Enable "Google".
-   - Add your Google Client ID/Secret (from next section).
-5. **Test**: In Supabase dashboard > SQL Editor, run a query like `SELECT now();` to confirm connection.
-
-### Google OAuth
-
-1. **Create Credentials**:
-   - Go to [Google Cloud Console](https://console.cloud.google.com) > Select/Create project `pulse-hub`.
-   - APIs & Services > Credentials > Create Credentials > OAuth 2.0 Client IDs.
-   - Application type: Web application.
-   - Name: `Pulse Hub Local`.
-   - Authorized redirect URIs: Add `http://localhost:3001/api/google-calendar/callback`.
-   - Click Create – copy Client ID and Secret.
-2. **Update in Env**: Paste into backend/frontend `.env` as above.
-3. **Scopes** (if needed): In Google Console > OAuth consent screen, add scopes like `https://www.googleapis.com/auth/calendar` for Google Calendar integration.
-
-
-
-## Running Tests (Backend)
 ```bash
 cd backend
 npm test
-
 ```
-
-
-
-
-
-
-
-
-
-
-
-
